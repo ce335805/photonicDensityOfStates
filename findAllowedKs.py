@@ -75,7 +75,7 @@ def extremalPoints(L, omega, eps, N, mode):
     if(mode == "TE" or mode == "TM"):
         upperBound = omega / consts.c
     elif(mode == "TEEva"):
-        upperBound = np.sqrt(eps - 1) * omega / consts.c
+        upperBound = np.sqrt(eps - 1.) * omega / consts.c
 
     intervals = np.zeros((N, 2))
     lowerBounds = np.linspace(0, upperBound, N, endpoint=False)
@@ -117,6 +117,9 @@ def computeRootsGivenExtrema(L, omega, eps, extrema, mode):
         #    continue
         tempRoot = scipy.optimize.root_scalar(rootFunc, args = (L, omega, eps), bracket=tuple(intervals[rootInd, :]))
         roots[rootInd] = tempRoot.root
+
+    if(roots[0] == 0.):
+        return roots[1:]
 
     return roots
 

@@ -47,7 +47,7 @@ mpl.rcParams['text.latex.preamble'] = [
 
 def dosFuncBoxOverFreeTE(z, kArr, L, omega, eps):
     c = consts.c
-    epsNorm = 1.
+    epsNorm = eps
     kD = np.sqrt((eps - 1) * omega ** 2 / c ** 2 + kArr[None, :] ** 2)
     prefac = 2. * np.pi * c / omega / L
 
@@ -60,7 +60,7 @@ def dosFuncBoxOverFreeTE(z, kArr, L, omega, eps):
 
 def dosFuncBoxNegOverFreeTE(z, kArr, L, omega, eps):
     c = consts.c
-    epsNorm = 1.
+    epsNorm = eps
     kD = np.sqrt((eps - 1) * omega ** 2 / c ** 2 + kArr[None, :] ** 2)
     prefac = 2. * np.pi * c / omega / L
 
@@ -101,6 +101,8 @@ def dosFuncBoxNegOverFreeTM(z, kArr, L, omega, eps):
     dos = prefac * num / denom
     dosSummed = np.sum(dos, axis=1)
     return dosSummed
+
+
 def computeDosBoxTE(z, L, omega, eps):
 
     #Factor of 10 for more points and a +17 to avoid special numbers

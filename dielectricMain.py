@@ -21,6 +21,9 @@ import dosFresnel
 import findAllowedKs
 import dosBox
 import evanescentWavefunction
+import dosEvanescent
+import TEWaveFunction
+import TMWaveFunctions
 
 fontsize = 8
 
@@ -65,7 +68,7 @@ def plotDos(zArr, dos):
 
     plt.savefig("./savedPlots/dosFresnel.png")
 
-def plotDosCompare(zArr, dos1, dos2):
+def plotDosCompare(zArr, dos1, dos2, eps):
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
@@ -74,8 +77,10 @@ def plotDosCompare(zArr, dos1, dos2):
 
     ax.plot(zArr, dos1, color='peru', lw=1., label = "DOS from Box")
     ax.plot(zArr, dos2, color='teal', lw=1., label = "DOS from Fresnel")
+    ax.plot(zArr, dos1 + dos2, color='coral', lw=1., label = "DOS from Fresnel")
     ax.axhline(0.5, lw = 0.5, color = 'gray', zorder = -666)
-    ax.axhline(0.25, lw = 0.5, color = 'gray')
+    ax.axhline(0.5 * np.sqrt(eps)**3, lw = 0.5, color = 'gray')
+    ax.axhline(0.5 * np.sqrt(eps)**1, lw = 0.5, color = 'gray')
 
     ax.axvline(0., lw = 0.5, color = 'gray')
 
@@ -125,20 +130,22 @@ def boxDosFromIntegral(zArr, L, omega, eps, c):
 def main():
     #computeDosFromFresnel()
 
-    evanescentWavefunction.createPlotEva()
-    exit()
+    #evanescentWavefunction.createPlotEva()
+    #TEWaveFunction.createPlotTE()
+    TMWaveFunctions.createPlotTM()
+    #exit()
 
-    epsilon = 2.
+    epsilon = 1.5
     omega = 2 * 1e11
     c = 3 * 1e8
-    L = 10.
+    L = 0.2
 
-    zArr = np.linspace(-c / omega * 20., c / omega * 40., 1000)
+    zArr = np.linspace(-c / omega * 50., c / omega * 20., 1000)
 
     dosInBoxTE = dosBox.computeDosBoxTE(zArr, L, omega, epsilon)
-    dosInBoxTM = dosBox.computeDosBoxTM(zArr, L, omega, epsilon)
-    print(dosInBoxTE[900])
-    print(dosInBoxTM[900])
-    plotDosCompare(zArr, dosInBoxTE, dosInBoxTM)
+    #dosInBoxTM = dosBox.computeDosBoxTM(zArr, L, omega, epsilon)
+    dosTEEva = dosEvanescent.computeDosTEEva(zArr, L, omega, epsilon)
+
+    plotDosCompare(zArr, dosInBoxTE, dosTEEva, epsilon)
 
 main()
