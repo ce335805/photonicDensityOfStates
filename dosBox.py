@@ -47,7 +47,7 @@ mpl.rcParams['text.latex.preamble'] = [
 
 def dosFuncBoxOverFreeTE(z, kArr, L, omega, eps):
     c = consts.c
-    epsNorm = eps
+    epsNorm = 1.
     kD = np.sqrt((eps - 1) * omega ** 2 / c ** 2 + kArr[None, :] ** 2)
     prefac = 2. * np.pi * c / omega / L
 
@@ -60,7 +60,7 @@ def dosFuncBoxOverFreeTE(z, kArr, L, omega, eps):
 
 def dosFuncBoxNegOverFreeTE(z, kArr, L, omega, eps):
     c = consts.c
-    epsNorm = eps
+    epsNorm = 1.
     kD = np.sqrt((eps - 1) * omega ** 2 / c ** 2 + kArr[None, :] ** 2)
     prefac = 2. * np.pi * c / omega / L
 
@@ -77,15 +77,17 @@ def dosFuncBoxOverFreeTM(z, kArr, L, omega, eps):
     kD = np.sqrt((eps - 1) * omega ** 2 / c ** 2 + kArr[None, :] ** 2)
     prefac = 2. * np.pi * c / omega / L
 
-    num1 = kArr[None, :]**2 * c**2 / omega **2 * np.sin(kArr[None, :] * (L / 2. - z[:, None])) ** 2
-    num2 = (1. - kArr[None, :]**2 * c**2 / omega **2) * np.cos(kArr[None, :] * (L / 2. - z[:, None])) ** 2
+
+    num1 = np.sin(kArr[None, :] * (L / 2. - z[:, None])) ** 2
+    num2 = (omega**2 / consts.c**2 / kArr[None, :]**2 - 1) * np.cos(kArr[None, :] * (L / 2. - z[:, None])) ** 2
     num = (num1 + num2) * np.sin( kD * L / 2.) ** 2
-    denom = np.sin(kD * L / 2.) ** 2 + epsNorm * np.sin(kArr[None, :] * L / 2.) ** 2
+    normDenom1 = omega**2 / consts.c**2 / kArr[None, :]**2 *  np.sin(kD * L / 2.) ** 2
+    normDenom2 = eps * omega**2 / consts.c**2 / kD**2 * epsNorm * np.sin(kArr[None, :] * L / 2.) ** 2
+    denom = normDenom1 + normDenom2
 
     dos = prefac * num / denom
     dosSummed = np.sum(dos, axis=1)
     return dosSummed
-
 
 def dosFuncBoxNegOverFreeTM(z, kArr, L, omega, eps):
     c = consts.c
@@ -93,10 +95,13 @@ def dosFuncBoxNegOverFreeTM(z, kArr, L, omega, eps):
     kD = np.sqrt((eps - 1) * omega ** 2 / c ** 2 + kArr[None, :] ** 2)
     prefac = 2. * np.pi * c / omega / L
 
-    num1 = kD**2 * c**2 / omega **2 * np.sin(kD * (L / 2. - z[:, None])) ** 2
-    num2 = (1. - kD**2 * c**2 / omega **2) * np.cos(kD * (L / 2. - z[:, None])) ** 2
+
+    num1 = np.sin(kD * (L / 2. + z[:, None])) ** 2
+    num2 = (eps * omega**2 / consts.c**2 / kD**2 - 1) * np.cos(kD * (L / 2. + z[:, None])) ** 2
     num = (num1 + num2) * np.sin( kArr[None, :] * L / 2.) ** 2
-    denom = np.sin(kD * L / 2.) ** 2 + epsNorm * np.sin(kArr[None, :] * L / 2.) ** 2
+    normDenom1 = omega**2 / consts.c**2 / kArr[None, :]**2 *  np.sin(kD * L / 2.) ** 2
+    normDenom2 = eps * omega**2 / consts.c**2 / kD**2 * epsNorm * np.sin(kArr[None, :] * L / 2.) ** 2
+    denom = normDenom1 + normDenom2
 
     dos = prefac * num / denom
     dosSummed = np.sum(dos, axis=1)

@@ -96,7 +96,7 @@ def findKsTE(L, omega, eps):
     extremaTE = findAllowedKs.extremalPoints(L, omega, eps, NDiscrete, "TE")
     #findAllowedKs.plotRootFuncWithExtrema(L, omega, eps, extremaTEEva, "TEEva")
     rootsTE = findAllowedKs.computeRootsGivenExtrema(L, omega, eps, extremaTE, "TE")
-    print("Number of roots for TEEva found = {}".format(rootsTE.shape))
+    print("Number of roots for TEE found = {}".format(rootsTE.shape))
     #findAllowedKs.plotRootFuncWithRoots(L, omega, eps, rootsTEEva, "TEEva")
     return rootsTE
 

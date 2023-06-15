@@ -59,10 +59,16 @@ def rootFuncTM(k, L, omega, eps):
     return term1 + term2
 
 def rootFuncTEEva(kD, L, omega, eps):
-    kReal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2)
+    kReal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2 + 1e-6)
     term1 = kD * np.tanh(kReal * L / 2) * np.cos(kD * L / 2)
     term2 = kReal * np.sin(kD * L / 2)
     return term1 + term2
+
+def rootFuncTMEva(kD, L, omega, eps):
+    kReal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2 + 1e-6)
+    term1 = eps * kReal * np.tanh(kReal * L / 2) * np.cos(kD * L / 2)
+    term2 = kD * np.sin(kD * L / 2)
+    return term1 - term2
 
 def extremalPoints(L, omega, eps, N, mode):
     rootFunc = rootFuncTE
@@ -70,11 +76,13 @@ def extremalPoints(L, omega, eps, N, mode):
         rootFunc = rootFuncTM
     elif(mode == "TEEva"):
         rootFunc = rootFuncTEEva
+    elif (mode == "TMEva"):
+        rootFunc = rootFuncTMEva
 
     upperBound = 0
     if(mode == "TE" or mode == "TM"):
         upperBound = omega / consts.c
-    elif(mode == "TEEva"):
+    elif(mode == "TEEva" or mode == "TMEva"):
         upperBound = np.sqrt(eps - 1.) * omega / consts.c
 
     intervals = np.zeros((N, 2))
@@ -82,6 +90,9 @@ def extremalPoints(L, omega, eps, N, mode):
     upperBounds = np.linspace(0, upperBound, N, endpoint=False) + lowerBounds[1]
     intervals[:, 0] = lowerBounds
     intervals[:, 1] = upperBounds
+    if(mode == "TEEva"):
+        print("upperBound = {}".format(upperBound))
+        print("upperInterval = {}".format(intervals[-1, 1]))
     extrema = np.zeros(0)
     prevMaxatMaxInd = False#something to include maxima that are on boundaries of intervals
     for n in range(N):
@@ -104,6 +115,14 @@ def computeRootsGivenExtrema(L, omega, eps, extrema, mode):
         rootFunc = rootFuncTM
     elif(mode == "TEEva"):
         rootFunc = rootFuncTEEva
+    elif (mode == "TMEva"):
+        rootFunc = rootFuncTMEva
+
+    upperBound = 0
+    if(mode == "TE" or mode == "TM"):
+        upperBound = omega / consts.c
+    elif(mode == "TEEva" or mode == "TMEva"):
+        upperBound = np.sqrt(eps - 1.) * omega / consts.c
 
     nRoots = len(extrema)
     roots = np.zeros(nRoots)
@@ -111,6 +130,8 @@ def computeRootsGivenExtrema(L, omega, eps, extrema, mode):
     intervals[0, :] = np.array([0, extrema[0]])
     intervals[1:, 0] = extrema[:-1]
     intervals[1:, 1] = extrema[1:]
+    if(rootFunc(extrema[-1], L, omega, eps) * rootFunc(upperBound - 1e-6, L, omega, eps) < 0):
+        intervals = np.append(intervals, np.array([[extrema[-1], upperBound - 1e-6]]), axis = 0)
     for rootInd, root in enumerate(roots):
         #not always a root between two adjacent extrema
         #if(rootFunc(intervals[rootInd, 0], L, omega, eps) * rootFunc(intervals[rootInd, 1], L, omega, eps) > 0):
@@ -129,12 +150,20 @@ def plotRootFuncWithExtrema(L, omega, eps, extrema, mode):
         rootFunc = rootFuncTM
     elif(mode == "TEEva"):
         rootFunc = rootFuncTEEva
+    elif (mode == "TMEva"):
+        rootFunc = rootFuncTMEva
+
+
+    upperBound = 0
+    if(mode == "TE" or mode == "TM"):
+        upperBound = omega / consts.c
+    elif(mode == "TEEva" or mode == "TMEva"):
+        upperBound = np.sqrt(eps - 1.) * omega / consts.c
 
     c = consts.c
 
-    kArr = np.linspace(0., 1.1 * omega / c, 1000)
+    kArr = np.linspace(0., upperBound - 1e-6, 1000)
     rootFuncVals = rootFunc(kArr, L, omega, eps)
-    rootFuncValsEps1 = rootFunc(kArr, L, omega, 1.)
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
@@ -145,7 +174,6 @@ def plotRootFuncWithExtrema(L, omega, eps, extrema, mode):
         ax.axvline(extrema, color = 'gray', lw = 0.5)
 
     ax.plot(kArr, rootFuncVals, color='indianred', lw=0.8)
-    ax.plot(kArr, rootFuncValsEps1, color='teal', lw=0.8, linestyle = '--')
     ax.set_xlim(np.amin(kArr), np.amax(kArr))
 
 
@@ -160,12 +188,20 @@ def plotRootFuncWithRoots(L, omega, eps, roots, mode):
         rootFunc = rootFuncTM
     elif(mode == "TEEva"):
         rootFunc = rootFuncTEEva
+    elif (mode == "TMEva"):
+        rootFunc = rootFuncTMEva
+
+    upperBound = 0
+    if(mode == "TE" or mode == "TM"):
+        upperBound = omega / consts.c
+    elif(mode == "TEEva" or mode == "TMEva"):
+        upperBound = np.sqrt(eps - 1.) * omega / consts.c
 
     c = consts.c
 
     print("omega / c = {}".format(omega / c))
 
-    kArr = np.linspace(0., 1.1 * omega / c, 1000)
+    kArr = np.linspace(0., upperBound - 1e-6, 1000)
     rootFuncVals = rootFunc(kArr, L, omega, eps)
     #rootFuncValsEps1 = rootFunc(kArr, L, omega, 1., c)
 

@@ -12,6 +12,8 @@ import matplotlib.colors
 import h5py
 from matplotlib import gridspec
 from matplotlib.patches import ConnectionPatch
+
+import TMEvaWaveFunction
 import complexIntegral
 import scipy.integrate as integrate
 import scipy.optimize as opt
@@ -20,8 +22,9 @@ import scipy
 import dosFresnel
 import findAllowedKs
 import dosBox
-import evanescentWavefunction
-import dosEvanescent
+import TEEvaWaveFunction
+import dosEvanescentTE
+import dosEvanescentTM
 import TEWaveFunction
 import TMWaveFunctions
 
@@ -77,10 +80,10 @@ def plotDosCompare(zArr, dos1, dos2, eps):
 
     ax.plot(zArr, dos1, color='peru', lw=1., label = "DOS from Box")
     ax.plot(zArr, dos2, color='teal', lw=1., label = "DOS from Fresnel")
-    ax.plot(zArr, dos1 + dos2, color='coral', lw=1., label = "DOS from Fresnel")
+    #ax.plot(zArr, dos1 + dos2, color='coral', lw=1., label = "DOS from Fresnel")
     ax.axhline(0.5, lw = 0.5, color = 'gray', zorder = -666)
     ax.axhline(0.5 * np.sqrt(eps)**3, lw = 0.5, color = 'gray')
-    ax.axhline(0.5 * np.sqrt(eps)**1, lw = 0.5, color = 'gray')
+    #ax.axhline(0.5 * np.sqrt(eps)**1, lw = 0.5, color = 'gray')
 
     ax.axvline(0., lw = 0.5, color = 'gray')
 
@@ -96,6 +99,46 @@ def plotDosCompare(zArr, dos1, dos2, eps):
     #legend.get_frame().set_linewidth(0.0)
 
     plt.savefig("./savedPlots/dosCompare.png")
+
+def plotDosTotal(zArr, dos1, dos2, dos3, dos4, eps):
+
+    fig = plt.figure(figsize=(3., 2.5), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.8, bottom=0.25, left=0.18, right=0.96)
+    ax = plt.subplot(gs[0, 0])
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+
+    ax.plot(zArr, dos1, color=cmapPink(0.2), lw=1., label = "TE free")
+    ax.plot(zArr, dos3, color=cmapPink(0.5), lw=1., label = "TE evanescent")
+    ax.plot(zArr, dos1 + dos3, color=cmapPink(0.7), lw=1., label = "TE added")
+    ax.plot(zArr, dos2, color=cmapBone(0.2), lw=1., label = "TM free")
+    ax.plot(zArr, dos4, color=cmapBone(0.5), lw=1., label = "TM evanescent")
+    ax.plot(zArr, dos2 + dos4, color=cmapBone(0.7), lw=1., label = "TM added")
+    #ax.plot(zArr, dos1 + dos2, color='coral', lw=1., label = "DOS from Fresnel")
+    ax.axhline(0.5, lw = 0.5, color = 'gray', zorder = -666)
+    ax.axhline(0.5 * np.sqrt(eps)**3, lw = 0.5, color = 'gray')
+    #ax.axhline(0.5 * np.sqrt(eps)**1, lw = 0.5, color = 'gray')
+
+    ax.axvline(0., lw = 0.5, color = 'gray')
+
+    ax.set_xlim(np.amin(zArr), np.amax(zArr))
+    #ax.set_ylim(0., 0.69)
+
+    ax.set_yticks([0., 0.5, 1., 0.5 * np.sqrt(eps)**3])
+    ax.set_yticklabels([r"$0$", r"$0.5$", r"$1$", r"$\frac{\sqrt{\varepsilon}^3}{2}$"])
+
+    ax.set_xlabel(r"$z[\frac{c}{\omega}]$")
+    ax.set_ylabel(r"$\rho / \rho_0$")
+
+    legend = ax.legend(fontsize=fontsize, loc='lower left', bbox_to_anchor=(-0.1, 0.95), edgecolor='black', ncol=2)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    plt.savefig("./savedPlots/dosTotal.png")
+
 
 
 def boxDosFromIntegralIntegrand(kVal, z, L, omega, eps, c):
@@ -130,22 +173,29 @@ def boxDosFromIntegral(zArr, L, omega, eps, c):
 def main():
     #computeDosFromFresnel()
 
-    #evanescentWavefunction.createPlotEva()
-    #TEWaveFunction.createPlotTE()
-    TMWaveFunctions.createPlotTM()
-    #exit()
+    #TEEvaWaveFunction.createPlotEva()
+    #TMEvaWaveFunction.createPlotTM()
+    TEWaveFunction.createPlotTE()
+    #TMWaveFunctions.createPlotTM()
+    exit()
 
-    epsilon = 1.5
-    omega = 2 * 1e11
+    epsilon = 1.0001
+    omega = 1 * 1e11
     c = 3 * 1e8
-    L = 0.2
+    L = 20.
 
-    zArr = np.linspace(-c / omega * 50., c / omega * 20., 1000)
+    zArr = np.linspace(-c / omega * 50., c / omega * 10., 1000)
 
     dosInBoxTE = dosBox.computeDosBoxTE(zArr, L, omega, epsilon)
-    #dosInBoxTM = dosBox.computeDosBoxTM(zArr, L, omega, epsilon)
-    dosTEEva = dosEvanescent.computeDosTEEva(zArr, L, omega, epsilon)
+    dosInBoxTM = dosBox.computeDosBoxTM(zArr, L, omega, epsilon)
+    dosTEEva = dosEvanescentTE.computeDosTEEva(zArr, L, omega, epsilon)
+    dosTMEva = dosEvanescentTM.computeDosTMEva(zArr, L, omega, epsilon)
 
-    plotDosCompare(zArr, dosInBoxTE, dosTEEva, epsilon)
+    #plotDosCompare(zArr, dosTEEva, dosTMEva, epsilon)
+
+    plotDosTotal(zArr, dosInBoxTE, dosInBoxTM, dosTEEva, dosTMEva, epsilon)
+
+
+#plotDosCompare(zArr, dosInBoxTE, dosInBoxTM, epsilon)
 
 main()

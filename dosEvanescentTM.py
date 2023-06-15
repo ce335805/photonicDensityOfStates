@@ -45,28 +45,39 @@ mpl.rcParams['text.latex.preamble'] = [
 ]
 
 
+def XBracket(kDArr, L, omega, eps, epsNorm):
+    kArr = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kDArr[None, :] ** 2)
+    term1 = np.sin(kDArr * L / 2)**2 * omega**2 / consts.c**2 / kArr**2 * (1 + (1 + 2 * consts.c**2 * kArr **2 / omega**2) * np.sinh(kArr * L) / kArr / L)
+    #term1 = np.sin(kDArr * L / 2)**2 * omega**2 / consts.c**2 / kArr**2
+    term2 = epsNorm * np.sinh(kArr * L / 2)**2 * eps * omega ** 2 / consts.c**2 / kDArr**2 * (1 + (1 - 2 * consts.c**2 * kDArr**2 / eps / omega**2) * np.sin(kDArr**2 * L) / kDArr / L)
+    #term2 = epsNorm * np.sinh(kArr * L / 2)**2 * eps * omega ** 2 / consts.c**2 / kDArr**2
+    return term1 + term2
 
-def dosEvaPosTE(zArr, kDArr, L, omega, eps):
+def dosEvaPosTM(zArr, kDArr, L, omega, eps):
     c = consts.c
-    epsNorm = eps
+    epsNorm = 1.
     kArr = np.sqrt((eps - 1) * omega ** 2 / c ** 2 - kDArr[None, :] ** 2)
     prefac = 2. * eps * np.pi * c / omega / L
 
-    num = np.sin(kDArr * L / 2.)**2 * np.sinh(kArr * (L / 2 - zArr[:, None]))**2
-    denom = (np.sinh(kArr * L) / (kArr * L) - 1) * np.sin(kDArr[None, :] * L / 2.)**2 + epsNorm * (1 - np.sin(kDArr * L) / (kDArr * L)) * np.sinh(kArr * L / 2.)**2
+    num1 = np.sinh(kArr * (L / 2 - zArr[:, None]))**2
+    num2 = (omega**2 / consts.c**2 / kArr**2 - 1.) * np.cosh(kArr * (L / 2 - zArr[:, None]))**2
+    num = np.sin(kDArr * L / 2.)**2 * (num1 + num2)
+    denom = XBracket(kDArr, L, omega, eps, epsNorm)
 
     dos = prefac * num / denom
     dosSummed = np.sum(dos, axis=1)
     return dosSummed
 
-def dosEvaNegTE(zArr, kDArr, L, omega, eps):
+def dosEvaNegTM(zArr, kDArr, L, omega, eps):
     c = consts.c
-    epsNorm = eps
+    epsNorm = 1.
     kArr = np.sqrt((eps - 1) * omega ** 2 / c ** 2 - kDArr[None, :] ** 2)
     prefac = 2. * eps * np.pi * c / omega / L
 
-    num = np.sinh(kArr * L / 2.)**2 * np.sin(kDArr * (L / 2 + zArr[:, None]))**2
-    denom = (np.sinh(kArr * L) / (kArr * L) - 1) * np.sin(kDArr[None, :] * L / 2.)**2 + epsNorm * np.sinh(kArr * L / 2.)**2
+    num1 = np.sin(kDArr * (L / 2 + zArr[:, None]))**2
+    num2 = (eps * omega**2 / consts.c**2 / kDArr[None, :]**2 - 1.) * np.cos(kDArr * (L / 2 + zArr[:, None]))**2
+    num = np.sinh(kArr * L / 2.)**2 * (num1 + num2)
+    denom = XBracket(kDArr, L, omega, eps, epsNorm)
 
     dos = prefac * num / denom
     dosSummed = np.sum(dos, axis=1)
@@ -74,17 +85,17 @@ def dosEvaNegTE(zArr, kDArr, L, omega, eps):
 
 
 
-def computeDosTEEva(z, L, omega, eps):
+def computeDosTMEva(z, L, omega, eps):
 
     #Factor of 10 for more points and a +17 to avoid special numbers
     NDiscrete = 10 * int(omega / consts.c * L / (4. * np.pi) + 17)
     print("NDiscrete = {}".format(NDiscrete))
 
-    extremaTEEva = findAllowedKs.extremalPoints(L, omega, eps, NDiscrete, "TEEva")
-    findAllowedKs.plotRootFuncWithExtrema(L, omega, eps, extremaTEEva, "TEEva")
-    rootsTEEva = findAllowedKs.computeRootsGivenExtrema(L, omega, eps, extremaTEEva, "TEEva")
-    print("Number of roots for TEEva found = {}".format(rootsTEEva.shape))
-    findAllowedKs.plotRootFuncWithRoots(L, omega, eps, rootsTEEva, "TEEva")
+    extremaTMEva = findAllowedKs.extremalPoints(L, omega, eps, NDiscrete, "TMEva")
+    findAllowedKs.plotRootFuncWithExtrema(L, omega, eps, extremaTMEva, "TMEva")
+    rootsTMEva = findAllowedKs.computeRootsGivenExtrema(L, omega, eps, extremaTMEva, "TMEva")
+    print("Number of roots for TMEva found = {}".format(rootsTMEva.shape))
+    findAllowedKs.plotRootFuncWithRoots(L, omega, eps, rootsTMEva, "TMEva")
 
     #exit()
 
@@ -93,8 +104,8 @@ def computeDosTEEva(z, L, omega, eps):
     zPosArr = z[indPos]
     zNegArr = z[indNeg]
 
-    dosTEEvaPos = dosEvaPosTE(zPosArr, rootsTEEva, L, omega, eps)
-    dosTEEvaNeg = dosEvaNegTE(zNegArr, rootsTEEva, L, omega, eps)
-    dosTEEva = np.append(dosTEEvaNeg, dosTEEvaPos)
-    return dosTEEva
+    dosTMEvaPos = dosEvaPosTM(zPosArr, rootsTMEva, L, omega, eps)
+    dosTMEvaNeg = dosEvaNegTM(zNegArr, rootsTMEva, L, omega, eps)
+    dosTMEva = np.append(dosTMEvaNeg, dosTMEvaPos)
+    return dosTMEva
 

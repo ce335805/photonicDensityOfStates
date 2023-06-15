@@ -48,6 +48,7 @@ mpl.rcParams['text.latex.preamble'] = [
 def NormSqr(kD, L, omega, eps):
     epsNorm = 1.
     kReal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2)
+
     denom = np.sinh(kReal * L / 2.) ** 2 * np.sin(kD * L / 2) ** 2
     bracket = (np.sinh(kReal * L) / (kReal * L) - 1) * np.sin(kD * L / 2.)**2 + epsNorm * (1 - np.sin(kD * L) / (kD * L)) * np.sinh(kReal * L / 2.) ** 2
     return L ** 3 / 4 * bracket / denom
@@ -56,6 +57,7 @@ def NormSqr(kD, L, omega, eps):
 def waveFunctionPos(zArr, kD, L, omega, eps):
     NSqr = NormSqr(kD, L, omega, eps)
     kReal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2)
+
     func = - 1. / np.tanh(kReal * L / 2.) * np.sinh(kReal * zArr) + np.cosh(kReal * zArr)
     return 1. / np.sqrt(NSqr) * func
 
