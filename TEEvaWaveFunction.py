@@ -88,6 +88,12 @@ def waveFunctionForInt(z, k, L, omega, eps):
     else:
         return (waveFunctionNeg(z, k, L, omega, eps))**2
 
+def waveFunctionScalarProduct(z, k1, k2, L, omega, eps):
+    if (z >= 0):
+        return waveFunctionPos(z, k1, L, omega, eps) * waveFunctionPos(z, k2, L, omega, eps)
+    else:
+        return waveFunctionNeg(z, k1, L, omega, eps) * waveFunctionNeg(z, k2, L, omega, eps)
+
 def findKsEva(L, omega, eps):
     #Factor of 10 for more points and a +17 to avoid special numbers
     NDiscrete = 10 * int(omega / consts.c * L / (4. * np.pi) + 17)
@@ -112,6 +118,18 @@ def checkNormalizations(L, omega, eps):
     for kVal in allowedKs[:10]:
         checkNormalizationK(kVal, L, omega, eps)
 
+def orthonormalityIntegral(k1, k2, L, omega, eps):
+    checkInt = integrate.quad(waveFunctionScalarProduct, -L / 2., L / 2., args=(k1, k2, L, omega, eps))
+    return checkInt[0] * L**2
+
+def checkOrthonormality(L, omega, eps):
+    allowedKs = findKsEva(L, omega, eps)
+    scalarProducts = np.zeros((len(allowedKs), len(allowedKs)))
+    for k1Ind, k1Val in enumerate(allowedKs):
+        for k2Ind, k2Val in enumerate(allowedKs):
+            scalarProducts[k1Ind, k2Ind] = orthonormalityIntegral(k1Val, k2Val, L, omega, eps)
+
+    return scalarProducts
 
 def plotWaveFunction(kDArr, zArr, L, omega, eps):
 
@@ -143,16 +161,19 @@ def plotWaveFunction(kDArr, zArr, L, omega, eps):
 def createPlotEva():
 
     epsilon = 2.
-    omega = 2 * 1e11
+    omega = 1 * 1e11
     c = 3 * 1e8
     L = 0.05
 
     checkNormalizations(L, omega, epsilon)
+    scalarProducts = checkOrthonormality(L, omega, epsilon)
+
+    print(scalarProducts)
 
     zArr = np.linspace(-c / omega * 40., c / omega * 20., 1000)
     zArr = np.linspace(- L / 2., L / 2., 1000)
 
     allowedKs = findKsEva(L, omega, epsilon)
 
-    plotWaveFunction(allowedKs[0:5], zArr, L, omega, epsilon)
+    plotWaveFunction(allowedKs[:], zArr, L, omega, epsilon)
 

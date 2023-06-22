@@ -57,7 +57,7 @@ def dosEvaPosTM(zArr, kDArr, L, omega, eps):
     c = consts.c
     epsNorm = 1.
     kArr = np.sqrt((eps - 1) * omega ** 2 / c ** 2 - kDArr[None, :] ** 2)
-    prefac = 2. * eps * np.pi * c / omega / L
+    prefac = 2. * np.pi * c / omega / L
 
     num1 = np.sinh(kArr * (L / 2 - zArr[:, None]))**2
     num2 = (omega**2 / consts.c**2 / kArr**2 - 1.) * np.cosh(kArr * (L / 2 - zArr[:, None]))**2

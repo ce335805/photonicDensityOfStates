@@ -59,10 +59,11 @@ def rootFuncTM(k, L, omega, eps):
     return term1 + term2
 
 def rootFuncTEEva(kD, L, omega, eps):
-    kReal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2 + 1e-6)
+    kReal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2 + 1e-8)
     term1 = kD * np.tanh(kReal * L / 2) * np.cos(kD * L / 2)
     term2 = kReal * np.sin(kD * L / 2)
     return term1 + term2
+
 
 def rootFuncTMEva(kD, L, omega, eps):
     kReal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2 + 1e-6)

@@ -44,16 +44,25 @@ mpl.rcParams['text.latex.preamble'] = [
     #    r'\everymath={\sf}'
 ]
 
-
-
 def dosEvaPosTE(zArr, kDArr, L, omega, eps):
     c = consts.c
     epsNorm = 1.
     kArr = np.sqrt((eps - 1) * omega ** 2 / c ** 2 - kDArr[None, :] ** 2)
-    prefac = 2. * eps * np.pi * c / omega / L
+    prefac = 2. * np.pi * c / omega / L
 
-    num = np.sin(kDArr * L / 2.)**2 * np.sinh(kArr * (L / 2 - zArr[:, None]))**2
-    denom = (np.sinh(kArr * L) / (kArr * L) - 1) * np.sin(kDArr[None, :] * L / 2.)**2 + epsNorm * (1 - np.sin(kDArr * L) / (kDArr * L)) * np.sinh(kArr * L / 2.)**2
+    #num = np.sin(kDArr[None, :] * L / 2.)**2 * np.sinh(kArr * (L / 2 - zArr[:, None]))**2
+    #denom = (np.sinh(kArr * L) / (kArr * L) - 1) * np.sin(kDArr[None, :] * L / 2.)**2 + epsNorm * (1. - np.sin(kDArr[None, :] * L) / (kDArr[None, :] * L)) * np.sinh(kArr * L / 2.)**2
+
+    #num = np.sin(kDArr[None, :] * L / 2.) ** 2 * np.cosh(kArr * L / 2)**2 * (np.cosh(kArr * zArr) * np.tanh(kArr * L / 2) - np.sinh(kArr * zArr)) ** 2
+    #denom = (np.sinh(kArr * L) / (kArr * L) - 1) * np.sin(kDArr[None, :] * L / 2.) ** 2 + epsNorm * (
+    #            1. - np.sin(kDArr[None, :] * L) / (kDArr[None, :] * L)) * np.sinh(kArr * L / 2.) ** 2
+
+    num = np.sin(kDArr[None, :] * L / 2.) ** 2 * (np.cosh(kArr * zArr[:, None]) * np.tanh(kArr * L / 2) - np.sinh(kArr * zArr[:, None])) ** 2
+    #denom = (np.sinh(kArr * L) / (kArr * L) - 1) * np.sin(kDArr[None, :] * L / 2.) ** 2 + epsNorm * (
+    #            1. - np.sin(kDArr[None, :] * L) / (kDArr[None, :] * L)) * np.sinh(kArr * L / 2.) ** 2
+
+    denom = ((1 - np.exp(- 2. * kArr * L)) / ((1 + np.exp(-kArr * L)) ** 2 * kArr * L)) * np.sin(
+        kDArr[None, :] * L / 2.) ** 2 + epsNorm * (1. - np.sin(kDArr[None, :] * L) / (kDArr[None, :] * L)) * np.tanh(kArr * L / 2)**2
 
     dos = prefac * num / denom
     dosSummed = np.sum(dos, axis=1)
@@ -66,8 +75,14 @@ def dosEvaNegTE(zArr, kDArr, L, omega, eps):
 
     prefac = 2. * eps * np.pi * c / omega / L
 
-    num = np.sinh(kArr * L / 2.)**2 * np.sin(kDArr * (L / 2 + zArr[:, None]))**2
-    denom = (np.sinh(kArr * L) / (kArr * L) - 1) * np.sin(kDArr[None, :] * L / 2.)**2 + epsNorm * np.sinh(kArr * L / 2.)**2
+    #num = np.sinh(kArr * L / 2.)**2 * np.sin(kDArr[None, :] * (L / 2 + zArr[:, None]))**2
+    #denom = (np.sinh(kArr * L) / (kArr * L) - 1) * np.sin(kDArr[None, :] * L / 2.)**2 + epsNorm * (1. - np.sin(kDArr[None, :] * L) / (kDArr[None, :] * L)) * np.sinh(kArr * L / 2.)**2
+    num = np.sin(kDArr[None, :] * (L / 2 + zArr[:, None])) ** 2
+    #denom = (np.sinh(kArr * L) / (kArr * L) - 1) * np.sin(kDArr[None, :] * L / 2.) ** 2 / np.sinh(kArr * L / 2.) ** 2 + epsNorm * (
+    #            1. - np.sin(kDArr[None, :] * L) / (kDArr[None, :] * L))
+
+    #denom = ((1 - np.exp(- 2. * kArr * L)) / ( (1 - np.exp(-kArr * L))**2 * kArr * L) - 1. / np.sinh(kArr * L / 2.) ** 2) * np.sin(kDArr[None, :] * L / 2.) ** 2 + epsNorm * (1. - np.sin(kDArr[None, :] * L) / (kDArr[None, :] * L))
+    denom = ((1 - np.exp(- 2. * kArr * L)) / ( (1 - np.exp(-kArr * L))**2 * kArr * L)) * np.sin(kDArr[None, :] * L / 2.) ** 2 + epsNorm * (1. - np.sin(kDArr[None, :] * L) / (kDArr[None, :] * L))
 
     dos = prefac * num / denom
     dosSummed = np.sum(dos, axis=1)
@@ -78,7 +93,7 @@ def dosEvaNegTE(zArr, kDArr, L, omega, eps):
 def computeDosTEEva(z, L, omega, eps):
 
     #Factor of 10 for more points and a +17 to avoid special numbers
-    NDiscrete = 10 * int(omega / consts.c * L / (4. * np.pi) + 17)
+    NDiscrete = 170 * int(omega / consts.c * L / (4. * np.pi) + 17)
     print("NDiscrete = {}".format(NDiscrete))
 
     extremaTEEva = findAllowedKs.extremalPoints(L, omega, eps, NDiscrete, "TEEva")

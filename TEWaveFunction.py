@@ -49,7 +49,8 @@ def NormSqr(kVal, L, omega, eps):
     epsNorm = 1.
     kDVal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 + kVal ** 2)
     denom = np.sin(kVal * L / 2.) ** 2 * np.sin(kDVal * L / 2) ** 2
-    bracket = epsNorm * (1 - np.sin(kDVal * L) / (kDVal * L)) * np.sin(kVal * L / 2.) ** 2 + (1 - np.sin(kVal * L) / (kVal * L)) * np.sin(kDVal * L / 2.) ** 2
+    bracket = epsNorm * (1 - np.sin(kDVal * L) / (kDVal * L)) * np.sin(kVal * L / 2.) ** 2 + (
+                1 - np.sin(kVal * L) / (kVal * L)) * np.sin(kDVal * L / 2.) ** 2
     return L ** 3 / 4 * bracket / denom
 
 
@@ -66,9 +67,7 @@ def waveFunctionNeg(zArr, kVal, L, omega, eps):
     return 1. / np.sqrt(NSqr) * func
 
 
-
 def waveFunctionTE(zArr, kArr, L, omega, eps):
-
     indNeg = np.where(zArr < 0)
     indPos = np.where(zArr >= 0)
     zPosArr = zArr[indPos]
@@ -81,40 +80,60 @@ def waveFunctionTE(zArr, kArr, L, omega, eps):
 
     return wF
 
-def waveFunctionForInt(z, k, L, omega, eps):
 
-    if(z >= 0):
-        return (waveFunctionPos(z, k, L, omega, eps))**2
+def waveFunctionForInt(z, k, L, omega, eps):
+    if (z >= 0):
+        return (waveFunctionPos(z, k, L, omega, eps)) ** 2
     else:
-        return (waveFunctionNeg(z, k, L, omega, eps))**2
+        return eps * (waveFunctionNeg(z, k, L, omega, eps)) ** 2
+
+
+def waveFunctionScalarProduct(z, k1, k2, L, omega, eps):
+    if (z >= 0):
+        return waveFunctionPos(z, k1, L, omega, eps) * waveFunctionPos(z, k2, L, omega, eps)
+    else:
+        return waveFunctionNeg(z, k1, L, omega, eps) * waveFunctionNeg(z, k2, L, omega, eps)
+
 
 def findKsTE(L, omega, eps):
-    #Factor of 10 for more points and a +17 to avoid special numbers
+    # Factor of 10 for more points and a +17 to avoid special numbers
     NDiscrete = 10 * int(omega / consts.c * L / (4. * np.pi) + 17)
     print("NDiscrete = {}".format(NDiscrete))
 
     extremaTE = findAllowedKs.extremalPoints(L, omega, eps, NDiscrete, "TE")
-    #findAllowedKs.plotRootFuncWithExtrema(L, omega, eps, extremaTEEva, "TEEva")
+    # findAllowedKs.plotRootFuncWithExtrema(L, omega, eps, extremaTEEva, "TEEva")
     rootsTE = findAllowedKs.computeRootsGivenExtrema(L, omega, eps, extremaTE, "TE")
     print("Number of roots for TEE found = {}".format(rootsTE.shape))
-    #findAllowedKs.plotRootFuncWithRoots(L, omega, eps, rootsTEEva, "TEEva")
+    # findAllowedKs.plotRootFuncWithRoots(L, omega, eps, rootsTEEva, "TEEva")
     return rootsTE
 
-def checkNormalizationK(k, L, omega, eps):
 
+def checkNormalizationK(k, L, omega, eps):
     checkInt = integrate.quad(waveFunctionForInt, -L / 2., L / 2., args=(k, L, omega, eps))
-    print("Norm = {}, with Int accuracy = {}".format(checkInt[0] * L**2, checkInt[1]))
+    print("Norm = {}, with Int accuracy = {}".format(checkInt[0] * L ** 2, checkInt[1]))
+
 
 def checkNormalizations(L, omega, eps):
     allowedKs = findKsTE(L, omega, eps)
-    if(allowedKs[0] == 0):
-        allowedKs = allowedKs[1:]
     for kVal in allowedKs[:10]:
         checkNormalizationK(kVal, L, omega, eps)
 
 
-def plotWaveFunction(kDArr, zArr, L, omega, eps):
+def orthonormalityIntegral(k1, k2, L, omega, eps):
+    checkInt = integrate.quad(waveFunctionScalarProduct, -L / 2., L / 2., args=(k1, k2, L, omega, eps))
+    return checkInt[0] * L**2
 
+def checkOrthonormality(L, omega, eps):
+    allowedKs = findKsTE(L, omega, eps)
+    scalarProducts = np.zeros((len(allowedKs), len(allowedKs)))
+    for k1Ind, k1Val in enumerate(allowedKs):
+        for k2Ind, k2Val in enumerate(allowedKs):
+            scalarProducts[k1Ind, k2Ind] = orthonormalityIntegral(k1Val, k2Val, L, omega, eps)
+
+    return scalarProducts
+
+
+def plotWaveFunction(kDArr, zArr, L, omega, eps):
     wF = np.zeros((kDArr.shape[0], zArr.shape[0]), dtype=float)
 
     for kDInd, kDVal in enumerate(kDArr):
@@ -130,8 +149,8 @@ def plotWaveFunction(kDArr, zArr, L, omega, eps):
         color = cmapPink(kDInd / (wF.shape[0] + 0.5))
         ax.plot(zArr, wF[kDInd, :], color=color, lw=1.)
 
-    ax.axhline(0, lw = 0.5, color = 'gray')
-    ax.axvline(0, lw = 0.5, color = 'gray')
+    ax.axhline(0, lw=0.5, color='gray')
+    ax.axvline(0, lw=0.5, color='gray')
 
     ax.set_xlim(np.amin(zArr), np.amax(zArr))
 
@@ -143,20 +162,22 @@ def plotWaveFunction(kDArr, zArr, L, omega, eps):
 
     plt.savefig("./savedPlots/wFTE.png")
 
-def createPlotTE():
 
+def createPlotTE():
     epsilon = 2.
-    omega = 2 * 1e11
+    omega = 1 * 1e11
     c = 3 * 1e8
-    L = 0.05
+    L = 0.1
 
     checkNormalizations(L, omega, epsilon)
+    orthomat = checkOrthonormality(L, omega, epsilon)
+
+    print(orthomat)
 
     zArr = np.linspace(-c / omega * 40., c / omega * 20., 1000)
     zArr = np.linspace(- L / 2., L / 2., 1000)
 
     allowedKs = findKsTE(L, omega, epsilon)
 
-    print(allowedKs[0 : 10])
-    plotWaveFunction(allowedKs[1:5], zArr, L, omega, epsilon)
-
+    print(allowedKs)
+    plotWaveFunction(allowedKs[:], zArr, L, omega, epsilon)

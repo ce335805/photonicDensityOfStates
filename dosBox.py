@@ -62,7 +62,7 @@ def dosFuncBoxNegOverFreeTE(z, kArr, L, omega, eps):
     c = consts.c
     epsNorm = 1.
     kD = np.sqrt((eps - 1) * omega ** 2 / c ** 2 + kArr[None, :] ** 2)
-    prefac = 2. * np.pi * c / omega / L
+    prefac = 2. * eps * np.pi * c / omega / L
 
     num = np.sin(kD * (L / 2. + z[:, None])) ** 2 * np.sin( kArr[None, :] * L / 2.) ** 2
     denom = np.sin(kD * L / 2.) ** 2 + epsNorm * np.sin(kArr[None, :] * L / 2.) ** 2
@@ -93,7 +93,7 @@ def dosFuncBoxNegOverFreeTM(z, kArr, L, omega, eps):
     c = consts.c
     epsNorm = 1.
     kD = np.sqrt((eps - 1) * omega ** 2 / c ** 2 + kArr[None, :] ** 2)
-    prefac = 2. * np.pi * c / omega / L
+    prefac = 2. * eps * np.pi * c / omega / L
 
 
     num1 = np.sin(kD * (L / 2. + z[:, None])) ** 2
@@ -111,7 +111,7 @@ def dosFuncBoxNegOverFreeTM(z, kArr, L, omega, eps):
 def computeDosBoxTE(z, L, omega, eps):
 
     #Factor of 10 for more points and a +17 to avoid special numbers
-    NDiscrete = 10 * int(omega / consts.c * L / (4. * np.pi) + 17)
+    NDiscrete = 17 * int(omega / consts.c * L / (4. * np.pi) + 17)
     print("NDiscrete = {}".format(NDiscrete))
 
     extremaTE = findAllowedKs.extremalPoints(L, omega, eps, NDiscrete, "TE")

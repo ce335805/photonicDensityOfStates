@@ -17,7 +17,7 @@ import TMEvaWaveFunction
 import complexIntegral
 import scipy.integrate as integrate
 import scipy.optimize as opt
-import scipy
+import scipy.constants as consts
 
 import dosFresnel
 import findAllowedKs
@@ -80,7 +80,7 @@ def plotDosCompare(zArr, dos1, dos2, eps):
 
     ax.plot(zArr, dos1, color='peru', lw=1., label = "DOS from Box")
     ax.plot(zArr, dos2, color='teal', lw=1., label = "DOS from Fresnel")
-    #ax.plot(zArr, dos1 + dos2, color='coral', lw=1., label = "DOS from Fresnel")
+    ax.plot(zArr, dos1 + dos2, color='coral', lw=1., label = "DOS from Fresnel")
     ax.axhline(0.5, lw = 0.5, color = 'gray', zorder = -666)
     ax.axhline(0.5 * np.sqrt(eps)**3, lw = 0.5, color = 'gray')
     #ax.axhline(0.5 * np.sqrt(eps)**1, lw = 0.5, color = 'gray')
@@ -175,24 +175,28 @@ def main():
 
     #TEEvaWaveFunction.createPlotEva()
     #TMEvaWaveFunction.createPlotTM()
-    TEWaveFunction.createPlotTE()
+    #TEWaveFunction.createPlotTE()
     #TMWaveFunctions.createPlotTM()
-    exit()
+    #exit()
 
-    epsilon = 1.0001
+    epsilon = 2.
     omega = 1 * 1e11
-    c = 3 * 1e8
-    L = 20.
+    L = 1.
 
-    zArr = np.linspace(-c / omega * 50., c / omega * 10., 1000)
+    zArr = np.linspace(-consts.c / omega * 20., consts.c / omega * 20., 1000)
+    #zArr = np.linspace(- L / 2., L / 2., 1000)
+
 
     dosInBoxTE = dosBox.computeDosBoxTE(zArr, L, omega, epsilon)
     dosInBoxTM = dosBox.computeDosBoxTM(zArr, L, omega, epsilon)
     dosTEEva = dosEvanescentTE.computeDosTEEva(zArr, L, omega, epsilon)
     dosTMEva = dosEvanescentTM.computeDosTMEva(zArr, L, omega, epsilon)
 
-    #plotDosCompare(zArr, dosTEEva, dosTMEva, epsilon)
 
+
+    #plotDosCompare(zArr, dosInBoxTE, dosTEEva, epsilon)
+    #plotDosCompare(zArr, dosInBoxTE, dosInBoxTE, epsilon)
+    #plotDosCompare(zArr, dosTEEva, dosTMEva, epsilon)
     plotDosTotal(zArr, dosInBoxTE, dosInBoxTM, dosTEEva, dosTMEva, epsilon)
 
 
