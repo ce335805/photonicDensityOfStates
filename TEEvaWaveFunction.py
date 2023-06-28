@@ -46,7 +46,7 @@ mpl.rcParams['text.latex.preamble'] = [
 
 
 def NormSqr(kD, L, omega, eps):
-    epsNorm = 1.
+    epsNorm = eps
     kReal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2)
 
     denom = np.sinh(kReal * L / 2.) ** 2 * np.sin(kD * L / 2) ** 2

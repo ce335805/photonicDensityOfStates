@@ -175,9 +175,9 @@ def main():
 
     #TEEvaWaveFunction.createPlotEva()
     #TMEvaWaveFunction.createPlotTM()
-    #TEWaveFunction.createPlotTE()
+    TEWaveFunction.createPlotTE()
     #TMWaveFunctions.createPlotTM()
-    #exit()
+    exit()
 
     epsilon = 2.
     omega = 1 * 1e11

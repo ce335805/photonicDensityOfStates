@@ -54,17 +54,30 @@ def NormSqr(kVal, L, omega, eps):
     return L ** 3 / 4 * bracket / denom
 
 
-def waveFunctionPos(zArr, kVal, L, omega, eps):
-    NSqr = NormSqr(kVal, L, omega, eps)
-    func = - 1. / np.tan(kVal * L / 2.) * np.sin(kVal * zArr) + np.cos(kVal * zArr)
-    return 1. / np.sqrt(NSqr) * func
+#def waveFunctionPos(zArr, kVal, L, omega, eps):
+#    NSqr = NormSqr(kVal, L, omega, eps)
+#    func = - 1. / np.tan(kVal * L / 2.) * np.sin(kVal * zArr) + np.cos(kVal * zArr)
+#    return 1. / np.sqrt(NSqr) * func
 
+def waveFunctionPos(zArr, kVal, L, omega, eps):
+    #NSqr = NormSqr(kVal, L, omega, eps)
+    kDVal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 + kVal ** 2)
+    func = - np.sin(kVal * (L / 2 - zArr)) * np.sin(kDVal * L / 2.)
+    #return 1. / np.sqrt(NSqr) * func
+    return func
+
+#def waveFunctionNeg(zArr, kVal, L, omega, eps):
+#    NSqr = NormSqr(kVal, L, omega, eps)
+#    kDVal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 + kVal ** 2)
+#    func = 1. / np.tan(kDVal * L / 2.) * np.sin(kDVal * zArr) + np.cos(kDVal * zArr)
+#    return 1. / np.sqrt(NSqr) * func
 
 def waveFunctionNeg(zArr, kVal, L, omega, eps):
-    NSqr = NormSqr(kVal, L, omega, eps)
+    #NSqr = NormSqr(kVal, L, omega, eps)
     kDVal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 + kVal ** 2)
-    func = 1. / np.tan(kDVal * L / 2.) * np.sin(kDVal * zArr) + np.cos(kDVal * zArr)
-    return 1. / np.sqrt(NSqr) * func
+    func = np.sin(kDVal * (L / 2. + zArr)) * np.sin(kVal * L / 2.)
+    #return 1. / np.sqrt(NSqr) * func
+    return func
 
 
 def waveFunctionTE(zArr, kArr, L, omega, eps):
@@ -92,7 +105,13 @@ def waveFunctionScalarProduct(z, k1, k2, L, omega, eps):
     if (z >= 0):
         return waveFunctionPos(z, k1, L, omega, eps) * waveFunctionPos(z, k2, L, omega, eps)
     else:
-        return waveFunctionNeg(z, k1, L, omega, eps) * waveFunctionNeg(z, k2, L, omega, eps)
+        return eps * waveFunctionNeg(z, k1, L, omega, eps) * waveFunctionNeg(z, k2, L, omega, eps)
+
+def waveFunctionScalarProductPos(z, k1, k2, L, omega, eps):
+    return waveFunctionPos(z, k1, L, omega, eps) * waveFunctionPos(z, k2, L, omega, eps)
+
+def waveFunctionScalarProductNeg(z, k1, k2, L, omega, eps):
+    return waveFunctionNeg(z, k1, L, omega, eps) * waveFunctionNeg(z, k2, L, omega, eps)
 
 
 def findKsTE(L, omega, eps):
@@ -120,8 +139,11 @@ def checkNormalizations(L, omega, eps):
 
 
 def orthonormalityIntegral(k1, k2, L, omega, eps):
-    checkInt = integrate.quad(waveFunctionScalarProduct, -L / 2., L / 2., args=(k1, k2, L, omega, eps))
-    return checkInt[0] * L**2
+    #checkInt = integrate.quad(waveFunctionScalarProduct, -L / 2., L / 2., args=(k1, k2, L, omega, eps))
+    checkIntPos = integrate.quad(waveFunctionScalarProductPos, 0., L/ 2., args=(k1, k2, L, omega, eps))
+    checkIntNeg = integrate.quad(waveFunctionScalarProductNeg, -L/2, 0., args=(k1, k2, L, omega, eps))
+
+    return (checkIntPos[0] + eps * checkIntNeg[0]) * L**2
 
 def checkOrthonormality(L, omega, eps):
     allowedKs = findKsTE(L, omega, eps)
@@ -167,7 +189,7 @@ def createPlotTE():
     epsilon = 2.
     omega = 1 * 1e11
     c = 3 * 1e8
-    L = 0.1
+    L = 0.05
 
     checkNormalizations(L, omega, epsilon)
     orthomat = checkOrthonormality(L, omega, epsilon)

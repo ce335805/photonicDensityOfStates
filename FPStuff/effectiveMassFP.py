@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 from scipy.integrate import quad
+import math
 
 from matplotlib import ticker
 from matplotlib.colors import LogNorm
@@ -69,10 +70,17 @@ def plotEffectiveMassIntegrad(L, omArr):
     ax.set_xscale("log")
 
     ax.set_xlabel(r"$\omega \, [\frac{1}{s}]$")
-    ax.set_ylabel(r"$\rho / \rho_0$")
+    ax.set_ylabel(r"$ \frac{d}{d \Lambda} (\Delta t / t_0)$")
 
     plt.savefig("./FPStuff/FPPlotsSaved/integrandEffMass.png")
 
+def smoothenFunction(data):
+    smoothDegree = math.floor(len(data) * 0.0002)
+    smoothDegree = 0
+    smoothData = data
+    for smoothD in np.arange(smoothDegree):
+        smoothData += np.roll(data, -smoothD + 1) + np.roll(data, smoothD + 1)
+    return smoothData / (2 * smoothDegree + 1)
 
 
 def diffIntegrand(L, omArr):
@@ -84,7 +92,8 @@ def diffIntegrand(L, omArr):
     print("computed Dos in FP")
     prefac = 2. * consts.fine_structure * alat**2 * omArr / 3. / np.pi / consts.c**2
     toInt = prefac * (dosFPAsOfOm / dosFree - 1)
-    #toInt = omArr * (dosFPAsOfOm / dosFree - 1)
+    #toInt = np.sqrt(omArr)**2 * (dosFPAsOfOm / dosFree - 1)
+    toInt = smoothenFunction(toInt)
 
     return toInt
 
