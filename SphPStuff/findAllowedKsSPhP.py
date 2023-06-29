@@ -13,10 +13,16 @@ def rootFuncTE(k, L, omega, wLO, wTO, epsInf):
     term2 = kD * np.cos(kD * L / 2.) * np.sin(k * L / 2.)
     return  term1 + term2
 
-def rootFuncTEEva(kD, L, omega, eps):
-    kReal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2 + 1e-8)
-    term1 = kD * np.tanh(kReal * L / 2) * np.cos(kD * L / 2)
-    term2 = kReal * np.sin(kD * L / 2)
+def rootFuncTEEva(k, L, omega, wLO, wTO, epsInf):
+    kD = epsFunc.kDFromKEva(k, omega, wLO, wTO, epsInf)
+    term1 = k * np.sin(kD * L / 2)
+    term2 = kD * np.cos(kD * L / 2) * np.tanh(k * L / 2)
+    return term1 + term2
+
+def rootFuncTERes(k, L, omega, wLO, wTO, epsInf):
+    kD = epsFunc.kDFromKRes(k, omega, wLO, wTO, epsInf)
+    term1 = k * np.cos(k * L / 2) * np.tanh(kD * L / 2)
+    term2 = kD * np.sin(k * L / 2)
     return term1 + term2
 
 def rootFuncTM(k, L, omega, eps):
@@ -32,7 +38,7 @@ def rootFuncTMEva(kD, L, omega, eps):
     term2 = kD * np.sin(kD * L / 2)
     return term1 - term2
 
-def extremalPoints(L, omega, eps, N, mode):
+def extremalPoints(L, omega, wLO, wTO, epsInf, N, mode):
     rootFunc = rootFuncTE
     if(mode == "TM"):
         rootFunc = rootFuncTM
@@ -40,12 +46,15 @@ def extremalPoints(L, omega, eps, N, mode):
         rootFunc = rootFuncTEEva
     elif (mode == "TMEva"):
         rootFunc = rootFuncTMEva
+    elif (mode == "TERes"):
+        rootFunc = rootFuncTERes
 
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     upperBound = 0
-    if(mode == "TE" or mode == "TM"):
+    if (mode == "TE" or mode == "TM" or mode == "TERes"):
         upperBound = omega / consts.c
-    elif(mode == "TEEva" or mode == "TMEva"):
-        upperBound = np.sqrt(eps - 1.) * omega / consts.c
+    elif (mode == "TEEva" or mode == "TMEva"):
+        upperBound = np.sqrt(eps - 1) * omega / consts.c
 
     intervals = np.zeros((N, 2))
     lowerBounds = np.linspace(0, upperBound, N, endpoint=False)
@@ -60,7 +69,7 @@ def extremalPoints(L, omega, eps, N, mode):
     for n in range(N):
         Ntemp = 3
         tempArr = np.linspace(intervals[n, 0], intervals[n, 1], Ntemp)
-        maxInd = np.argmax(rootFunc(tempArr, L, omega, eps) ** 2)
+        maxInd = np.argmax(rootFunc(tempArr, L, omega, wLO, wTO, epsInf) ** 2)
         if(maxInd == Ntemp - 1):
             prevMaxatMaxInd = True
             continue
@@ -71,7 +80,7 @@ def extremalPoints(L, omega, eps, N, mode):
         prevMaxatMaxInd = False
     return extrema
 
-def computeRootsGivenExtrema(L, omega, eps, extrema, mode):
+def computeRootsGivenExtrema(L, omega, wLO, wTO, epsInf, extrema, mode):
     rootFunc = rootFuncTE
     if(mode == "TM"):
         rootFunc = rootFuncTM
@@ -79,12 +88,15 @@ def computeRootsGivenExtrema(L, omega, eps, extrema, mode):
         rootFunc = rootFuncTEEva
     elif (mode == "TMEva"):
         rootFunc = rootFuncTMEva
+    elif (mode == "TERes"):
+        rootFunc = rootFuncTERes
 
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     upperBound = 0
-    if(mode == "TE" or mode == "TM"):
+    if (mode == "TE" or mode == "TM" or mode == "TERes"):
         upperBound = omega / consts.c
-    elif(mode == "TEEva" or mode == "TMEva"):
-        upperBound = np.sqrt(eps - 1.) * omega / consts.c
+    elif (mode == "TEEva" or mode == "TMEva"):
+        upperBound = np.sqrt(eps - 1) * omega / consts.c
 
     nRoots = len(extrema)
     roots = np.zeros(nRoots)
@@ -92,13 +104,13 @@ def computeRootsGivenExtrema(L, omega, eps, extrema, mode):
     intervals[0, :] = np.array([0, extrema[0]])
     intervals[1:, 0] = extrema[:-1]
     intervals[1:, 1] = extrema[1:]
-    if(rootFunc(extrema[-1], L, omega, eps) * rootFunc(upperBound - 1e-6, L, omega, eps) < 0):
+    if(rootFunc(extrema[-1], L, omega, wLO, wTO, epsInf) * rootFunc(upperBound - 1e-6, L, omega, wLO, wTO, epsInf) < 0):
         intervals = np.append(intervals, np.array([[extrema[-1], upperBound - 1e-6]]), axis = 0)
     for rootInd, root in enumerate(roots):
         #not always a root between two adjacent extrema
         #if(rootFunc(intervals[rootInd, 0], L, omega, eps) * rootFunc(intervals[rootInd, 1], L, omega, eps) > 0):
         #    continue
-        tempRoot = scipy.optimize.root_scalar(rootFunc, args = (L, omega, eps), bracket=tuple(intervals[rootInd, :]))
+        tempRoot = scipy.optimize.root_scalar(rootFunc, args = (L, omega, wLO, wTO, epsInf), bracket=tuple(intervals[rootInd, :]))
         roots[rootInd] = tempRoot.root
 
     if(roots[0] == 0.):
@@ -106,7 +118,7 @@ def computeRootsGivenExtrema(L, omega, eps, extrema, mode):
 
     return roots
 
-def plotRootFuncWithExtrema(L, omega, eps, extrema, mode):
+def plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extrema, mode):
     rootFunc = rootFuncTE
     if(mode == "TM"):
         rootFunc = rootFuncTM
@@ -114,18 +126,19 @@ def plotRootFuncWithExtrema(L, omega, eps, extrema, mode):
         rootFunc = rootFuncTEEva
     elif (mode == "TMEva"):
         rootFunc = rootFuncTMEva
+    elif (mode == "TERes"):
+        rootFunc = rootFuncTERes
 
-
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     upperBound = 0
-    if(mode == "TE" or mode == "TM"):
+    if (mode == "TE" or mode == "TM" or mode == "TERes"):
         upperBound = omega / consts.c
-    elif(mode == "TEEva" or mode == "TMEva"):
-        upperBound = np.sqrt(eps - 1.) * omega / consts.c
-
+    elif (mode == "TEEva" or mode == "TMEva"):
+        upperBound = np.sqrt(eps - 1) * omega / consts.c
     c = consts.c
 
     kArr = np.linspace(0., upperBound - 1e-6, 1000)
-    rootFuncVals = rootFunc(kArr, L, omega, eps)
+    rootFuncVals = rootFunc(kArr, L, omega, wLO, wTO, epsInf)
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
@@ -142,9 +155,9 @@ def plotRootFuncWithExtrema(L, omega, eps, extrema, mode):
     ax.axhline(0., color = 'gray', lw = 0.5)
     ax.axvline(omega / c, color = 'teal', lw = 0.8)
 
-    plt.savefig("./savedPlots/rootFuncWithExtrema" + mode + ".png")
+    plt.savefig("./SPhPPlotsSaved/rootFuncWithExtrema" + mode + ".png")
 
-def plotRootFuncWithRoots(L, omega, eps, roots, mode):
+def plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, roots, mode):
     rootFunc = rootFuncTE
     if(mode == "TM"):
         rootFunc = rootFuncTM
@@ -152,19 +165,18 @@ def plotRootFuncWithRoots(L, omega, eps, roots, mode):
         rootFunc = rootFuncTEEva
     elif (mode == "TMEva"):
         rootFunc = rootFuncTMEva
+    elif (mode == "TERes"):
+        rootFunc = rootFuncTERes
 
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     upperBound = 0
-    if(mode == "TE" or mode == "TM"):
+    if (mode == "TE" or mode == "TM" or mode == "TERes"):
         upperBound = omega / consts.c
-    elif(mode == "TEEva" or mode == "TMEva"):
-        upperBound = np.sqrt(eps - 1.) * omega / consts.c
-
-    c = consts.c
-
-    print("omega / c = {}".format(omega / c))
+    elif (mode == "TEEva" or mode == "TMEva"):
+        upperBound = np.sqrt(eps - 1) * omega / consts.c
 
     kArr = np.linspace(0., upperBound - 1e-6, 1000)
-    rootFuncVals = rootFunc(kArr, L, omega, eps)
+    rootFuncVals = rootFunc(kArr, L, omega, wLO, wTO, epsInf)
     #rootFuncValsEps1 = rootFunc(kArr, L, omega, 1., c)
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)
@@ -173,12 +185,11 @@ def plotRootFuncWithRoots(L, omega, eps, roots, mode):
     ax = plt.subplot(gs[0, 0])
 
     for exInd, roots in enumerate(roots):
-        ax.axvline(roots * c / omega, color ='gray', lw = 0.4)
+        ax.axvline(roots * consts.c / omega, color ='gray', lw = 0.4)
 
-    ax.plot(kArr * c / omega, rootFuncVals, color='indianred', lw=0.8)
+    ax.plot(kArr * consts.c / omega, rootFuncVals, color='indianred', lw=0.8)
     #ax.plot(kArr, rootFuncValsEps1, color='teal', lw=0.8, linestyle = '--')
-    ax.set_xlim(np.amin(kArr) * c / omega, np.amax(kArr) * c / omega)
-
+    ax.set_xlim(np.amin(kArr) * consts.c / omega, np.amax(kArr) * consts.c / omega)
 
     ax.axhline(0., color = 'gray', lw = 0.5)
     ax.axvline(1., color = 'teal', lw = 1.)
@@ -186,4 +197,4 @@ def plotRootFuncWithRoots(L, omega, eps, roots, mode):
     ax.set_xlabel(r'$k_z \, [\frac{\omega}{c}]$')
     ax.set_ylabel(r'$K(\omega)$')
 
-    plt.savefig("./savedPlots/rootFuncWithRootsSPhP" + mode + ".png")
+    plt.savefig("./SPhPPlotsSaved/rootFuncWithRootsSPhP" + mode + ".png")
