@@ -91,8 +91,7 @@ def checkNormalizationK(k, L, omega, wLO, wTO, epsInf):
     checkInt = integrate.quad(waveFunctionForInt, -L / 2., L / 2., args=(k, L, omega, wLO, wTO, epsInf))
     print("Norm = {}, with Int accuracy = {}".format(checkInt[0], checkInt[1]))
 
-def checkNormalizations(L, omega, wLO, wTO, epsInf):
-    allowedKs = findKsTERes(L, omega, wLO, wTO, epsInf)
+def checkNormalizations(allowedKs, L, omega, wLO, wTO, epsInf):
     for kVal in allowedKs[:10]:
         checkNormalizationK(kVal, L, omega, wLO, wTO, epsInf)
 
@@ -109,19 +108,6 @@ def waveFunctionTERes(zArr, kArr, L, omega, wLO, wTO, epsInf):
     wF = np.append(wFNeg, wFPos)
 
     return wF
-
-
-def findKsTERes(L, omega, wLO, wTO, epsInf):
-    # Factor of 10 for more points and a +17 to avoid special numbers
-    NDiscrete = 170 * int(omega / consts.c * L / (4. * np.pi) + 17)
-    print("NDiscrete = {}".format(NDiscrete))
-
-    extremaTE = findAllowedKsSPhP.extremalPoints(L, omega, wLO, wTO, epsInf, NDiscrete, "TERes")
-    findAllowedKsSPhP.plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extremaTE, "TERes")
-    rootsTE = findAllowedKsSPhP.computeRootsGivenExtrema(L, omega, wLO, wTO, epsInf, extremaTE, "TERes")
-    print("Number of roots for TERes found = {}".format(rootsTE.shape))
-    findAllowedKsSPhP.plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, rootsTE, "TERes")
-    return rootsTE
 
 def plotWaveFunction(kDArr, zArr, L, omega, wLO, wTO, epsInf):
     wF = np.zeros((kDArr.shape[0], zArr.shape[0]), dtype=float)
@@ -163,7 +149,7 @@ def createPlotTERes():
     zArr = np.linspace(-consts.c / omega * 100., consts.c / omega * 100., 1000)
     #zArr = np.linspace(- L / 2., L / 2., 1000)
 
-    checkNormalizations(L, omega, wLO, wTO, epsInf)
+    allowedKs = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TERes")
 
-    allowedKs = findKsTERes(L, omega, wLO, wTO, epsInf)
+    checkNormalizations(allowedKs, L, omega, wLO, wTO, epsInf)
     plotWaveFunction(allowedKs[:5], zArr, L, omega, wLO, wTO, epsInf)

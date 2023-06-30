@@ -72,7 +72,7 @@ def dosEvaNegTM(zArr, kDArr, L, omega, eps):
     c = consts.c
     epsNorm = 1.
     kArr = np.sqrt((eps - 1) * omega ** 2 / c ** 2 - kDArr[None, :] ** 2)
-    prefac = 2. * eps * np.pi * c / omega / L
+    prefac = 2. * np.pi * c / omega / L
 
     num1 = np.sin(kDArr * (L / 2 + zArr[:, None]))**2
     num2 = (eps * omega**2 / consts.c**2 / kDArr[None, :]**2 - 1.) * np.cos(kDArr * (L / 2 + zArr[:, None]))**2

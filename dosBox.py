@@ -62,7 +62,7 @@ def dosFuncBoxNegOverFreeTE(z, kArr, L, omega, eps):
     c = consts.c
     epsNorm = 1.
     kD = np.sqrt((eps - 1) * omega ** 2 / c ** 2 + kArr[None, :] ** 2)
-    prefac = 2. * eps * np.pi * c / omega / L
+    prefac = 2. * np.pi * c / omega / L
 
     num = np.sin(kD * (L / 2. + z[:, None])) ** 2 * np.sin( kArr[None, :] * L / 2.) ** 2
     denom = np.sin(kD * L / 2.) ** 2 + epsNorm * np.sin(kArr[None, :] * L / 2.) ** 2
@@ -93,7 +93,7 @@ def dosFuncBoxNegOverFreeTM(z, kArr, L, omega, eps):
     c = consts.c
     epsNorm = 1.
     kD = np.sqrt((eps - 1) * omega ** 2 / c ** 2 + kArr[None, :] ** 2)
-    prefac = 2. * eps * np.pi * c / omega / L
+    prefac = 2. * np.pi * c / omega / L
 
 
     num1 = np.sin(kD * (L / 2. + z[:, None])) ** 2

@@ -118,7 +118,7 @@ def plotDosTotal(zArr, dos1, dos2, dos3, dos4, eps):
     ax.plot(zArr, dos2 + dos4, color=cmapBone(0.7), lw=1., label = "TM added")
     #ax.plot(zArr, dos1 + dos2, color='coral', lw=1., label = "DOS from Fresnel")
     ax.axhline(0.5, lw = 0.5, color = 'gray', zorder = -666)
-    ax.axhline(0.5 * np.sqrt(eps)**3, lw = 0.5, color = 'gray')
+    ax.axhline(0.5 * np.sqrt(eps), lw = 0.5, color = 'gray')
     #ax.axhline(0.5 * np.sqrt(eps)**1, lw = 0.5, color = 'gray')
 
     ax.axvline(0., lw = 0.5, color = 'gray')
@@ -126,8 +126,8 @@ def plotDosTotal(zArr, dos1, dos2, dos3, dos4, eps):
     ax.set_xlim(np.amin(zArr), np.amax(zArr))
     #ax.set_ylim(0., 0.69)
 
-    ax.set_yticks([0., 0.5, 1., 0.5 * np.sqrt(eps)**3])
-    ax.set_yticklabels([r"$0$", r"$0.5$", r"$1$", r"$\frac{\sqrt{\varepsilon}^3}{2}$"])
+    ax.set_yticks([0., 0.5, 1., 0.5 * np.sqrt(eps)])
+    ax.set_yticklabels([r"$0$", r"$0.5$", r"$1$", r"$\frac{\sqrt{\varepsilon}}{2}$"])
 
     ax.set_xlabel(r"$z[\frac{c}{\omega}]$")
     ax.set_ylabel(r"$\rho / \rho_0$")
@@ -175,9 +175,9 @@ def main():
 
     #TEEvaWaveFunction.createPlotEva()
     #TMEvaWaveFunction.createPlotTM()
-    TEWaveFunction.createPlotTE()
+    #TEWaveFunction.createPlotTE()
     #TMWaveFunctions.createPlotTM()
-    exit()
+    #exit()
 
     epsilon = 2.
     omega = 1 * 1e11

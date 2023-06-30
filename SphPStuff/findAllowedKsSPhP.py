@@ -198,3 +198,15 @@ def plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, roots, mode):
     ax.set_ylabel(r'$K(\omega)$')
 
     plt.savefig("./SPhPPlotsSaved/rootFuncWithRootsSPhP" + mode + ".png")
+
+def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
+    # Factor of 10 for more points and a +17 to avoid special numbers
+    NDiscrete = 170 * int(omega / consts.c * L / (4. * np.pi) + 17)
+    print("NDiscrete = {}".format(NDiscrete))
+
+    extremaTE = extremalPoints(L, omega, wLO, wTO, epsInf, NDiscrete, mode)
+    plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extremaTE, mode)
+    rootsTE = computeRootsGivenExtrema(L, omega, wLO, wTO, epsInf, extremaTE, mode)
+    print("Number of roots for " + mode +" found = {}".format(rootsTE.shape))
+    plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, rootsTE, mode)
+    return rootsTE
