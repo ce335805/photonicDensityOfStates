@@ -40,14 +40,19 @@ def rootFuncTMEva(kD, L, omega, eps):
 
 def extremalPoints(L, omega, wLO, wTO, epsInf, N, mode):
     rootFunc = rootFuncTE
-    if(mode == "TM"):
-        rootFunc = rootFuncTM
+    if(mode == "TE"):
+        rootFunc = rootFuncTE
+    elif (mode == "TM"):
+            rootFunc = rootFuncTM
     elif(mode == "TEEva"):
         rootFunc = rootFuncTEEva
     elif (mode == "TMEva"):
         rootFunc = rootFuncTMEva
     elif (mode == "TERes"):
         rootFunc = rootFuncTERes
+    else:
+        print("Error: specified mode doesn't exist!!!!!!!!!!!!!!!!")
+        exit()
 
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     upperBound = 0

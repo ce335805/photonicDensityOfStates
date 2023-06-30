@@ -179,7 +179,7 @@ def main():
     #TMWaveFunctions.createPlotTM()
     #exit()
 
-    epsilon = 2.
+    epsilon = 3.
     omega = 1 * 1e11
     L = 1.
 

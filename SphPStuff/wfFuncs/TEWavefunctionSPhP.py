@@ -17,8 +17,9 @@ import scipy.integrate as integrate
 import scipy.optimize as opt
 import scipy.constants as consts
 
-import findAllowedKsSPhP
-import epsilonFunctions as epsFunc
+import SphPStuff.findAllowedKsSPhP as findAllowedKsSPhP
+import SphPStuff.epsilonFunctions as epsFunc
+
 
 fontsize = 8
 
@@ -45,26 +46,36 @@ mpl.rcParams['text.latex.preamble'] = [
     #    r'\everymath={\sf}'
 ]
 
-
 def NormSqr(kVal, L, omega, wLO, wTO, epsInf):
-    kDVal = epsFunc.kDFromKEva(kVal, omega, wLO, wTO, epsInf)
-    brack1 = (1 - np.exp(- 2. * kVal * L)) / (2. * kVal * L) - np.exp(- kVal * L)
-    term1 = brack1 * np.sin(kDVal * L / 2) ** 2
-    brack2 = 1 - np.sin(kDVal * L) / (kDVal * L)
-    term2 = brack2 * 0.25 * (1 + np.exp(-2 * kVal * L) - 2. * np.exp(- kVal * L))
+    kDVal = epsFunc.kDFromK(kVal, omega, wLO, wTO, epsInf)
+    term1 = (1 - np.sin(kVal * L) / (kVal * L)) * np.sin(kDVal * L / 2)**2
+    term2 = (1 - np.sin(kDVal * L) / (kDVal * L)) * np.sin(kVal * L / 2)**2
     return L / 4 * (term1 + term2)
 
 def waveFunctionPos(zArr, kVal, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kVal, L, omega, wLO, wTO, epsInf)
-    kDVal = epsFunc.kDFromKEva(kVal, omega, wLO, wTO, epsInf)
-    func = 0.5 * (np.exp(- kVal * zArr) - np.exp(kVal * zArr - kVal * L)) * np.sin(kDVal * L / 2.)
+    kDVal = epsFunc.kDFromK(kVal, omega, wLO, wTO, epsInf)
+    func = np.sin(kVal * (L / 2 - zArr)) * np.sin(kDVal * L / 2.)
     return 1. / np.sqrt(NSqr) * func
 
 def waveFunctionNeg(zArr, kVal, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kVal, L, omega, wLO, wTO, epsInf)
-    kDVal = epsFunc.kDFromKEva(kVal, omega, wLO, wTO, epsInf)
-    func = np.sin(kDVal * (L / 2. + zArr)) * 0.5 * (1 - np.exp(- kVal * L))
+    kDVal = epsFunc.kDFromK(kVal, omega, wLO, wTO, epsInf)
+    func = np.sin(kDVal * (L / 2. + zArr)) * np.sin(kVal * L / 2.)
     return 1. / np.sqrt(NSqr) * func
+
+def waveFunctionTE(zArr, kArr, L, omega, wLO, wTO, epsInf):
+    indNeg = np.where(zArr < 0)
+    indPos = np.where(zArr >= 0)
+    zPosArr = zArr[indPos]
+    zNegArr = zArr[indNeg]
+
+    wFPos = waveFunctionPos(zPosArr, kArr, L, omega, wLO, wTO, epsInf)
+    wFNeg = waveFunctionNeg(zNegArr, kArr, L, omega, wLO, wTO, epsInf)
+
+    wF = np.append(wFNeg, wFPos)
+
+    return wF
 
 def waveFunctionForInt(z, k, L, omega, wLO, wTO, epsInf):
     if (z >= 0):
@@ -80,25 +91,11 @@ def checkNormalizations(allowedKs, L, omega, wLO, wTO, epsInf):
     for kVal in allowedKs[:10]:
         checkNormalizationK(kVal, L, omega, wLO, wTO, epsInf)
 
+def plotWaveFunction(kDArr, zArr, L, omega, wLO, wTO, epsInf):
+    wF = np.zeros((kDArr.shape[0], zArr.shape[0]), dtype=float)
 
-def waveFunctionTEEva(zArr, kArr, L, omega, wLO, wTO, epsInf):
-    indNeg = np.where(zArr < 0)
-    indPos = np.where(zArr >= 0)
-    zPosArr = zArr[indPos]
-    zNegArr = zArr[indNeg]
-
-    wFPos = waveFunctionPos(zPosArr, kArr, L, omega, wLO, wTO, epsInf)
-    wFNeg = waveFunctionNeg(zNegArr, kArr, L, omega, wLO, wTO, epsInf)
-
-    wF = np.append(wFNeg, wFPos)
-
-    return wF
-
-def plotWaveFunction(kArr, zArr, L, omega, wLO, wTO, epsInf):
-    wF = np.zeros((kArr.shape[0], zArr.shape[0]), dtype=float)
-
-    for kInd, kVal in enumerate(kArr):
-        wF[kInd, :] = waveFunctionTEEva(zArr, kVal, L, omega, wLO, wTO, epsInf)
+    for kDInd, kDVal in enumerate(kDArr):
+        wF[kDInd, :] = waveFunctionTE(zArr, kDVal, L, omega, wLO, wTO, epsInf)
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
@@ -106,9 +103,9 @@ def plotWaveFunction(kArr, zArr, L, omega, wLO, wTO, epsInf):
     ax = plt.subplot(gs[0, 0])
 
     cmapPink = cm.get_cmap('pink')
-    for kInd, kVal in enumerate(kArr):
-        color = cmapPink(kInd / (wF.shape[0] + 0.5))
-        ax.plot(zArr, wF[kInd, :], color=color, lw=1.)
+    for kDInd, kDVal in enumerate(kDArr):
+        color = cmapPink(kDInd / (wF.shape[0] + 0.5))
+        ax.plot(zArr, wF[kDInd, :], color=color, lw=1.)
 
     ax.axhline(0, lw=0.5, color='gray')
     ax.axvline(0, lw=0.5, color='gray')
@@ -121,20 +118,21 @@ def plotWaveFunction(kArr, zArr, L, omega, wLO, wTO, epsInf):
     ax.set_xlabel(r"$z$")
     ax.set_ylabel(r"$f(z) \; [\mathrm{arb. \, units}]$")
 
-    plt.savefig("./SPhPPlotsSaved/wFSPhPTEEva.png")
+    plt.savefig("./SPhPPlotsSaved/wFSPhPTE.png")
 
 
-def createPlotTEEva():
+def createPlotTE():
     epsInf = 2.
     omega = 1. * 1e11
     wLO = 3. * 1e12
     wTO = 1. * 1e12
-    L = 0.05
+    c = 3 * 1e8
+    L = 0.09
 
-    zArr = np.linspace(-consts.c / omega * 10., consts.c / omega * 10., 1000)
+    #zArr = np.linspace(-c / omega * 40., c / omega * 40., 1000)
     zArr = np.linspace(- L / 2., L / 2., 1000)
 
+    allowedKs = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TE")
 
-    allowedKs = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TEEva")
     checkNormalizations(allowedKs, L, omega, wLO, wTO, epsInf)
-    plotWaveFunction(allowedKs[-3:], zArr, L, omega, wLO, wTO, epsInf)
+    plotWaveFunction(allowedKs[:], zArr, L, omega, wLO, wTO, epsInf)
