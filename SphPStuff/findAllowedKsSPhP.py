@@ -25,9 +25,9 @@ def rootFuncTERes(k, L, omega, wLO, wTO, epsInf):
     term2 = kD * np.sin(k * L / 2)
     return term1 + term2
 
-def rootFuncTM(k, L, omega, eps):
-    c = consts.c
-    kD = np.sqrt((eps - 1) * omega**2 / c**2 + k**2)
+def rootFuncTM(k, L, omega, wLO, wTO, epsInf):
+    kD = epsFunc.kDFromK(k, omega,wLO, wTO, epsInf)
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     term1 = eps * k * np.sin(k * L / 2.) * np.cos(kD * L / 2.)
     term2 = kD * np.cos(k * L / 2.) * np.sin(kD * L / 2)
     return term1 + term2
@@ -43,7 +43,7 @@ def extremalPoints(L, omega, wLO, wTO, epsInf, N, mode):
     if(mode == "TE"):
         rootFunc = rootFuncTE
     elif (mode == "TM"):
-            rootFunc = rootFuncTM
+        rootFunc = rootFuncTM
     elif(mode == "TEEva"):
         rootFunc = rootFuncTEEva
     elif (mode == "TMEva"):

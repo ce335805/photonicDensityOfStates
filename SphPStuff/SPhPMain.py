@@ -1,4 +1,6 @@
 from SphPStuff.wfFuncs import TEWavefunctionSPhP as TE, TEWavefunctionEvaSPhP as TEEva, TEWavefunctionResSPhP as TERes
+from SphPStuff.wfFuncs import TMWavefunctionSPhP as TM
+
 
 from SphPStuff.dosFuncs import dosTEModes as dosTE
 from SphPStuff.dosFuncs import dosTEEvaModes as dosTEEva
@@ -10,10 +12,11 @@ def SPhPMain():
     #TE.createPlotTE()
     #TEEva.createPlotTEEva()
     #TERes.createPlotTERes()
+    TM.createPlotTM()
 
     #dosTE.createPlotDosTE()
     #dosTEEva.createPlotDosTEEva()
-    dosTERes.createPlotDosTERes()
+    #dosTERes.createPlotDosTERes()
 
 
 SPhPMain()
