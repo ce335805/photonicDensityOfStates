@@ -147,8 +147,8 @@ def createPlotTERes():
     wTO = 1. * 1e12
     L = 0.05
 
-    zArr = np.linspace(-consts.c / omega * 100., consts.c / omega * 100., 1000)
-    #zArr = np.linspace(- L / 2., L / 2., 1000)
+    #zArr = np.linspace(-consts.c / omega * 100., consts.c / omega * 100., 1000)
+    zArr = np.linspace(- L / 200., L / 200., 1000)
 
     allowedKs = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TERes")
 

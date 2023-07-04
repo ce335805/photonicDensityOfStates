@@ -42,9 +42,16 @@ def rootFuncTMEva(k, L, omega, wLO, wTO, epsInf):
 def rootFuncTMRes(k, L, omega, wLO, wTO, epsInf):
     kD = epsFunc.kDFromKRes(k, omega, wLO, wTO, epsInf)
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    term1 = eps * k * np.sin(k * L / 2)
-    term2 = kD * np.cos(k * L / 2) * np.tanh(kD * L / 2)
+    term1 = eps * k / kD * np.sin(k * L / 2)
+    term2 = np.cos(k * L / 2) * np.tanh(kD * L / 2)
     return term1 - term2
+
+def rootFuncSurf(k, L, omega, wLO, wTO, epsInf):
+    kD = epsFunc.kDFromKSurf(k, omega, wLO, wTO, epsInf)
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    term1 = eps * k / kD * np.tanh(k * L / 2)
+    term2 = np.tanh(kD * L / 2)
+    return term1 + term2
 
 def extremalPoints(L, omega, wLO, wTO, epsInf, N, mode):
     rootFunc = rootFuncTE
@@ -60,13 +67,15 @@ def extremalPoints(L, omega, wLO, wTO, epsInf, N, mode):
         rootFunc = rootFuncTERes
     elif (mode == "TMRes"):
         rootFunc = rootFuncTMRes
+    elif (mode == "Surf"):
+        rootFunc = rootFuncSurf
     else:
         print("Error: specified mode doesn't exist!!!!!!!!!!!!!!!!")
         exit()
 
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     upperBound = 0
-    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes"):
+    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes" or mode == "Surf"):
         upperBound = omega / consts.c
     elif (mode == "TEEva" or mode == "TMEva"):
         upperBound = np.sqrt(eps - 1) * omega / consts.c
@@ -76,9 +85,6 @@ def extremalPoints(L, omega, wLO, wTO, epsInf, N, mode):
     upperBounds = np.linspace(0, upperBound, N, endpoint=False) + lowerBounds[1]
     intervals[:, 0] = lowerBounds
     intervals[:, 1] = upperBounds
-    if(mode == "TEEva"):
-        print("upperBound = {}".format(upperBound))
-        print("upperInterval = {}".format(intervals[-1, 1]))
     extrema = np.zeros(0)
     prevMaxatMaxInd = False#something to include maxima that are on boundaries of intervals
     for n in range(N):
@@ -107,10 +113,12 @@ def computeRootsGivenExtrema(L, omega, wLO, wTO, epsInf, extrema, mode):
         rootFunc = rootFuncTERes
     elif (mode == "TMRes"):
         rootFunc = rootFuncTMRes
+    elif (mode == "Surf"):
+        rootFunc = rootFuncSurf
 
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     upperBound = 0
-    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes"):
+    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes" or mode == "Surf"):
         upperBound = omega / consts.c
     elif (mode == "TEEva" or mode == "TMEva"):
         upperBound = np.sqrt(eps - 1) * omega / consts.c
@@ -147,10 +155,12 @@ def plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extrema, mode):
         rootFunc = rootFuncTERes
     elif (mode == "TMRes"):
         rootFunc = rootFuncTMRes
+    elif (mode == "Surf"):
+        rootFunc = rootFuncSurf
 
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     upperBound = 0
-    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes"):
+    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes" or mode == "Surf"):
         upperBound = omega / consts.c
     elif (mode == "TEEva" or mode == "TMEva"):
         upperBound = np.sqrt(eps - 1) * omega / consts.c
@@ -188,10 +198,12 @@ def plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, roots, mode):
         rootFunc = rootFuncTERes
     elif (mode == "TMRes"):
         rootFunc = rootFuncTMRes
+    elif (mode == "Surf"):
+        rootFunc = rootFuncSurf
 
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     upperBound = 0
-    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes"):
+    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes" or mode == "Surf"):
         upperBound = omega / consts.c
     elif (mode == "TEEva" or mode == "TMEva"):
         upperBound = np.sqrt(eps - 1) * omega / consts.c
@@ -220,14 +232,22 @@ def plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, roots, mode):
 
     plt.savefig("./SPhPPlotsSaved/rootFuncWithRootsSPhP" + mode + ".png")
 
-def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
-    # Factor of 10 for more points and a +17 to avoid special numbers
-    NDiscrete = 170 * int(omega / consts.c * L / (4. * np.pi) + 17)
-    print("NDiscrete = {}".format(NDiscrete))
+def allowedKSurf(L, omega, wLO, wTO, epsInf):
+    root = scipy.optimize.root_scalar(rootFuncSurf, args=(L, omega, wLO, wTO, epsInf),
+                                          bracket=tuple([0., omega / consts.c]))
+    return np.array([root.root])
 
-    extremaTE = extremalPoints(L, omega, wLO, wTO, epsInf, NDiscrete, mode)
-    plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extremaTE, mode)
-    rootsTE = computeRootsGivenExtrema(L, omega, wLO, wTO, epsInf, extremaTE, mode)
-    print("Number of roots for " + mode +" found = {}".format(rootsTE.shape))
-    plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, rootsTE, mode)
-    return rootsTE
+def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
+    if(mode == "Surf"):
+        return allowedKSurf(L, omega, wLO, wTO, epsInf)
+    else:
+        # Factor of 10 for more points and a +17 to avoid special numbers
+        NDiscrete = 170 * int(omega / consts.c * L / (4. * np.pi) + 17)
+        print("NDiscrete = {}".format(NDiscrete))
+
+        extremaTE = extremalPoints(L, omega, wLO, wTO, epsInf, NDiscrete, mode)
+        plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extremaTE, mode)
+        rootsTE = computeRootsGivenExtrema(L, omega, wLO, wTO, epsInf, extremaTE, mode)
+        print("Number of roots for " + mode +" found = {}".format(rootsTE.shape))
+        plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, rootsTE, mode)
+        return rootsTE

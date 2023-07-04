@@ -42,7 +42,11 @@ def kDFromKEva(kVal, omega, wLO, wTO, epsInf):
     return np.sqrt((epsilon(omega, wLO, wTO, epsInf) - 1) * omega ** 2 / consts.c ** 2 - kVal ** 2)
 
 def kDFromKRes(kVal, omega, wLO, wTO, epsInf):
-    return np.sqrt(1 - epsilon(omega, wLO, wTO, epsInf)) * omega ** 2 / consts.c ** 2 - kVal ** 2
+    return np.sqrt((1 - epsilon(omega, wLO, wTO, epsInf)) * omega ** 2 / consts.c ** 2 - kVal ** 2)
+
+def kDFromKSurf(kVal, omega, wLO, wTO, epsInf):
+    return np.sqrt((1 - epsilon(omega, wLO, wTO, epsInf)) * omega ** 2 / consts.c ** 2 + kVal ** 2)
+
 
 def plotEpsilon(omegaArr, epsilonArr, epsInf, wLO, wTO):
 
