@@ -1,7 +1,7 @@
 from SphPStuff.wfFuncs import TEWavefunctionSPhP as TE, TEWavefunctionEvaSPhP as TEEva, TEWavefunctionResSPhP as TERes
 from SphPStuff.wfFuncs import TMWavefunctionSPhP as TM
 from SphPStuff.wfFuncs import TMWavefunctionEvaSPhP as TMEva
-
+from SphPStuff.wfFuncs import TMWavefunctionResSPhP as TMRes
 
 from SphPStuff.dosFuncs import dosTEModes as dosTE
 from SphPStuff.dosFuncs import dosTEEvaModes as dosTEEva
@@ -14,7 +14,8 @@ def SPhPMain():
     #TEEva.createPlotTEEva()
     #TERes.createPlotTERes()
     #TM.createPlotTM()
-    TMEva.createPlotTMEva()
+    #TMEva.createPlotTMEva()
+    TMRes.createPlotTMRes()
 
     #dosTE.createPlotDosTE()
     #dosTEEva.createPlotDosTEEva()
