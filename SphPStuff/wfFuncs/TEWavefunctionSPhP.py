@@ -123,11 +123,10 @@ def plotWaveFunction(kDArr, zArr, L, omega, wLO, wTO, epsInf):
 
 def createPlotTE():
     epsInf = 2.
-    omega = 1. * 1e11
+    omega = 5. * 1e11
     wLO = 3. * 1e12
     wTO = 1. * 1e12
-    c = 3 * 1e8
-    L = 0.09
+    L = 0.5
 
     #zArr = np.linspace(-c / omega * 40., c / omega * 40., 1000)
     zArr = np.linspace(- L / 2., L / 2., 1000)

@@ -47,40 +47,40 @@ mpl.rcParams['text.latex.preamble'] = [
 ]
 
 def NormSqr(kVal, L, omega, wLO, wTO, epsInf):
-    kDVal = epsFunc.kDFromK(kVal, omega, wLO, wTO, epsInf)
+    kDVal = epsFunc.kDFromKEva(kVal, omega, wLO, wTO, epsInf)
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    brack11 = omega**2 / (consts.c**2 * kVal**2)
-    brack12 = (omega**2 / (consts.c**2 * kVal**2) - 2) * np.sin(kVal * L) / (kVal * L)
+    brack11 = np.exp(- kVal * L) * omega**2 / (consts.c**2 * kVal**2)
+    brack12 = (omega**2 / (consts.c**2 * kVal**2) + 2) * (1 - np.exp(- 2 * kVal * L)) / (2 * kVal * L)
     term1 = (brack11 + brack12) * np.sin(kDVal * L / 2.)**2
     brack21 = eps * omega**2 / (consts.c**2 * kDVal**2)
     brack22 = (eps * omega**2 / (consts.c**2 * kDVal**2) - 2) * np.sin(kDVal * L) / (kDVal * L)
-    term2 = (brack21 + brack22) * np.sin(kVal * L / 2.)**2
+    term2 = (brack21 + brack22) * 0.25 * (1 + np.exp(-2. * kVal * L) - 2. * np.exp(-kVal * L))
 
     return L / 4. * (term1 + term2)
 
 def waveFunctionPosPara(zArr, kVal, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kVal, L, omega, wLO, wTO, epsInf)
-    kDVal = epsFunc.kDFromK(kVal, omega, wLO, wTO, epsInf)
-    func = np.sin(kVal * (L / 2 - zArr)) * np.sin(kDVal * L / 2.)
+    kDVal = epsFunc.kDFromKEva(kVal, omega, wLO, wTO, epsInf)
+    func = 0.5 * (np.exp(- kVal * zArr) - np.exp(kVal * (zArr - L))) * np.sin(kDVal * L / 2.)
     return 1. / np.sqrt(NSqr) * func
 
 def waveFunctionNegPara(zArr, kVal, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kVal, L, omega, wLO, wTO, epsInf)
-    kDVal = epsFunc.kDFromK(kVal, omega, wLO, wTO, epsInf)
-    func = np.sin(kDVal * (L / 2. + zArr)) * np.sin(kVal * L / 2.)
+    kDVal = epsFunc.kDFromKEva(kVal, omega, wLO, wTO, epsInf)
+    func = np.sin(kDVal * (L / 2. + zArr)) * 0.5 * (1 - np.exp(-kVal * L))
     return 1. / np.sqrt(NSqr) * func
 
 def waveFunctionPosPerp(zArr, kVal, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kVal, L, omega, wLO, wTO, epsInf)
-    kDVal = epsFunc.kDFromK(kVal, omega, wLO, wTO, epsInf)
-    func = np.sqrt(omega**2 / (consts.c**2 * kVal**2) - 1) * np.cos(kVal * (L / 2 - zArr)) * np.sin(kDVal * L / 2.)
+    kDVal = epsFunc.kDFromKEva(kVal, omega, wLO, wTO, epsInf)
+    func = np.sqrt(omega**2 / (consts.c**2 * kVal**2) + 1) * 0.5 * ( np.exp(- kVal * zArr)) +  np.exp(kVal * (zArr - L)) * np.sin(kDVal * L / 2.)
     return 1. / np.sqrt(NSqr) * func
 
 def waveFunctionNegPerp(zArr, kVal, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kVal, L, omega, wLO, wTO, epsInf)
-    kDVal = epsFunc.kDFromK(kVal, omega, wLO, wTO, epsInf)
+    kDVal = epsFunc.kDFromKEva(kVal, omega, wLO, wTO, epsInf)
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    func = - np.sqrt(eps * omega**2 / (consts.c**2 * kDVal**2) - 1) * np.cos(kDVal * (L / 2. + zArr)) * np.sin(kVal * L / 2.)
+    func = np.sqrt(eps * omega**2 / (consts.c**2 * kDVal**2) - 1) * np.cos(kDVal * (L / 2. + zArr)) * 0.5 * (1 - np.exp(-kVal * L))
     return 1. / np.sqrt(NSqr) * func
 
 def waveFunctionTMPara(zArr, kArr, L, omega, wLO, wTO, epsInf):
@@ -151,7 +151,7 @@ def plotWaveFunctionPara(kDArr, zArr, L, omega, wLO, wTO, epsInf):
     ax.set_xlabel(r"$z$")
     ax.set_ylabel(r"$f(z) \; [\mathrm{arb. \, units}]$")
 
-    plt.savefig("./SPhPPlotsSaved/wFSPhPTMPara.png")
+    plt.savefig("./SPhPPlotsSaved/wFSPhPTMEvaPara.png")
 
 def plotWaveFunctionPerp(kDArr, zArr, L, omega, wLO, wTO, epsInf):
     wF = np.zeros((kDArr.shape[0], zArr.shape[0]), dtype=float)
@@ -184,10 +184,10 @@ def plotWaveFunctionPerp(kDArr, zArr, L, omega, wLO, wTO, epsInf):
     ax.set_xlabel(r"$z$")
     ax.set_ylabel(r"$ \varepsilon(\omega) f(z) \; [\mathrm{arb. \, units}]$")
 
-    plt.savefig("./SPhPPlotsSaved/wFSPhPTMPerp.png")
+    plt.savefig("./SPhPPlotsSaved/wFSPhPTMEvaPerp.png")
 
 
-def createPlotTM():
+def createPlotTMEva():
     epsInf = 2.
     omega = 1. * 1e11
     wLO = 3. * 1e12

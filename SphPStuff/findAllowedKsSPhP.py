@@ -32,9 +32,10 @@ def rootFuncTM(k, L, omega, wLO, wTO, epsInf):
     term2 = kD * np.cos(k * L / 2.) * np.sin(kD * L / 2)
     return term1 + term2
 
-def rootFuncTMEva(kD, L, omega, eps):
-    kReal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2 + 1e-6)
-    term1 = eps * kReal * np.tanh(kReal * L / 2) * np.cos(kD * L / 2)
+def rootFuncTMEva(k, L, omega, wLO, wTO, epsInf):
+    kD = epsFunc.kDFromKEva(k, omega, wLO, wTO, epsInf)
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    term1 = eps * k * np.tanh(k * L / 2) * np.cos(kD * L / 2)
     term2 = kD * np.sin(kD * L / 2)
     return term1 - term2
 
@@ -113,8 +114,8 @@ def computeRootsGivenExtrema(L, omega, wLO, wTO, epsInf, extrema, mode):
         intervals = np.append(intervals, np.array([[extrema[-1], upperBound - 1e-6]]), axis = 0)
     for rootInd, root in enumerate(roots):
         #not always a root between two adjacent extrema
-        #if(rootFunc(intervals[rootInd, 0], L, omega, eps) * rootFunc(intervals[rootInd, 1], L, omega, eps) > 0):
-        #    continue
+        if(rootInd == 0 and rootFunc(intervals[rootInd, 0], L, omega, wLO, wTO, epsInf) * rootFunc(intervals[rootInd, 1], L, omega, wLO, wTO, epsInf) > 0):
+            continue
         tempRoot = scipy.optimize.root_scalar(rootFunc, args = (L, omega, wLO, wTO, epsInf), bracket=tuple(intervals[rootInd, :]))
         roots[rootInd] = tempRoot.root
 
@@ -206,7 +207,7 @@ def plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, roots, mode):
 
 def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
     # Factor of 10 for more points and a +17 to avoid special numbers
-    NDiscrete = 170 * int(omega / consts.c * L / (4. * np.pi) + 17)
+    NDiscrete = 21 * int(omega / consts.c * L / (4. * np.pi) + 17)
     print("NDiscrete = {}".format(NDiscrete))
 
     extremaTE = extremalPoints(L, omega, wLO, wTO, epsInf, NDiscrete, mode)
