@@ -15,8 +15,8 @@ def rootFuncTE(k, L, omega, wLO, wTO, epsInf):
 
 def rootFuncTEEva(k, L, omega, wLO, wTO, epsInf):
     kD = epsFunc.kDFromKEva(k, omega, wLO, wTO, epsInf)
-    term1 = k * np.sin(kD * L / 2)
-    term2 = kD * np.cos(kD * L / 2) * np.tanh(k * L / 2)
+    term1 = k / kD * np.sin(kD * L / 2)
+    term2 = np.cos(kD * L / 2) * np.tanh(k * L / 2)
     return term1 + term2
 
 def rootFuncTERes(k, L, omega, wLO, wTO, epsInf):
@@ -28,8 +28,8 @@ def rootFuncTERes(k, L, omega, wLO, wTO, epsInf):
 def rootFuncTM(k, L, omega, wLO, wTO, epsInf):
     kD = epsFunc.kDFromK(k, omega,wLO, wTO, epsInf)
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    term1 = eps * k * np.sin(k * L / 2.) * np.cos(kD * L / 2.)
-    term2 = kD * np.cos(k * L / 2.) * np.sin(kD * L / 2)
+    term1 = eps * k / kD * np.sin(k * L / 2.) * np.cos(kD * L / 2.)
+    term2 = np.cos(k * L / 2.) * np.sin(kD * L / 2)
     return term1 + term2
 
 def rootFuncTMEva(k, L, omega, wLO, wTO, epsInf):
@@ -80,9 +80,17 @@ def extremalPoints(L, omega, wLO, wTO, epsInf, N, mode):
     elif (mode == "TEEva" or mode == "TMEva"):
         upperBound = np.sqrt(eps - 1) * omega / consts.c
 
+    lowerBound = 0
+    if(eps > 0 and eps < 1):
+        if (mode == "TE" or mode == "TM"):
+            lowerBound = np.sqrt(1 - eps) * omega / consts.c + 1e-6
+        if (mode == "TERes" or mode == "TMRes"):
+            upperBound = np.sqrt(1 - eps) * omega / consts.c
+
+
     intervals = np.zeros((N, 2))
-    lowerBounds = np.linspace(0, upperBound, N, endpoint=False)
-    upperBounds = np.linspace(0, upperBound, N, endpoint=False) + lowerBounds[1]
+    lowerBounds = np.linspace(lowerBound, upperBound, N, endpoint=False)
+    upperBounds = np.linspace(lowerBound, upperBound, N, endpoint=False) + (lowerBounds[1] - lowerBounds[0])
     intervals[:, 0] = lowerBounds
     intervals[:, 1] = upperBounds
     extrema = np.zeros(0)
@@ -123,18 +131,25 @@ def computeRootsGivenExtrema(L, omega, wLO, wTO, epsInf, extrema, mode):
     elif (mode == "TEEva" or mode == "TMEva"):
         upperBound = np.sqrt(eps - 1) * omega / consts.c
 
+    lowerBound = 0
+    if(eps > 0 and eps < 1):
+        if (mode == "TE" or mode == "TM"):
+            lowerBound = np.sqrt(1 - eps) * omega / consts.c + 1e-6
+
     nRoots = len(extrema)
     roots = np.zeros(nRoots)
     intervals = np.zeros((nRoots, 2))
-    intervals[0, :] = np.array([0, extrema[0]])
+    intervals[0, :] = np.array([lowerBound, extrema[0]])
     intervals[1:, 0] = extrema[:-1]
     intervals[1:, 1] = extrema[1:]
     if(rootFunc(extrema[-1], L, omega, wLO, wTO, epsInf) * rootFunc(upperBound - 1e-6, L, omega, wLO, wTO, epsInf) < 0):
         intervals = np.append(intervals, np.array([[extrema[-1], upperBound - 1e-6]]), axis = 0)
     for rootInd, root in enumerate(roots):
         #not always a root between two adjacent extrema
-        if(rootInd == 0 and rootFunc(intervals[rootInd, 0], L, omega, wLO, wTO, epsInf) * rootFunc(intervals[rootInd, 1], L, omega, wLO, wTO, epsInf) > 0):
-            continue
+        #if(rootInd == 0 and rootFunc(intervals[rootInd, 0], L, omega, wLO, wTO, epsInf) * rootFunc(intervals[rootInd, 1], L, omega, wLO, wTO, epsInf) > 0):
+        if (rootFunc(intervals[rootInd, 0], L, omega, wLO, wTO, epsInf) * rootFunc(
+                    intervals[rootInd, 1], L, omega, wLO, wTO, epsInf) > 0):
+                continue
         tempRoot = scipy.optimize.root_scalar(rootFunc, args = (L, omega, wLO, wTO, epsInf), bracket=tuple(intervals[rootInd, :]))
         roots[rootInd] = tempRoot.root
 
@@ -166,7 +181,15 @@ def plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extrema, mode):
         upperBound = np.sqrt(eps - 1) * omega / consts.c
     c = consts.c
 
-    kArr = np.linspace(0., upperBound - 1e-6, 1000)
+    lowerBound = 0
+    if(eps > 0 and eps < 1):
+        if (mode == "TE" or mode == "TM"):
+            lowerBound = np.sqrt(1 - eps) * omega / consts.c
+        if (mode == "TERes" or mode == "TMRes"):
+            upperBound = np.sqrt(1 - eps) * omega / consts.c
+
+
+    kArr = np.linspace(lowerBound, upperBound - 1e-6, 1000)
     rootFuncVals = rootFunc(kArr, L, omega, wLO, wTO, epsInf)
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)
@@ -178,7 +201,8 @@ def plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extrema, mode):
         ax.axvline(extrema, color = 'gray', lw = 0.5)
 
     ax.plot(kArr, rootFuncVals, color='indianred', lw=0.8)
-    ax.set_xlim(np.amin(kArr), np.amax(kArr))
+    #ax.set_xlim(np.amin(kArr), np.amax(kArr))
+    ax.set_xlim(np.amax(kArr) * 0.9, np.amax(kArr))
 
 
     ax.axhline(0., color = 'gray', lw = 0.5)
@@ -241,13 +265,15 @@ def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
     if(mode == "Surf"):
         return allowedKSurf(L, omega, wLO, wTO, epsInf)
     else:
-        # Factor of 10 for more points and a +17 to avoid special numbers
-        NDiscrete = 170 * int(omega / consts.c * L / (4. * np.pi) + 17)
+        eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+        NDiscrete = 11 * int(omega / consts.c * (np.sqrt(eps) + 1.) * L  + 17)
         print("NDiscrete = {}".format(NDiscrete))
 
         extremaTE = extremalPoints(L, omega, wLO, wTO, epsInf, NDiscrete, mode)
-        plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extremaTE, mode)
+        if(len(extremaTE) == 0):
+            return np.array([])
+        #plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extremaTE, mode)
         rootsTE = computeRootsGivenExtrema(L, omega, wLO, wTO, epsInf, extremaTE, mode)
         print("Number of roots for " + mode +" found = {}".format(rootsTE.shape))
-        plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, rootsTE, mode)
+        #plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, rootsTE, mode)
         return rootsTE

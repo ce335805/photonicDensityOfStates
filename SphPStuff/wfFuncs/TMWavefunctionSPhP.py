@@ -145,8 +145,8 @@ def plotWaveFunctionPara(kDArr, zArr, L, omega, wLO, wTO, epsInf):
 
     ax.set_xlim(np.amin(zArr), np.amax(zArr))
 
-    #ax.set_xticks([np.amin(zArr), 0, np.amax(zArr)])
-    #ax.set_xticklabels([r"$-\frac{L}{2}$", r"$0$", r"$\frac{L}{2}$"])
+    ax.set_xticks([np.amin(zArr), 0, np.amax(zArr)])
+    ax.set_xticklabels([r"$-\frac{L}{20}$", r"$0$", r"$\frac{L}{20}$"])
 
     ax.set_xlabel(r"$z$")
     ax.set_ylabel(r"$f(z) \; [\mathrm{arb. \, units}]$")
@@ -178,8 +178,8 @@ def plotWaveFunctionPerp(kDArr, zArr, L, omega, wLO, wTO, epsInf):
 
     ax.set_xlim(np.amin(zArr), np.amax(zArr))
 
-    #ax.set_xticks([np.amin(zArr), 0, np.amax(zArr)])
-    #ax.set_xticklabels([r"$-\frac{L}{2}$", r"$0$", r"$\frac{L}{2}$"])
+    ax.set_xticks([np.amin(zArr), 0, np.amax(zArr)])
+    ax.set_xticklabels([r"$-\frac{L}{20}$", r"$0$", r"$\frac{L}{20}$"])
 
     ax.set_xlabel(r"$z$")
     ax.set_ylabel(r"$ \varepsilon(\omega) f(z) \; [\mathrm{arb. \, units}]$")
@@ -192,11 +192,9 @@ def createPlotTM():
     omega = 1. * 1e11
     wLO = 3. * 1e12
     wTO = 1. * 1e12
-    c = 3 * 1e8
-    L = 0.09
+    L = 0.1
 
-    zArr = np.linspace(-c / omega * 5., c / omega * 5., 1000)
-    #zArr = np.linspace(- L / 2., L / 2., 1000)
+    zArr = np.linspace(- L / 20., L / 20., 1000)
 
     allowedKs = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TM")
 

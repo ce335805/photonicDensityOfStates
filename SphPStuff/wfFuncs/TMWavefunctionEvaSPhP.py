@@ -145,8 +145,8 @@ def plotWaveFunctionPara(kDArr, zArr, L, omega, wLO, wTO, epsInf):
 
     ax.set_xlim(np.amin(zArr), np.amax(zArr))
 
-    #ax.set_xticks([np.amin(zArr), 0, np.amax(zArr)])
-    #ax.set_xticklabels([r"$-\frac{L}{2}$", r"$0$", r"$\frac{L}{2}$"])
+    ax.set_xticks([np.amin(zArr), 0, np.amax(zArr)])
+    ax.set_xticklabels([r"$-\frac{L}{2}$", r"$0$", r"$\frac{L}{2}$"])
 
     ax.set_xlabel(r"$z$")
     ax.set_ylabel(r"$f(z) \; [\mathrm{arb. \, units}]$")
@@ -176,12 +176,10 @@ def plotWaveFunctionPerp(kDArr, zArr, L, omega, wLO, wTO, epsInf):
     ax.axhline(0, lw=0.5, color='gray')
     ax.axvline(0, lw=0.5, color='gray')
 
-    #ax.set_xlim(np.amin(zArr), np.amax(zArr))
-    ax.set_xlim(-L/16, L/16)
-    ax.set_ylim(-50, 50)
+    ax.set_xlim(np.amin(zArr), np.amax(zArr))
 
-    #ax.set_xticks([np.amin(zArr), 0, np.amax(zArr)])
-    #ax.set_xticklabels([r"$-\frac{L}{2}$", r"$0$", r"$\frac{L}{2}$"])
+    ax.set_xticks([np.amin(zArr), 0, np.amax(zArr)])
+    ax.set_xticklabels([r"$-\frac{L}{2}$", r"$0$", r"$\frac{L}{2}$"])
 
     ax.set_xlabel(r"$z$")
     ax.set_ylabel(r"$ \varepsilon(\omega) f(z) \; [\mathrm{arb. \, units}]$")
@@ -194,7 +192,7 @@ def createPlotTMEva():
     omega = 1. * 1e11
     wLO = 3. * 1e12
     wTO = 1. * 1e12
-    L = 0.02
+    L = 0.1
 
     #zArr = np.linspace(-consts.c / omega * 5., consts.c / omega * 5., 1000)
     zArr = np.linspace(- L / 2., L / 2., 1000)

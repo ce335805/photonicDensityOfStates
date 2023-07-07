@@ -47,8 +47,9 @@ mpl.rcParams['text.latex.preamble'] = [
 
 def NormSqr(kArr, L, omega, wLO, wTO, epsInf):
     kDVal = epsFunc.kDFromK(kArr, omega, wLO, wTO, epsInf)
+    eps = epsFunc.epsilon(omega,wLO,wTO,epsInf)
     term1 = (1 - np.sin(kArr * L) / (kArr * L)) * np.sin(kDVal * L / 2) ** 2
-    term2 = (1 - np.sin(kDVal * L) / (kDVal * L)) * np.sin(kArr * L / 2) ** 2
+    term2 = eps * (1 - np.sin(kDVal * L) / (kDVal * L)) * np.sin(kArr * L / 2) ** 2
     return L / 4 * (term1 + term2)
 
 def dosSumPos(zArr, kArr, L, omega, wLO, wTO, epsInf):
@@ -93,9 +94,12 @@ def plotDosTESPhP(zArr, dos, L, omega, wLO, wTO, epsInf):
 
     ax.axvline(0., lw = 0.5, color = 'gray')
 
+    #ax.set_xticks([- L / 2., 0., L / 2.])
+    #ax.set_xticklabels([r"$-\frac{L}{2}$", r"$0$", r"$\frac{L}{2}$"])
+
     ax.set_xlim(np.amin(zArr), np.amax(zArr))
 
-    ax.set_xlabel(r"$z[\frac{c}{\omega}]$")
+    ax.set_xlabel(r"$z[\mathrm{m}]$")
     ax.set_ylabel(r"$\rho / \rho_0$")
 
     #legend = ax.legend(fontsize=fontsize, loc='lower right', bbox_to_anchor=(1.0, 0.1), edgecolor='black', ncol=1)
@@ -113,7 +117,7 @@ def createPlotDosTE():
     epsInf = 2.
     L = 10.
 
-    zArr = np.linspace(-L / 2., L / 2., 500)
+    zArr = np.linspace(-L / 20., L / 20., 500)
 
     dos = calcDosTE(zArr, L, omega, wLO, wTO, epsInf)
     plotDosTESPhP(zArr, dos, L, omega, wLO, wTO, epsInf)

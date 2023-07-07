@@ -127,7 +127,7 @@ def plotWaveFunction(kArr, zArr, L, omega, wLO, wTO, epsInf):
 
 def createPlotTEEva():
     epsInf = 2.
-    omega = 1. * 1e11
+    omega = 5. * 1e12
     wLO = 3. * 1e12
     wTO = 1. * 1e12
     L = 0.05

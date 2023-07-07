@@ -45,43 +45,66 @@ mpl.rcParams['text.latex.preamble'] = [
     #    r'\everymath={\sf}'
 ]
 
-def NormSqr(kArr, L, omega, wLO, wTO, epsInf):
-    kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
-    brack1 = 1 - np.sin(kArr * L) / (kArr * L)
-    term1 = brack1 * 0.25 * (1 + np.exp(-2 * kDArr * L) - 2. * np.exp(- kDArr * L))
-    brack2 = (1 - np.exp(- 2. * kDArr * L)) / (2. * kDArr * L) - np.exp(- kDArr * L)
-    term2 = brack2 * np.sin(kArr * L / 2) ** 2
-    return L / 4 * (term1 + term2)
 
-def dosSumPos(zArr, kArr, L, omega, wLO, wTO, epsInf):
+def NormSqr(kVal, L, omega, wLO, wTO, epsInf):
+    kDArr = epsFunc.kDFromKRes(kVal, omega, wLO, wTO, epsInf)
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    brack11 =  omega**2 / (consts.c**2 * kVal**2)
+    brack12 = (omega**2 / (consts.c**2 * kVal**2) - 2) * np.sin(kVal * L) / (kVal * L)
+    term1 = (brack11 + brack12) * 0.25 * (1 - np.exp(- 2. * kDArr * L) - 2 * np.exp(- kDArr * L))
+    brack21 = np.exp(- kDArr * L) * eps * omega**2 / (consts.c**2 * kDArr**2)
+    brack22 = (eps * omega**2 / (consts.c**2 * kDArr**2) + 2) * (1 - np.exp(-kDArr * L)) / (2 * kDArr * L)
+    term2 = (brack21 + brack22) * np.sin(kVal * L)**2
+
+    return L / 4. * (term1 + term2)
+
+def waveFunctionPosPara(zArr, kArr, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
     kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
-    func = np.sin(kArr[None, :] * (L / 2. - zArr[:, None])) * 0.5 * (1 - np.exp(- kDArr[None, :] * L))
-    return np.sum(1. / NSqr[None, :] * func**2, axis = 1)
+    func = np.sin(kArr[None, :] * (L / 2. - zArr[:, None])) * 0.5 * (1 - np.exp(-kDArr[None, :] * L))
+    return np.sum(1. / NSqr[None, :] * func ** 2, axis=1)
 
-def dosSumNeg(zArr, kArr, L, omega, wLO, wTO, epsInf):
+
+def waveFunctionNegPara(zArr, kArr, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
     kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
-    func = 0.5 * (np.exp(kDArr[None, :] * zArr[:, None]) - np.exp(-kDArr[None, :] * zArr[:, None] - kDArr[None, :] * L)) * np.sin(kArr[None, :] * L / 2.)
-    return np.sum(1. / NSqr[None, :] * func**2, axis = 1)
+    func = 0.5 * (np.exp(kDArr[None, :] * zArr[:, None]) - np.exp(-kDArr[None, :] * (zArr[:, None] + L))) * np.sin(kArr[None, :] * L / 2.)
+    return np.sum(1. / NSqr[None, :] * func ** 2, axis=1)
 
 
-def calcDosTE(zArr, L, omega, wLO, wTO, epsInf):
+def waveFunctionPosPerp(zArr, kArr, L, omega, wLO, wTO, epsInf):
+    NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
+    kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
+    func = np.sqrt(omega**2 / (consts.c**2 * kArr[None, :]**2) - 1) * np.cos(kArr[None, :] * (L / 2. - zArr[:, None])) * 0.5 * (1 - np.exp(-kDArr[None, :] * L))
+    return np.sum(1. / NSqr[None, :] * func ** 2, axis=1)
 
-    kArr = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TERes")
+
+def waveFunctionNegPerp(zArr, kArr, L, omega, wLO, wTO, epsInf):
+    NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
+    kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    func = np.sqrt(eps * omega**2 / (consts.c**2 * kDArr[None, :]**2) + 1) * 0.5 * ( np.exp(kDArr[None, :] * zArr[:, None]) +  np.exp(-kDArr[None, :] * (zArr[:, None] + L))) * np.sin(kArr[None, :] * L / 2.)
+    return np.sum(1. / NSqr[None, :] * func ** 2, axis=1)
+
+
+def calcDosTM(zArr, L, omega, wLO, wTO, epsInf):
+
+    kArr = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TMRes")
 
     indNeg = np.where(zArr < 0)
     indPos = np.where(zArr >= 0)
     zPosArr = zArr[indPos]
     zNegArr = zArr[indNeg]
 
-    dosPos = dosSumPos(zPosArr, kArr, L, omega, wLO, wTO, epsInf)
-    dosNeg = dosSumNeg(zNegArr, kArr, L, omega, wLO, wTO, epsInf)
+    dosPos = waveFunctionPosPara(zPosArr, kArr, L, omega, wLO, wTO, epsInf)
+    dosNeg = waveFunctionNegPara(zNegArr, kArr, L, omega, wLO, wTO, epsInf)
+    dosPos += waveFunctionPosPerp(zPosArr, kArr, L, omega, wLO, wTO, epsInf)
+    dosNeg += waveFunctionNegPerp(zNegArr, kArr, L, omega, wLO, wTO, epsInf)
 
     dos = np.pi * consts.c / (2. * omega) * np.append(dosNeg, dosPos)
     return dos
 
-def plotDosTESPhP(zArr, dos, L, omega, wLO, wTO, epsInf):
+def plotDosTMSPhP(zArr, dos, L, omega, wLO, wTO, epsInf):
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
@@ -101,7 +124,7 @@ def plotDosTESPhP(zArr, dos, L, omega, wLO, wTO, epsInf):
     ax.set_xticks([np.amin(zArr), 0, np.amax(zArr)])
     ax.set_xticklabels([r"$-\frac{L}{2}$", r"$0$", r"$\frac{L}{2}$"])
 
-    ax.set_xlabel(r"$z[\frac{c}{\omega}]$")
+    ax.set_xlabel(r"$z$")
     ax.set_ylabel(r"$\rho / \rho_0$")
 
     #legend = ax.legend(fontsize=fontsize, loc='lower right', bbox_to_anchor=(1.0, 0.1), edgecolor='black', ncol=1)
@@ -109,20 +132,20 @@ def plotDosTESPhP(zArr, dos, L, omega, wLO, wTO, epsInf):
     #legend.get_frame().set_boxstyle('Square', pad=0.1)
     #legend.get_frame().set_linewidth(0.0)
 
-    plt.savefig("./SPhPPlotsSaved/dosTERes.png")
+    plt.savefig("./SPhPPlotsSaved/dosTMRes.png")
 
-def createPlotDosTERes():
+def createPlotDosTMRes():
 
-    omega = 2. * 1e12
+    omega = 2 * 1e12
     wLO = 3. * 1e12
     wTO = 1. * 1e12
     epsInf = 2.
     L = 1.
 
-    zArr = np.linspace(-L / 2., L / 2., 500)
+    zArr = np.linspace(-L / 2., L / 2., 1000)
 
-    dos = calcDosTE(zArr, L, omega, wLO, wTO, epsInf)
-    plotDosTESPhP(zArr, dos, L, omega, wLO, wTO, epsInf)
+    dos = calcDosTM(zArr, L, omega, wLO, wTO, epsInf)
+    plotDosTMSPhP(zArr, dos, L, omega, wLO, wTO, epsInf)
 
 
 

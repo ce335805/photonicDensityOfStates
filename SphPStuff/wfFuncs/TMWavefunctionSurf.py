@@ -180,8 +180,8 @@ def plotWaveFunctionPerp(kDArr, zArr, L, omega, wLO, wTO, epsInf):
 
     ax.set_xlim(np.amin(zArr), np.amax(zArr))
 
-    #ax.set_xticks([np.amin(zArr), 0, np.amax(zArr)])
-    #ax.set_xticklabels([r"$-\frac{L}{2}$", r"$0$", r"$\frac{L}{2}$"])
+    ax.set_xticks([np.amin(zArr), 0, np.amax(zArr)])
+    ax.set_xticklabels([r"$-\frac{L}{200}$", r"$0$", r"$\frac{L}{200}$"])
 
     ax.set_xlabel(r"$z$")
     ax.set_ylabel(r"$ \varepsilon(\omega) f(z) \; [\mathrm{arb. \, units}]$")
@@ -191,7 +191,7 @@ def plotWaveFunctionPerp(kDArr, zArr, L, omega, wLO, wTO, epsInf):
 
 def createPlotSurf():
     epsInf = 2.
-    omega = 2.2 * 1e12
+    omega = 2. * 1e12
     wLO = 3. * 1e12
     wTO = 1. * 1e12
     L = 1.

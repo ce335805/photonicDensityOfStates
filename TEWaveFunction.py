@@ -189,17 +189,24 @@ def createPlotTE():
     epsilon = 2.
     omega = 1 * 1e11
     c = 3 * 1e8
-    L = 0.05
+    L = 10.
 
-    checkNormalizations(L, omega, epsilon)
-    orthomat = checkOrthonormality(L, omega, epsilon)
+    #checkNormalizations(L, omega, epsilon)
+    #orthomat = checkOrthonormality(L, omega, epsilon)
 
-    print(orthomat)
+    #print(orthomat)
 
     zArr = np.linspace(-c / omega * 40., c / omega * 20., 1000)
     zArr = np.linspace(- L / 2., L / 2., 1000)
 
     allowedKs = findKsTE(L, omega, epsilon)
+
+    for kInd, kVal in enumerate(allowedKs):
+        kDVal = np.sqrt((epsilon - 1) * omega ** 2 / consts.c ** 2 + kVal ** 2)
+        test = np.sin(kVal * L / 2)**2 / (np.sin(kDVal * L / 2)**2)
+        print("sin(kD) / sin(k) = {}".format(test))
+
+    exit()
 
     print(allowedKs)
     plotWaveFunction(allowedKs[:], zArr, L, omega, epsilon)

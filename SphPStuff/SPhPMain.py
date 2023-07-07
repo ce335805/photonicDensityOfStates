@@ -7,6 +7,14 @@ from SphPStuff.wfFuncs import TMWavefunctionSurf as Surf
 from SphPStuff.dosFuncs import dosTEModes as dosTE
 from SphPStuff.dosFuncs import dosTEEvaModes as dosTEEva
 from SphPStuff.dosFuncs import dosTEResModes as dosTERes
+from SphPStuff.dosFuncs import dosTMModes as dosTM
+from SphPStuff.dosFuncs import dosTMEvaModes as dosTMEva
+from SphPStuff.dosFuncs import dosTMResModes as dosTMRes
+from SphPStuff.dosFuncs import dosTMSurfModes as dosTMSurf
+
+from SphPStuff.asOfFrequency import dosAsOfFreq
+
+
 
 def SPhPMain():
     print("Compute full Dos and all modes")
@@ -17,11 +25,16 @@ def SPhPMain():
     #TM.createPlotTM()
     #TMEva.createPlotTMEva()
     #TMRes.createPlotTMRes()
-    Surf.createPlotSurf()
+    #Surf.createPlotSurf()
 
-    #dosTE.createPlotDosTE()
+    dosTE.createPlotDosTE()
     #dosTEEva.createPlotDosTEEva()
     #dosTERes.createPlotDosTERes()
+    #dosTM.createPlotDosTM()
+    #dosTMEva.createPlotDosTMEva()
+    #dosTMRes.createPlotDosTMRes()
+    #dosTMSurf.createPlotDosTMSurf()
 
+    #dosAsOfFreq.createPlotAsOfOmega()
 
 SPhPMain()

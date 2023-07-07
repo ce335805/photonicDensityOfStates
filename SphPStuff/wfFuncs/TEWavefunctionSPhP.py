@@ -123,10 +123,10 @@ def plotWaveFunction(kDArr, zArr, L, omega, wLO, wTO, epsInf):
 
 def createPlotTE():
     epsInf = 2.
-    omega = 5. * 1e11
+    omega = 3.5 * 1e12
     wLO = 3. * 1e12
     wTO = 1. * 1e12
-    L = 0.5
+    L = 0.1
 
     #zArr = np.linspace(-c / omega * 40., c / omega * 40., 1000)
     zArr = np.linspace(- L / 2., L / 2., 1000)
@@ -134,4 +134,4 @@ def createPlotTE():
     allowedKs = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TE")
 
     checkNormalizations(allowedKs, L, omega, wLO, wTO, epsInf)
-    plotWaveFunction(allowedKs[:], zArr, L, omega, wLO, wTO, epsInf)
+    plotWaveFunction(allowedKs[:5], zArr, L, omega, wLO, wTO, epsInf)

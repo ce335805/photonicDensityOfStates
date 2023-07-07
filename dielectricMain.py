@@ -1,32 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import gridspec
-from scipy.integrate import quad
 
-from matplotlib import ticker
-from matplotlib.colors import LogNorm
-import matplotlib.patches as patches
 import matplotlib as mpl
 import matplotlib.cm as cm
-import matplotlib.colors
-import h5py
 from matplotlib import gridspec
-from matplotlib.patches import ConnectionPatch
 
-import TMEvaWaveFunction
-import complexIntegral
 import scipy.integrate as integrate
-import scipy.optimize as opt
 import scipy.constants as consts
 
-import dosFresnel
-import findAllowedKs
 import dosBox
-import TEEvaWaveFunction
 import dosEvanescentTE
 import dosEvanescentTM
-import TEWaveFunction
-import TMWaveFunctions
+from understandThings import understandSubstitution
+from understandThings import pedestrianDos as pedestrian
 
 fontsize = 8
 
@@ -171,13 +157,18 @@ def boxDosFromIntegral(zArr, L, omega, eps, c):
 
 
 def main():
+
+    #understandSubstitution.creatDosPlot()
+    pedestrian.pedestrianMain()
+    exit()
+
     #computeDosFromFresnel()
 
     #TEEvaWaveFunction.createPlotEva()
     #TMEvaWaveFunction.createPlotTM()
     #TEWaveFunction.createPlotTE()
     #TMWaveFunctions.createPlotTM()
-    #exit()
+    exit()
 
     epsilon = 3.
     omega = 1 * 1e11

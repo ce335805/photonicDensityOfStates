@@ -137,7 +137,7 @@ def plotWaveFunction(kDArr, zArr, L, omega, wLO, wTO, epsInf):
     ax.set_xlabel(r"$z$")
     ax.set_ylabel(r"$f(z) \; [\mathrm{arb. \, units}]$")
 
-    plt.savefig("./SPhPPlotsSaved/wFSPhPTERes.png")
+    plt.savefig("./SPhPPlotsSaved/wFSPhPTEResZoom.png")
 
 
 def createPlotTERes():
