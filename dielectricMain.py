@@ -13,6 +13,7 @@ import dosEvanescentTE
 import dosEvanescentTM
 from understandThings import understandSubstitution
 from understandThings import pedestrianDos as pedestrian
+from understandThings import pedestrianDosDielectric as pedestrianDielectric
 
 fontsize = 8
 
@@ -159,7 +160,8 @@ def boxDosFromIntegral(zArr, L, omega, eps, c):
 def main():
 
     #understandSubstitution.creatDosPlot()
-    pedestrian.pedestrianMain()
+    #pedestrian.pedestrianMain()
+    pedestrianDielectric.pedestrianMainDielectric()
     exit()
 
     #computeDosFromFresnel()
