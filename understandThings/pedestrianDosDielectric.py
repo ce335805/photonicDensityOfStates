@@ -108,7 +108,8 @@ def dosAnalytical(omega, zArr, eps, L):
     kDArr = np.sqrt((eps - 1) * omega**2 / consts.c**2 + kzArr**2)
     NSqr = L / 4 * (eps * np.sin(kzArr * L / 2.)**2  * (1 - np.sin(kDArr * L) / (kDArr * L)) + np.sin(kDArr * L / 2.)**2 * (1 - np.sin(kzArr * L) / (kzArr * L)))
     func = np.sin(kzArr[None, :] * (L / 2 - zArr[:, None])) * np.sin(kDArr[None, :] * L / 2.)
-    return np.sum(1. / NSqr[None, :] * (1 -  2 * consts.c**2 / omega * kzArr[None, :] * kzArrDel[None, :]) * func ** 2, axis=1)
+    return np.sum(1. / NSqr[None, :] * (1 -  consts.c**2 / omega * kzArr[None, :] * kzArrDel[None, :]) * func ** 2, axis=1)
+    #return np.sum(1. / NSqr[None, :] * 1. / (1 +  consts.c**2 / omega * kzArr[None, :] * kzArrDel[None, :]) * func ** 2, axis=1)
 
 def dosAnalyticalNoDerivative(omega, zArr, eps, L):
     kzArr = allowedKsOm.findKs(L, omega, eps, "TE")
@@ -200,7 +201,7 @@ def pedestrianMainDielectric():
 
     L = .1
     eps = 2.
-    omega = .5 * 1e11
+    omega = .3 * 1e11
     deltaOmega = omega / 10.
 
     kBound = np.sqrt(eps) * (omega + deltaOmega) / consts.c

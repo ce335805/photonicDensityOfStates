@@ -45,7 +45,7 @@ mpl.rcParams['text.latex.preamble'] = [
 ]
 
 
-def plotPedestrianDoss(zArr, dos, omega, deltaOmega, eps):
+def plotPedestrianDoss(zArr, dos, dosInt, dosAna, omega, deltaOmega, eps):
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
@@ -55,6 +55,8 @@ def plotPedestrianDoss(zArr, dos, omega, deltaOmega, eps):
     rho0 = (omega + deltaOmega / 2)**2 / (2. * np.pi**2 * consts.c ** 3)
 
     ax.plot(zArr, dos / deltaOmega / rho0, color='peru', lw=1., label = "DOS from Box")
+    ax.plot(zArr, dosInt / deltaOmega / rho0, color='steelblue', linestyle = '-', lw=1., label = "DOS from Box")
+    ax.plot(zArr, dosAna / deltaOmega / rho0, color='orange', linestyle = '--', lw=1., label = "DOS from Box")
     #ax.plot(zArr, dosInt / deltaOmega / rho0, color='coral', lw=1., label = "DOS from Box")
     #ax.plot(zArr, dosAna / deltaOmega / rho0, color='teal', lw=1., label = "DOS from Box", linestyle = '--')
     ax.axhline(0.5, lw = 0.5, color = 'gray', zorder = -666)
