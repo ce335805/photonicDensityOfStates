@@ -32,6 +32,11 @@ mpl.rcParams['text.latex.preamble'] = [
     #    r'\everymath={\sf}'
 ]
 
+def normFac(omega, wLO, wTO, epsInf):
+    frac = (wLO**2 - wTO**2) / (wTO**2 - omega**2)**2
+    #return 2. * omega * epsInf * (1 + wTO**2 * frac)
+    return epsInf * (1 + wTO**2 * frac)
+
 def epsilon(omega, wLO, wTO, epsInf):
     return epsInf * (wLO ** 2 - omega ** 2) / (wTO ** 2 - omega ** 2)
 

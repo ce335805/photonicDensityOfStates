@@ -306,12 +306,21 @@ def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
         eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
         NDiscrete = 11 * int(omega / consts.c * (np.sqrt(eps) + 1.) * L  + 17)
         print("NDiscrete = {}".format(NDiscrete))
-
-        extremaTE = extremalPoints(L, omega, wLO, wTO, epsInf, NDiscrete, mode)
-        if(len(extremaTE) == 0):
+        extrema = extremalPoints(L, omega, wLO, wTO, epsInf, NDiscrete, mode)
+        if(len(extrema) == 0):
             return np.array([])
         #plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extremaTE, mode)
-        rootsTE = computeRootsGivenExtrema(L, omega, wLO, wTO, epsInf, extremaTE, mode)
-        print("Number of roots for " + mode +" found = {}".format(rootsTE.shape))
+        roots = computeRootsGivenExtrema(L, omega, wLO, wTO, epsInf, extrema, mode)
+        print("Number of roots for " + mode +" found = {}".format(roots.shape))
         #plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, rootsTE, mode)
-        return rootsTE
+        return roots
+
+
+def findKsDerivativeW(d, omega, wLO, wTO, epsInf, mode):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    delOm = omega * 1e-4
+    NDiscrete = 51 * int(omega / consts.c * (np.sqrt(eps) + 1.) * d + 17)
+    extrema = extremalPoints(d, omega, wLO, wTO, epsInf, NDiscrete, mode)
+    rootsPlus = computeRootsGivenExtrema(d, omega + delOm, wLO, wTO, epsInf, extrema, mode)
+    rootsMinus = computeRootsGivenExtrema(d, omega - delOm, wLO, wTO, epsInf, extrema, mode)
+    return (rootsPlus - rootsMinus) / (2. * delOm)

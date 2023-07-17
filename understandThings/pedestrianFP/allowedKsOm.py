@@ -32,27 +32,35 @@ mpl.rcParams['text.latex.preamble'] = [
     r'\usepackage[helvet]{sfmath}',
 ]
 
-
-
 def rootFuncTE(k, d, omega, eps):
     kD = np.sqrt((eps - 1) * omega**2 / consts.c**2 + k**2)
     term1 = k * np.cos(k * d / 2.) * np.sin(kD * d / 2.)
     term2 = kD * np.cos(kD * d / 2.) * np.sin(k * d / 2.)
     return term1 + term2
 
-def rootFuncTEEva(kD, d, omega, eps):
-    kReal = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2 + 1e-8)
-    term1 = kD * np.tanh(kReal * d / 2) * np.cos(kD * d / 2)
-    term2 = kReal * np.sin(kD * d / 2)
+def rootFuncTEEva(k, d, omega, eps):
+    #k = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2)
+    kD = np.sqrt((eps - 1) * omega**2 / consts.c**2 - k**2)
+    term1 = kD * np.tanh(k * d / 2) * np.cos(kD * d / 2)
+    term2 = k * np.sin(kD * d / 2)
+    return term1 + term2
+
+def rootFuncTEEvakD(kD, d, omega, eps):
+    k = np.sqrt((eps - 1) * omega ** 2 / consts.c ** 2 - kD ** 2)
+    #kD = np.sqrt((eps - 1) * omega**2 / consts.c**2 - k**2)
+    term1 = kD * np.tanh(k * d / 2) * np.cos(kD * d / 2)
+    term2 = k * np.sin(kD * d / 2)
     return term1 + term2
 
 def extremalPoints(d, omega, eps, N, mode):
     rootFunc = rootFuncTE
     if (mode == "TEEva"):
         rootFunc = rootFuncTEEva
+    elif(mode == "TEEvakD"):
+        rootFunc = rootFuncTEEvakD
 
     upperBound = omega / consts.c
-    if(mode == "TEEva"):
+    if(mode == "TEEva" or mode == "TEEvakD"):
         upperBound = np.sqrt(eps - 1.) * omega / consts.c
 
     intervals = np.zeros((N, 2))
@@ -60,9 +68,6 @@ def extremalPoints(d, omega, eps, N, mode):
     upperBounds = np.linspace(0, upperBound, N, endpoint=False) + lowerBounds[1]
     intervals[:, 0] = lowerBounds
     intervals[:, 1] = upperBounds
-    if(mode == "TEEva"):
-        print("upperBound = {}".format(upperBound))
-        print("upperInterval = {}".format(intervals[-1, 1]))
     extrema = np.zeros(0)
     prevMaxatMaxInd = False#something to include maxima that are on boundaries of intervals
     for n in range(N):
@@ -83,9 +88,12 @@ def computeRootsGivenExtrema(d, omega, eps, extrema, mode):
     rootFunc = rootFuncTE
     if(mode == "TEEva"):
         rootFunc = rootFuncTEEva
+    elif(mode == "TEEvakD"):
+        rootFunc = rootFuncTEEvakD
+
 
     upperBound = omega / consts.c
-    if(mode == "TEEva"):
+    if(mode == "TEEva" or mode == "TEEvakD"):
         upperBound = np.sqrt(eps - 1.) * omega / consts.c
 
     nRoots = len(extrema)
@@ -135,14 +143,12 @@ def plotRootFuncWithRoots(d, omega, eps, roots):
     plt.savefig("./savePedestrianFPPlots/rootFuncWithRootsOm.png")
 
 
-def findKs(d, omega, eps, mode, doIPlot):
+def findKs(d, omega, eps, mode):
     NDiscrete = 51 * int(omega / consts.c * (np.sqrt(eps) + 1.) * d + 17)
     extrema = extremalPoints(d, omega, eps, NDiscrete, mode)
     if(len(extrema) == 0):
         return np.array([])
     roots = computeRootsGivenExtrema(d, omega, eps, extrema, mode)
-    if(doIPlot):
-        plotRootFuncWithRoots(d, omega, eps, roots)
     return roots
 
 def findKsDerivativeW(d, omega, eps, mode):
@@ -150,7 +156,5 @@ def findKsDerivativeW(d, omega, eps, mode):
     NDiscrete = 51 * int(omega / consts.c * (np.sqrt(eps) + 1.) * d + 17)
     extrema = extremalPoints(d, omega, eps, NDiscrete, mode)
     rootsPlus = computeRootsGivenExtrema(d, omega + delOm, eps, extrema, mode)
-    #print("rootsPlus = {}".format(rootsPlus))
     rootsMinus = computeRootsGivenExtrema(d, omega - delOm, eps, extrema, mode)
-    #print("rootsMinus = {}".format(rootsMinus))
     return (rootsPlus - rootsMinus) / (2. * delOm)

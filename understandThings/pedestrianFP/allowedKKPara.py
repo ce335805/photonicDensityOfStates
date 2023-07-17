@@ -146,11 +146,9 @@ def findKs(d, omega, kx, ky, eps, mode):
     roots = computeRootsGivenExtrema(d, omega, kparaSq, eps, extrema, mode)
     return roots
 
-def findKsKPara(d, omega, kparaSq, eps, mode, doIPlot):
+def findKsKPara(d, omega, kparaSq, eps, mode):
     NDiscrete = 11 * int(omega / consts.c * (np.sqrt(eps) + 1.) * d + 17)
     extrema = extremalPoints(d, omega, kparaSq, eps, NDiscrete, mode)
     roots = computeRootsGivenExtrema(d, omega, kparaSq, eps, extrema, mode)
-    if(doIPlot):
-        plotRootFuncWithRoots(d, omega, kparaSq, eps, roots)
     return roots
 

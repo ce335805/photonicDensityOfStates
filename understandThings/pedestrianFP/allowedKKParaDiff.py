@@ -16,7 +16,7 @@ def computeSingleDerivative(d, kPara, delK, kz, eps):
 
 def findDerivativeKPara(d, omega, kzArr, eps):
     kParaArr = np.sqrt(omega**2 / consts.c**2 - kzArr**2)
-    delK = kzArr[0] * 1e-3
+    delK = kzArr[0] * 1e-4
     diffArr = np.zeros(kzArr.shape)
     for pairInd in range(len(kzArr)):
         diffArr[pairInd] = computeSingleDerivative(d, kParaArr[pairInd], delK, kzArr[pairInd], eps)

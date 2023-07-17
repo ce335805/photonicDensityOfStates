@@ -85,6 +85,8 @@ def waveFunctionNegPerp(zArr, kVal, L, omega, wLO, wTO, epsInf):
     func = -0.25 * np.sqrt(eps * omega**2 / (consts.c**2 * kDVal**2) + 1) * ( np.exp(kDVal * zArr) +  np.exp(-kDVal * (L + zArr))) * (1 - np.exp(-kVal * L))
     return 1. / np.sqrt(NSqr) * func
 
+
+
 def waveFunctionTMPara(zArr, kArr, L, omega, wLO, wTO, epsInf):
     indNeg = np.where(zArr < 0)
     indPos = np.where(zArr >= 0)
@@ -112,6 +114,63 @@ def waveFunctionTMPerp(zArr, kArr, L, omega, wLO, wTO, epsInf):
 
     return wF
 
+def NSqAna(kVal, omega, wLO, wTO, epsInf):
+    epsAbs = np.abs(epsFunc.epsilon(omega, wLO, wTO, epsInf))
+    kpara = np.sqrt(omega**2 / consts.c**2 + kVal**2)
+    return 1. / (2. * kpara * np.sqrt(epsAbs)) * (1 + epsAbs) * (epsAbs + 1. / epsAbs)
+    #return 1. / kpara * np.sqrt((eps**2 + 1) / np.abs(eps))
+
+def waveFunctionPosParaAna(zArr, kVal, omega, wLO, wTO, epsInf):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    kpara = np.sqrt(omega**2 / consts.c**2 + kVal**2)
+    NSq = NSqAna(kVal, omega, wLO, wTO, epsInf)
+    return 1. / np.sqrt(NSq) * np.exp(- np.sqrt(1. / np.abs(eps)) * kpara * zArr)
+
+def waveFunctionNegParaAna(zArr, kVal, omega, wLO, wTO, epsInf):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    kpara = np.sqrt(omega**2 / consts.c**2 + kVal**2)
+    NSq = NSqAna(kVal, omega, wLO, wTO, epsInf)
+    return 1./np.sqrt(NSq) * np.exp(np.sqrt(np.abs(eps)) * kpara * zArr)
+
+def waveFunctionTMParaAna(zArr, kArr, omega, wLO, wTO, epsInf):
+    indNeg = np.where(zArr < 0)
+    indPos = np.where(zArr >= 0)
+    zPosArr = zArr[indPos]
+    zNegArr = zArr[indNeg]
+
+    wFPos = waveFunctionPosParaAna(zPosArr, kArr, omega, wLO, wTO, epsInf)
+    wFNeg = waveFunctionNegParaAna(zNegArr, kArr, omega, wLO, wTO, epsInf)
+
+    wF = np.append(wFNeg, wFPos)
+
+    return wF
+
+def waveFunctionPosPerpAna(zArr, kVal, omega, wLO, wTO, epsInf):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    kpara = np.sqrt(omega**2 / consts.c**2 + kVal**2)
+    NSq = NSqAna(kVal, omega, wLO, wTO, epsInf)
+    return np.sqrt(np.abs(eps)) / np.sqrt(NSq) * np.exp(- np.sqrt(1. / np.abs(eps)) * kpara * zArr)
+
+def waveFunctionNegPerpAna(zArr, kVal, omega, wLO, wTO, epsInf):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    kpara = np.sqrt(omega**2 / consts.c**2 + kVal**2)
+    NSq = NSqAna(kVal, omega, wLO, wTO, epsInf)
+    return - 1. / (np.sqrt(NSq) * np.sqrt(np.abs(eps))) * np.exp(np.sqrt(np.abs(eps)) * kpara * zArr)
+
+def waveFunctionTMPerpAna(zArr, kArr, omega, wLO, wTO, epsInf):
+    indNeg = np.where(zArr < 0)
+    indPos = np.where(zArr >= 0)
+    zPosArr = zArr[indPos]
+    zNegArr = zArr[indNeg]
+
+    wFPos = waveFunctionPosPerpAna(zPosArr, kArr, omega, wLO, wTO, epsInf)
+    wFNeg = waveFunctionNegPerpAna(zNegArr, kArr, omega, wLO, wTO, epsInf)
+
+    wF = np.append(wFNeg, wFPos)
+
+    return wF
+
+
 def waveFunctionForInt(z, k, L, omega, wLO, wTO, epsInf):
     if (z >= 0):
         return (waveFunctionPosPara(z, k, L, omega, wLO, wTO, epsInf)) ** 2 + (waveFunctionPosPerp(z, k, L, omega, wLO, wTO, epsInf)) ** 2
@@ -119,18 +178,35 @@ def waveFunctionForInt(z, k, L, omega, wLO, wTO, epsInf):
         return (waveFunctionNegPara(z, k, L, omega, wLO, wTO, epsInf)) ** 2 + (waveFunctionNegPerp(z, k, L, omega, wLO, wTO, epsInf)) ** 2
 
 def checkNormalizationK(k, L, omega, wLO, wTO, epsInf):
-    checkInt = integrate.quad(waveFunctionForInt, -L / 2., L / 2., args=(k, L, omega, wLO, wTO, epsInf))
+    checkInt = integrate.quad(waveFunctionForInt, -L / 200., L / 200., args=(k, L, omega, wLO, wTO, epsInf))
     print("Norm = {}, with Int accuracy = {}".format(checkInt[0], checkInt[1]))
 
 def checkNormalizations(allowedKs, L, omega, wLO, wTO, epsInf):
-    for kVal in allowedKs[:10]:
+    for kVal in allowedKs:
         checkNormalizationK(kVal, L, omega, wLO, wTO, epsInf)
 
-def plotWaveFunctionPara(kDArr, zArr, L, omega, wLO, wTO, epsInf):
-    wF = np.zeros((kDArr.shape[0], zArr.shape[0]), dtype=float)
+def waveFunctionForIntAna(z, k, omega, wLO, wTO, epsInf):
+    if (z >= 0):
+        return (waveFunctionPosParaAna(z, k, omega, wLO, wTO, epsInf)) ** 2 + (waveFunctionPosPerpAna(z, k, omega, wLO, wTO, epsInf)) ** 2
+    else:
+        return (waveFunctionNegParaAna(z, k, omega, wLO, wTO, epsInf)) ** 2 + (waveFunctionNegPerpAna(z, k, omega, wLO, wTO, epsInf)) ** 2
 
-    for kDInd, kDVal in enumerate(kDArr):
-        wF[kDInd, :] = waveFunctionTMPara(zArr, kDVal, L, omega, wLO, wTO, epsInf)
+def checkNormalizationKAna(k, L, omega, wLO, wTO, epsInf):
+    checkInt = integrate.quad(waveFunctionForIntAna, -L / 200., L / 200., args=(k, omega, wLO, wTO, epsInf))
+    print("Norm = {}, with Int accuracy = {}".format(checkInt[0], checkInt[1]))
+
+def checkNormalizationsAna(allowedKs, L, omega, wLO, wTO, epsInf):
+    for kVal in allowedKs:
+        checkNormalizationKAna(kVal, L, omega, wLO, wTO, epsInf)
+
+
+def plotWaveFunctionPara(kArr, zArr, L, omega, wLO, wTO, epsInf):
+    wF = np.zeros((kArr.shape[0], zArr.shape[0]), dtype=float)
+    wFAna = np.zeros((kArr.shape[0], zArr.shape[0]), dtype=float)
+
+    for kInd, kVal in enumerate(kArr):
+        wF[kInd, :] = waveFunctionTMPara(zArr, kVal, L, omega, wLO, wTO, epsInf)
+        wFAna[kInd, :] = waveFunctionTMParaAna(zArr, kVal, omega, wLO, wTO, epsInf)
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
@@ -138,9 +214,9 @@ def plotWaveFunctionPara(kDArr, zArr, L, omega, wLO, wTO, epsInf):
     ax = plt.subplot(gs[0, 0])
 
     cmapPink = cm.get_cmap('pink')
-    for kDInd, kDVal in enumerate(kDArr):
-        color = cmapPink(kDInd / (wF.shape[0] + 0.5))
-        ax.plot(zArr, wF[kDInd, :], color=color, lw=1.)
+    for kInd, kVal in enumerate(kArr):
+        ax.plot(zArr, wF[kInd, :], color=cmapPink(.3), lw=1.)
+        ax.plot(zArr, wFAna[kInd, :], color=cmapPink(.6), lw=1., linestyle = '--')
 
     ax.axhline(0, lw=0.5, color='gray')
     ax.axvline(0, lw=0.5, color='gray')
@@ -157,23 +233,26 @@ def plotWaveFunctionPara(kDArr, zArr, L, omega, wLO, wTO, epsInf):
 
 def plotWaveFunctionPerp(kDArr, zArr, L, omega, wLO, wTO, epsInf):
     wF = np.zeros((kDArr.shape[0], zArr.shape[0]), dtype=float)
+    wFAna = np.zeros((kDArr.shape[0], zArr.shape[0]), dtype=float)
 
     for kDInd, kDVal in enumerate(kDArr):
         wF[kDInd, :] = waveFunctionTMPerp(zArr, kDVal, L, omega, wLO, wTO, epsInf)
+        wFAna[kDInd, :] = waveFunctionTMPerpAna(zArr, kDVal, omega, wLO, wTO, epsInf)
 
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     indNeg = np.where(zArr < 0)
     wF[:, indNeg] = wF[:, indNeg] * eps
+    wFAna[:, indNeg] = wFAna[:, indNeg] * eps
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
                            wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.22, right=0.96)
     ax = plt.subplot(gs[0, 0])
 
-    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
     for kDInd, kDVal in enumerate(kDArr):
-        color = cmapPink(kDInd / (wF.shape[0] + 0.5))
-        ax.plot(zArr, wF[kDInd, :], color=color, lw=1.)
+        ax.plot(zArr, wF[kDInd, :], color=cmapBone(0.3), lw=1.)
+        ax.plot(zArr, wFAna[kDInd, :], color=cmapBone(0.6), lw=1., linestyle = '--')
 
     ax.axhline(0, lw=0.5, color='gray')
     ax.axvline(0, lw=0.5, color='gray')
@@ -191,16 +270,17 @@ def plotWaveFunctionPerp(kDArr, zArr, L, omega, wLO, wTO, epsInf):
 
 def createPlotSurf():
     epsInf = 2.
-    omega = 2. * 1e12
+    omega = 1.5 * 1e12
     wLO = 3. * 1e12
     wTO = 1. * 1e12
-    L = 1.
+    L = 20.
 
     #zArr = np.linspace(-consts.c / omega * 5., consts.c / omega * 5., 1000)
-    zArr = np.linspace(- L / 200., L / 200., 1000)
+    zArr = np.linspace(- L / 2000., L / 2000., 1000)
 
     allowedKs = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "Surf")
 
     checkNormalizations(allowedKs, L, omega, wLO, wTO, epsInf)
+    checkNormalizationsAna(allowedKs, L, omega, wLO, wTO, epsInf)
     plotWaveFunctionPara(allowedKs[:], zArr, L, omega, wLO, wTO, epsInf)
     plotWaveFunctionPerp(allowedKs[:], zArr, L, omega, wLO, wTO, epsInf)

@@ -48,8 +48,10 @@ mpl.rcParams['text.latex.preamble'] = [
 
 def NormSqr(kVal, L, omega, wLO, wTO, epsInf):
     kDVal = epsFunc.kDFromK(kVal, omega, wLO, wTO, epsInf)
+    normPrefac = epsFunc.normFac(omega, wLO, wTO, epsInf)
+    #normPrefac = 1.
     term1 = (1 - np.sin(kVal * L) / (kVal * L)) * np.sin(kDVal * L / 2)**2
-    term2 = (1 - np.sin(kDVal * L) / (kDVal * L)) * np.sin(kVal * L / 2)**2
+    term2 = normPrefac * (1 - np.sin(kDVal * L) / (kDVal * L)) * np.sin(kVal * L / 2)**2
     return L / 4 * (term1 + term2)
 
 def waveFunctionPos(zArr, kVal, L, omega, wLO, wTO, epsInf):
@@ -123,10 +125,10 @@ def plotWaveFunction(kDArr, zArr, L, omega, wLO, wTO, epsInf):
 
 def createPlotTE():
     epsInf = 2.
-    omega = 3.5 * 1e12
+    omega = 1. * 1e11
     wLO = 3. * 1e12
     wTO = 1. * 1e12
-    L = 0.1
+    L = 10.
 
     #zArr = np.linspace(-c / omega * 40., c / omega * 40., 1000)
     zArr = np.linspace(- L / 2., L / 2., 1000)
