@@ -118,7 +118,6 @@ def NSqAna(kVal, omega, wLO, wTO, epsInf):
     epsAbs = np.abs(epsFunc.epsilon(omega, wLO, wTO, epsInf))
     kpara = np.sqrt(omega**2 / consts.c**2 + kVal**2)
     return 1. / (2. * kpara * np.sqrt(epsAbs)) * (1 + epsAbs) * (epsAbs + 1. / epsAbs)
-    #return 1. / kpara * np.sqrt((eps**2 + 1) / np.abs(eps))
 
 def waveFunctionPosParaAna(zArr, kVal, omega, wLO, wTO, epsInf):
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
@@ -204,9 +203,12 @@ def plotWaveFunctionPara(kArr, zArr, L, omega, wLO, wTO, epsInf):
     wF = np.zeros((kArr.shape[0], zArr.shape[0]), dtype=float)
     wFAna = np.zeros((kArr.shape[0], zArr.shape[0]), dtype=float)
 
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    kValAna = omega / consts.c * 1. / np.sqrt(np.abs(eps) - 1)
+
     for kInd, kVal in enumerate(kArr):
         wF[kInd, :] = waveFunctionTMPara(zArr, kVal, L, omega, wLO, wTO, epsInf)
-        wFAna[kInd, :] = waveFunctionTMParaAna(zArr, kVal, omega, wLO, wTO, epsInf)
+        wFAna[kInd, :] = waveFunctionTMParaAna(zArr, kValAna, omega, wLO, wTO, epsInf)
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
@@ -270,17 +272,23 @@ def plotWaveFunctionPerp(kDArr, zArr, L, omega, wLO, wTO, epsInf):
 
 def createPlotSurf():
     epsInf = 2.
-    omega = 1.5 * 1e12
+    omega = 2.1 * 1e12
     wLO = 3. * 1e12
     wTO = 1. * 1e12
-    L = 20.
+    L = 200.
 
     #zArr = np.linspace(-consts.c / omega * 5., consts.c / omega * 5., 1000)
-    zArr = np.linspace(- L / 2000., L / 2000., 1000)
+    zArr = np.linspace(- L / 20000., L / 20000., 1000)
 
     allowedKs = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "Surf")
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    kValAna = omega / consts.c * 1. / np.sqrt((np.abs(eps) - 1))
+    print("kVal numerical = {}".format(allowedKs[0]))
+    print("kVal analytical = {}".format(kValAna))
+
+
 
     checkNormalizations(allowedKs, L, omega, wLO, wTO, epsInf)
     checkNormalizationsAna(allowedKs, L, omega, wLO, wTO, epsInf)
-    plotWaveFunctionPara(allowedKs[:], zArr, L, omega, wLO, wTO, epsInf)
-    plotWaveFunctionPerp(allowedKs[:], zArr, L, omega, wLO, wTO, epsInf)
+    plotWaveFunctionPara(allowedKs, zArr, L, omega, wLO, wTO, epsInf)
+    plotWaveFunctionPerp(allowedKs, zArr, L, omega, wLO, wTO, epsInf)

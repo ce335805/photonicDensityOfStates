@@ -213,10 +213,13 @@ def plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extrema, mode):
 
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     upperBound = 0
-    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes" or mode == "Surf"):
+    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes"):
         upperBound = omega / consts.c
     elif (mode == "TEEva" or mode == "TMEva"):
         upperBound = np.sqrt(eps - 1) * omega / consts.c
+    elif (mode == "Surf"):
+        upperBound = omega / consts.c * 1. / (np.abs(eps) - 1)
+
     c = consts.c
 
     lowerBound = 0
@@ -240,7 +243,7 @@ def plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extrema, mode):
 
     ax.plot(kArr, rootFuncVals, color='indianred', lw=0.8)
     #ax.set_xlim(np.amin(kArr), np.amax(kArr))
-    ax.set_xlim(np.amax(kArr) * 0.9, np.amax(kArr))
+    #ax.set_xlim(np.amax(kArr) * 0.9, np.amax(kArr))
 
 
     ax.axhline(0., color = 'gray', lw = 0.5)
@@ -295,8 +298,9 @@ def plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, roots, mode):
     plt.savefig("./SPhPPlotsSaved/rootFuncWithRootsSPhP" + mode + ".png")
 
 def allowedKSurf(L, omega, wLO, wTO, epsInf):
+    epsAbs = np.abs(epsFunc.epsilon(omega, wLO, wTO, epsInf))
     root = scipy.optimize.root_scalar(rootFuncSurf, args=(L, omega, wLO, wTO, epsInf),
-                                          bracket=tuple([0., omega / consts.c]))
+                                          bracket=tuple([0., omega / consts.c * (10 + 10 / (epsAbs - 1))]))
     return np.array([root.root])
 
 def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
@@ -324,3 +328,18 @@ def findKsDerivativeW(d, omega, wLO, wTO, epsInf, mode):
     rootsPlus = computeRootsGivenExtrema(d, omega + delOm, wLO, wTO, epsInf, extrema, mode)
     rootsMinus = computeRootsGivenExtrema(d, omega - delOm, wLO, wTO, epsInf, extrema, mode)
     return (rootsPlus - rootsMinus) / (2. * delOm)
+
+def findKsSurf(L, omega, wLO, wTO, epsInf):
+    kVals = allowedKSurf(L, omega, wLO, wTO, epsInf)
+    if (len(kVals) == 0):
+        return 0
+    else:
+        return kVals[0]
+
+def findKsDerivativeWSurf(L, omega, wLO, wTO, epsInf):
+    delOm = omega * 1e-4
+    rootPlus = allowedKSurf(L, omega + delOm, wLO, wTO, epsInf)[0]
+    rootMinus = allowedKSurf(L, omega - delOm, wLO, wTO, epsInf)[0]
+
+    return (rootPlus - rootMinus) / (2. * delOm)
+

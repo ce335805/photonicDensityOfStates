@@ -25,7 +25,7 @@ def SPhPMain():
     #TM.createPlotTM()
     #TMEva.createPlotTMEva()
     #TMRes.createPlotTMRes()
-    Surf.createPlotSurf()
+    #Surf.createPlotSurf()
 
     #dosTE.createPlotDosTE()
     #dosTEEva.createPlotDosTEEva()
@@ -33,7 +33,7 @@ def SPhPMain():
     #dosTM.createPlotDosTM()
     #dosTMEva.createPlotDosTMEva()
     #dosTMRes.createPlotDosTMRes()
-    #dosTMSurf.createPlotDosTMSurf()
+    dosTMSurf.createPlotDosTMSurf()
 
     #dosAsOfFreq.createPlotAsOfOmega()
 
