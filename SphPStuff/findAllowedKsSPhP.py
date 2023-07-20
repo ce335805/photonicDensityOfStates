@@ -308,7 +308,7 @@ def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
         return allowedKSurf(L, omega, wLO, wTO, epsInf)
     else:
         eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-        NDiscrete = 11 * int(omega / consts.c * (np.sqrt(eps) + 1.) * L  + 17)
+        NDiscrete = 51 * int(omega / consts.c * (np.sqrt(np.abs(eps)) + 1.) * L  + 17)
         print("NDiscrete = {}".format(NDiscrete))
         extrema = extremalPoints(L, omega, wLO, wTO, epsInf, NDiscrete, mode)
         if(len(extrema) == 0):
@@ -320,13 +320,16 @@ def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
         return roots
 
 
-def findKsDerivativeW(d, omega, wLO, wTO, epsInf, mode):
+def findKsDerivativeW(L, omega, wLO, wTO, epsInf, mode):
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    delOm = omega * 1e-4
-    NDiscrete = 51 * int(omega / consts.c * (np.sqrt(eps) + 1.) * d + 17)
-    extrema = extremalPoints(d, omega, wLO, wTO, epsInf, NDiscrete, mode)
-    rootsPlus = computeRootsGivenExtrema(d, omega + delOm, wLO, wTO, epsInf, extrema, mode)
-    rootsMinus = computeRootsGivenExtrema(d, omega - delOm, wLO, wTO, epsInf, extrema, mode)
+    delOm = omega * 1e-5
+    NDiscrete = 51 * int(omega / consts.c * (np.sqrt(np.abs(eps)) + 1.) * L + 17)
+    extrema = extremalPoints(L, omega, wLO, wTO, epsInf, NDiscrete, mode)
+    print("len extrema for derivative: {}".format(len(extrema)))
+    if (len(extrema) == 0):
+        return np.array([])
+    rootsPlus = computeRootsGivenExtrema(L, omega + delOm, wLO, wTO, epsInf, extrema, mode)
+    rootsMinus = computeRootsGivenExtrema(L, omega - delOm, wLO, wTO, epsInf, extrema, mode)
     return (rootsPlus - rootsMinus) / (2. * delOm)
 
 def findKsSurf(L, omega, wLO, wTO, epsInf):

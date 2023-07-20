@@ -58,7 +58,9 @@ def NormSqr(kVal, L, omega, wLO, wTO, epsInf):
     brack22 = (eps * omega ** 2 / (consts.c ** 2 * kDVal ** 2) + 2) * (1 - np.exp(- 2 * kDVal * L)) / (2 * kDVal * L)
     term2 = (brack21 + brack22) * 0.25 * (1 + np.exp(-2. * kVal * L) - 2. * np.exp(-kVal * L))
 
-    return L / 4. * (term1 + term2)
+    hopfieldFactor = 1 + wTO**2 * (wLO**2 - wTO**2) / (wTO**2 - omega**2)**2
+
+    return L / 4. * (term1 + term2) * hopfieldFactor
 
 def waveFunctionPosPara(zArr, kVal, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kVal, L, omega, wLO, wTO, epsInf)
@@ -117,7 +119,8 @@ def waveFunctionTMPerp(zArr, kArr, L, omega, wLO, wTO, epsInf):
 def NSqAna(kVal, omega, wLO, wTO, epsInf):
     epsAbs = np.abs(epsFunc.epsilon(omega, wLO, wTO, epsInf))
     kpara = np.sqrt(omega**2 / consts.c**2 + kVal**2)
-    return 1. / (2. * kpara * np.sqrt(epsAbs)) * (1 + epsAbs) * (epsAbs + 1. / epsAbs)
+    hopfieldFactor = 1 + wTO**2 * (wLO**2 - wTO**2) / (wTO**2 - omega**2)**2
+    return hopfieldFactor / (2. * kpara * np.sqrt(epsAbs)) * (1 + epsAbs) * (epsAbs + 1. / epsAbs)
 
 def waveFunctionPosParaAna(zArr, kVal, omega, wLO, wTO, epsInf):
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
@@ -272,13 +275,13 @@ def plotWaveFunctionPerp(kDArr, zArr, L, omega, wLO, wTO, epsInf):
 
 def createPlotSurf():
     epsInf = 2.
-    omega = 2.1 * 1e12
+    omega = 2. * 1e12
     wLO = 3. * 1e12
     wTO = 1. * 1e12
-    L = 200.
+    L = 1.
 
     #zArr = np.linspace(-consts.c / omega * 5., consts.c / omega * 5., 1000)
-    zArr = np.linspace(- L / 20000., L / 20000., 1000)
+    zArr = np.linspace(- L / 200., L / 200., 1000)
 
     allowedKs = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "Surf")
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)

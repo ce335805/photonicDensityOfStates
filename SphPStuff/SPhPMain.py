@@ -11,6 +11,7 @@ from SphPStuff.dosFuncs import dosTMModes as dosTM
 from SphPStuff.dosFuncs import dosTMEvaModes as dosTMEva
 from SphPStuff.dosFuncs import dosTMResModes as dosTMRes
 from SphPStuff.dosFuncs import dosTMSurfModes as dosTMSurf
+from SphPStuff.dosFuncs import combinedDosPlots as combPlots
 
 from SphPStuff.asOfFrequency import dosAsOfFreq
 
@@ -32,9 +33,11 @@ def SPhPMain():
     #dosTERes.createPlotDosTERes()
     #dosTM.createPlotDosTM()
     #dosTMEva.createPlotDosTMEva()
-    #dosTMRes.createPlotDosTMRes()
-    dosTMSurf.createPlotDosTMSurf()
+    dosTMRes.createPlotDosTMRes()
+    #dosTMSurf.createPlotDosTMSurf()
 
-    #dosAsOfFreq.createPlotAsOfOmega()
+    #combPlots.plotTEWhole()
+    #combPlots.plotTMWhole()
+
 
 SPhPMain()
