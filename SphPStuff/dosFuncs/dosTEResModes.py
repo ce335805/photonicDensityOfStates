@@ -56,18 +56,20 @@ def NormSqr(kArr, L, omega, wLO, wTO, epsInf):
 
 def dosSumPos(zArr, kArr, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(L, omega, wLO, wTO, epsInf, "TERes")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TERes")
     kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
     func = np.sin(kArr[None, :] * (L / 2. - zArr[:, None])) * 0.5 * (1 - np.exp(- kDArr[None, :] * L))
     diffFac = (1. - consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
+    #diffFac = 1.
     return np.sum(1. / NSqr[None, :] * func**2 * diffFac, axis = 1)
 
 def dosSumNeg(zArr, kArr, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(L, omega, wLO, wTO, epsInf, "TERes")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TERes")
     kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
     func = 0.5 * (np.exp(kDArr[None, :] * zArr[:, None]) - np.exp(-kDArr[None, :] * zArr[:, None] - kDArr[None, :] * L)) * np.sin(kArr[None, :] * L / 2.)
     diffFac = (1. - consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
+    #diffFac = 1.
     return np.sum(1. / NSqr[None, :] * func**2 * diffFac, axis = 1)
 
 
@@ -118,7 +120,7 @@ def plotDosTESPhP(zArr, dos, L, omega, wLO, wTO, epsInf):
 
 def createPlotDosTERes():
 
-    omega = 2. * 1e12
+    omega = 3.5 * 1e12
     wLO = 3. * 1e12
     wTO = 1. * 1e12
     epsInf = 2.

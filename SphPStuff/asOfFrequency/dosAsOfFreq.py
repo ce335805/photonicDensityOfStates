@@ -1,24 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
-from scipy.integrate import quad
 
-from matplotlib import ticker
-from matplotlib.colors import LogNorm
-import matplotlib.patches as patches
 import matplotlib as mpl
 import matplotlib.cm as cm
 import matplotlib.colors
-import h5py
 from matplotlib import gridspec
-from matplotlib.patches import ConnectionPatch
-import complexIntegral
-import scipy.integrate as integrate
-import scipy.optimize as opt
-import scipy.constants as consts
-
-import SphPStuff.findAllowedKsSPhP as findAllowedKsSPhP
-import SphPStuff.epsilonFunctions as epsFunc
 
 fontsize = 8
 
@@ -45,6 +32,10 @@ mpl.rcParams['text.latex.preamble'] = [
     #    r'\everymath={\sf}'
 ]
 
+
+import SphPStuff.findAllowedKsSPhP as findAllowedKsSPhP
+import SphPStuff.epsilonFunctions as epsFunc
+
 from SphPStuff.dosFuncs import dosTEModes as dosTE
 from SphPStuff.dosFuncs import dosTEEvaModes as dosTEEva
 from SphPStuff.dosFuncs import dosTEResModes as dosTERes
@@ -59,11 +50,20 @@ def getDosTM(zVal, L, omega, wLO, wTO, epsInf):
         return dosTM.calcDosTM(np.array([zVal]), L, omega, wLO, wTO, epsInf)
     else:
         return 0
+
 def getDosTE(zVal, L, omega, wLO, wTO, epsInf):
     if(omega < wTO or omega > wLO ):
         return dosTE.calcDosTE(np.array([zVal]), L, omega, wLO, wTO, epsInf)
     else:
         return 0
+
+def getDosTERes(zVal, L, omega, wLO, wTO, epsInf):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    if(eps < 1.):
+        return dosTERes.calcDosTE(np.array([zVal]), L, omega, wLO, wTO, epsInf)
+    else:
+        return 0
+
 
 
 def createPlotAsOfOmega():
@@ -71,21 +71,23 @@ def createPlotAsOfOmega():
     wLO = 3. * 1e12
     wTO = 1. * 1e12
     epsInf = 2.
-    L = .5
+    L = .1
     zVal = L * 1e-1
 
-    omegaArr = np.linspace(0.01, 0.5, 156) * 1e13
-    #omegaArr = np.array([0.32 * 1e13])
+    omegaArr = np.linspace(0.01, 0.5, 13) * 1e13
 
-    dos = np.zeros(omegaArr.shape)
+    dosTE = np.zeros(omegaArr.shape)
+    dosTERes = np.zeros(omegaArr.shape)
     for omegaInd, omegaVal in enumerate(omegaArr):
         print("omega = {}THz".format(omegaVal * 1e-12))
-        dos[omegaInd] = getDosTE(zVal, L, omegaVal, wLO, wTO, epsInf)
+        dosTE[omegaInd] = getDosTE(zVal, L, omegaVal, wLO, wTO, epsInf)
+        dosTERes[omegaInd] = getDosTERes(zVal, L, omegaVal, wLO, wTO, epsInf)
+        print("")
 
-    plotDosAsOfFreq(dos, zVal, L, omegaArr, wLO, wTO, epsInf)
-    print(dos)
 
-def plotDosAsOfFreq(dos, zVal, L, omegaArr, wLO, wTO, epsInf):
+    plotDosAsOfFreq(dosTE, dosTERes, zVal, L, omegaArr, wLO, wTO, epsInf)
+
+def plotDosAsOfFreq(dos1, dos2, zVal, L, omegaArr, wLO, wTO, epsInf):
 
     omegaArr = omegaArr * 1e-12 #convert to THz
 
@@ -94,7 +96,12 @@ def plotDosAsOfFreq(dos, zVal, L, omegaArr, wLO, wTO, epsInf):
                            wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.22, right=0.96)
     ax = plt.subplot(gs[0, 0])
 
-    ax.plot(omegaArr, dos, color='peru', lw=1., label = "DOS from Box")
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+
+    ax.plot(omegaArr, dos1, color=cmapPink(.3), lw=1., linestyle = '', marker = 'X', markersize = 2)
+    ax.plot(omegaArr, dos2, color=cmapPink(.6), lw=1., linestyle = '', marker = 'X', markersize = 2)
+    ax.plot(omegaArr, dos1 + dos2, color=cmapBone(.5), lw=1., linestyle = '', marker = 'X', markersize = 2)
 
     ax.axvline(wLO * 1e-12, lw = 0.5, color = 'gray')
     ax.axvline(wTO * 1e-12, lw = 0.5, color = 'gray')

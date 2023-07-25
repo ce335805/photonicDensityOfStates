@@ -48,14 +48,13 @@ mpl.rcParams['text.latex.preamble'] = [
 def NormSqr(kArr, L, omega, wLO, wTO, epsInf):
     kDVal = epsFunc.kDFromK(kArr, omega, wLO, wTO, epsInf)
     normPrefac = epsFunc.normFac(omega, wLO, wTO, epsInf)
-    print("normPrefac = {}".format(normPrefac))
     term1 = (1 - np.sin(kArr * L) / (kArr * L)) * np.sin(kDVal * L / 2) ** 2
     term2 = normPrefac * (1 - np.sin(kDVal * L) / (kDVal * L)) * np.sin(kArr * L / 2) ** 2
     return L / 4 * (term1 + term2)
 
 def dosSumPos(zArr, kArr, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(L, omega, wLO, wTO, epsInf, "TE")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TE")
     kDArr = epsFunc.kDFromK(kArr, omega, wLO, wTO, epsInf)
     func = np.sin(kArr[None, :] * (L / 2 - zArr[:, None])) * np.sin(kDArr[None, :] * L / 2.)
     diffFac = (1. - consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
@@ -64,7 +63,7 @@ def dosSumPos(zArr, kArr, L, omega, wLO, wTO, epsInf):
 
 def dosSumNeg(zArr, kArr, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(L, omega, wLO, wTO, epsInf, "TE")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TE")
     kDArr = epsFunc.kDFromK(kArr, omega, wLO, wTO, epsInf)
     func = np.sin(kDArr[None, :] * (L / 2. + zArr[:, None])) * np.sin(kArr[None, :] * L / 2.)
     diffFac = (1. - consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
@@ -118,13 +117,13 @@ def plotDosTESPhP(zArr, dos, L, omega, wLO, wTO, epsInf):
 
 def createPlotDosTE():
 
-    omega = 1 * 1e11
+    omega = 4. * 1e11
     wLO = 3. * 1e12
     wTO = 1. * 1e12
-    epsInf = 2.
-    L = 1.
+    epsInf = 4.
+    L = .1
 
-    zArr = np.linspace(-L / 20., L / 20., 500)
+    zArr = np.linspace(-L / 2., L / 2., 500)
 
     dos = calcDosTE(zArr, L, omega, wLO, wTO, epsInf)
     plotDosTESPhP(zArr, dos, L, omega, wLO, wTO, epsInf)

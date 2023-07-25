@@ -91,6 +91,31 @@ def rootFuncSurf(k, L, omega, wLO, wTO, epsInf):
     term2 = np.tanh(kD * L / 2)
     return term1 + term2
 
+def getUpperBound(mode, omega, wLO, wTO, epsInf):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+
+    upperBound = 0
+    if (mode == "TE" or mode == "TM" or mode == "Surf"):
+            upperBound = omega / consts.c
+    elif (mode == "TEEva" or mode == "TMEva"):
+        upperBound = np.sqrt(eps - 1) * omega / consts.c - 1e-5
+    elif (mode == "TERes" or mode == "TMRes"):
+        if (eps < 0):
+            upperBound = omega / consts.c
+        elif(eps < 1 and eps > 0):
+            upperBound = np.sqrt(1 - eps) * omega / consts.c - 1e-5
+
+    return upperBound
+
+def getLowerBound(mode, omega, wLO, wTO, epsInf):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    lowerBound = 0
+    if(eps > 0 and eps < 1):
+        if (mode == "TE" or mode == "TM"):
+            lowerBound = np.sqrt(1 - eps) * omega / consts.c + 1e-5
+
+    return lowerBound
+
 def extremalPoints(L, omega, wLO, wTO, epsInf, N, mode):
     rootFunc = rootFuncTE
     if(mode == "TE"):
@@ -111,20 +136,8 @@ def extremalPoints(L, omega, wLO, wTO, epsInf, N, mode):
         print("Error: specified mode doesn't exist!!!!!!!!!!!!!!!!")
         exit()
 
-    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    upperBound = 0
-    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes" or mode == "Surf"):
-        upperBound = omega / consts.c
-    elif (mode == "TEEva" or mode == "TMEva"):
-        upperBound = np.sqrt(eps - 1) * omega / consts.c
-
-    lowerBound = 0
-    if(eps > 0 and eps < 1):
-        if (mode == "TE" or mode == "TM"):
-            lowerBound = np.sqrt(1 - eps) * omega / consts.c + 1e-6
-        if (mode == "TERes" or mode == "TMRes"):
-            upperBound = np.sqrt(1 - eps) * omega / consts.c
-
+    upperBound = getUpperBound(mode, omega, wLO, wTO, epsInf)
+    lowerBound = getLowerBound(mode, omega, wLO, wTO, epsInf)
 
     intervals = np.zeros((N, 2))
     lowerBounds = np.linspace(lowerBound, upperBound, N, endpoint=False)
@@ -163,16 +176,8 @@ def computeRootsGivenExtrema(L, omega, wLO, wTO, epsInf, extrema, mode):
         rootFunc = rootFuncSurf
 
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    upperBound = 0
-    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes" or mode == "Surf"):
-        upperBound = omega / consts.c
-    elif (mode == "TEEva" or mode == "TMEva"):
-        upperBound = np.sqrt(eps - 1) * omega / consts.c
-
-    lowerBound = 0
-    if(eps > 0 and eps < 1):
-        if (mode == "TE" or mode == "TM"):
-            lowerBound = np.sqrt(1 - eps) * omega / consts.c + 1e-6
+    upperBound = getUpperBound(mode, omega, wLO, wTO, epsInf)
+    lowerBound = getLowerBound(mode, omega, wLO, wTO, epsInf)
 
     nRoots = len(extrema)
     roots = np.zeros(nRoots)
@@ -212,23 +217,8 @@ def plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extrema, mode):
         rootFunc = rootFuncSurf
 
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    upperBound = 0
-    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes"):
-        upperBound = omega / consts.c
-    elif (mode == "TEEva" or mode == "TMEva"):
-        upperBound = np.sqrt(eps - 1) * omega / consts.c
-    elif (mode == "Surf"):
-        upperBound = omega / consts.c * 1. / (np.abs(eps) - 1)
-
-    c = consts.c
-
-    lowerBound = 0
-    if(eps > 0 and eps < 1):
-        if (mode == "TE" or mode == "TM"):
-            lowerBound = np.sqrt(1 - eps) * omega / consts.c
-        if (mode == "TERes" or mode == "TMRes"):
-            upperBound = np.sqrt(1 - eps) * omega / consts.c
-
+    upperBound = getUpperBound(mode, omega, wLO, wTO, epsInf)
+    lowerBound = getLowerBound(mode, omega, wLO, wTO, epsInf)
 
     kArr = np.linspace(lowerBound, upperBound - 1e-6, 1000)
     rootFuncVals = rootFunc(kArr, L, omega, wLO, wTO, epsInf)
@@ -247,7 +237,7 @@ def plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extrema, mode):
 
 
     ax.axhline(0., color = 'gray', lw = 0.5)
-    ax.axvline(omega / c, color = 'teal', lw = 0.8)
+    ax.axvline(omega / consts.c, color = 'teal', lw = 0.8)
 
     plt.savefig("./SPhPPlotsSaved/rootFuncWithExtrema" + mode + ".png")
 
@@ -267,12 +257,7 @@ def plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, roots, mode):
         rootFunc = rootFuncSurf
 
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    upperBound = 0
-    if (mode == "TE" or mode == "TM" or mode == "TERes" or mode == "TMRes" or mode == "Surf"):
-        upperBound = omega / consts.c
-    elif (mode == "TEEva" or mode == "TMEva"):
-        upperBound = np.sqrt(eps - 1) * omega / consts.c
-
+    upperBound = getUpperBound(mode, omega, wLO, wTO, epsInf)
     kArr = np.linspace(0., upperBound - 1e-6, 1000)
     rootFuncVals = rootFunc(kArr, L, omega, wLO, wTO, epsInf)
     #rootFuncValsEps1 = rootFunc(kArr, L, omega, 1., c)
@@ -308,7 +293,7 @@ def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
         return allowedKSurf(L, omega, wLO, wTO, epsInf)
     else:
         eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-        NDiscrete = 51 * int(omega / consts.c * (np.sqrt(np.abs(eps)) + 1.) * L  + 17)
+        NDiscrete = 11 * int(omega / consts.c * (np.sqrt(np.abs(eps)) + 1.) * L  + 17)
         print("NDiscrete = {}".format(NDiscrete))
         extrema = extremalPoints(L, omega, wLO, wTO, epsInf, NDiscrete, mode)
         if(len(extrema) == 0):
@@ -316,21 +301,33 @@ def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
         #plotRootFuncWithExtrema(L, omega, wLO, wTO, epsInf, extremaTE, mode)
         roots = computeRootsGivenExtrema(L, omega, wLO, wTO, epsInf, extrema, mode)
         print("Number of roots for " + mode +" found = {}".format(roots.shape))
-        #plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, rootsTE, mode)
+        plotRootFuncWithRoots(L, omega, wLO, wTO, epsInf, roots, mode)
+        print("roots = {}".format(roots))
         return roots
 
-
-def findKsDerivativeW(L, omega, wLO, wTO, epsInf, mode):
+def buildExtremaFromRoots(roots, omega, wLO, wTO, epsInf, mode):
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    delOm = omega * 1e-5
+    upperBound = getUpperBound(mode, omega, wLO, wTO, epsInf)
+    lowerBound = getLowerBound(mode, omega, wLO, wTO, epsInf)
+
+    rootsBelow = np.append([lowerBound], roots)
+    rootsAbove = np.append(roots, [upperBound])
+    extrema = (rootsBelow + rootsAbove) / 2.
+    return extrema
+
+def findKsDerivativeW(roots, L, omega, wLO, wTO, epsInf, mode):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    delOm = omega * 1e-7
+    extrema = buildExtremaFromRoots(roots, omega, wLO, wTO, epsInf, mode)
     NDiscrete = 51 * int(omega / consts.c * (np.sqrt(np.abs(eps)) + 1.) * L + 17)
-    extrema = extremalPoints(L, omega, wLO, wTO, epsInf, NDiscrete, mode)
-    print("len extrema for derivative: {}".format(len(extrema)))
+    #extrema = extremalPoints(L, omega, wLO, wTO, epsInf, NDiscrete, mode)
     if (len(extrema) == 0):
         return np.array([])
     rootsPlus = computeRootsGivenExtrema(L, omega + delOm, wLO, wTO, epsInf, extrema, mode)
-    rootsMinus = computeRootsGivenExtrema(L, omega - delOm, wLO, wTO, epsInf, extrema, mode)
-    return (rootsPlus - rootsMinus) / (2. * delOm)
+    rootsPlus = rootsPlus[:len(roots)]
+    print("rootsPlus = {}".format(rootsPlus))
+    print("extrema = {}".format(extrema))
+    return (rootsPlus - roots) / (delOm)
 
 def findKsSurf(L, omega, wLO, wTO, epsInf):
     kVals = allowedKSurf(L, omega, wLO, wTO, epsInf)

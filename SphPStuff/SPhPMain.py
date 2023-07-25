@@ -28,16 +28,18 @@ def SPhPMain():
     #TMRes.createPlotTMRes()
     #Surf.createPlotSurf()
 
-    #dosTE.createPlotDosTE()
+    #.createPlotDosTE()
     #dosTEEva.createPlotDosTEEva()
     #dosTERes.createPlotDosTERes()
     #dosTM.createPlotDosTM()
     #dosTMEva.createPlotDosTMEva()
-    dosTMRes.createPlotDosTMRes()
+    #dosTMRes.createPlotDosTMRes()
     #dosTMSurf.createPlotDosTMSurf()
 
     #combPlots.plotTEWhole()
     #combPlots.plotTMWhole()
+
+    dosAsOfFreq.createPlotAsOfOmega()
 
 
 SPhPMain()
