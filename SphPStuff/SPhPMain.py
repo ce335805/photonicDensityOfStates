@@ -20,7 +20,7 @@ from SphPStuff.asOfFrequency import dosAsOfFreq
 def SPhPMain():
     print("Compute full Dos and all modes")
 
-    TE.createPlotTE()
+    #TE.createPlotTE()
     #TEEva.createPlotTEEva()
     #TERes.createPlotTERes()
     #TM.createPlotTM()
@@ -28,12 +28,12 @@ def SPhPMain():
     #TMRes.createPlotTMRes()
     #Surf.createPlotSurf()
 
-    #.createPlotDosTE()
+    #dosTE.createPlotDosTE()
     #dosTEEva.createPlotDosTEEva()
     #dosTERes.createPlotDosTERes()
     #dosTM.createPlotDosTM()
     #dosTMEva.createPlotDosTMEva()
-    #dosTMRes.createPlotDosTMRes()
+    dosTMRes.createPlotDosTMRes()
     #dosTMSurf.createPlotDosTMSurf()
 
     #combPlots.plotTEWhole()
