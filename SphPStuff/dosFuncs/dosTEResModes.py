@@ -120,7 +120,7 @@ def plotDosTESPhP(zArr, dos, L, omega, wLO, wTO, epsInf):
 
 def createPlotDosTERes():
 
-    omega = 3.5 * 1e12
+    omega = 2. * 1e12
     wLO = 3. * 1e12
     wTO = 1. * 1e12
     epsInf = 2.

@@ -61,7 +61,7 @@ def NormSqr(kVal, L, omega, wLO, wTO, epsInf):
 
 def waveFunctionPosPara(zArr, kArr, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(L, omega, wLO, wTO, epsInf, "TMRes")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TMRes")
     kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
     func = np.sin(kArr[None, :] * (L / 2. - zArr[:, None])) * 0.5 * (1 - np.exp(-kDArr[None, :] * L))
     diffFac = (1. - consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
@@ -70,7 +70,7 @@ def waveFunctionPosPara(zArr, kArr, L, omega, wLO, wTO, epsInf):
 
 def waveFunctionNegPara(zArr, kArr, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(L, omega, wLO, wTO, epsInf, "TMRes")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TMRes")
     kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
     func = 0.5 * (np.exp(kDArr[None, :] * zArr[:, None]) - np.exp(-kDArr[None, :] * (zArr[:, None] + L))) * np.sin(kArr[None, :] * L / 2.)
     diffFac = (1. - consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
@@ -79,7 +79,7 @@ def waveFunctionNegPara(zArr, kArr, L, omega, wLO, wTO, epsInf):
 
 def waveFunctionPosPerp(zArr, kArr, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(L, omega, wLO, wTO, epsInf, "TMRes")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TMRes")
     kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
     func = np.sqrt(omega**2 / (consts.c**2 * kArr[None, :]**2) - 1) * np.cos(kArr[None, :] * (L / 2. - zArr[:, None])) * 0.5 * (1 - np.exp(-kDArr[None, :] * L))
     diffFac = (1. - consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
@@ -88,7 +88,7 @@ def waveFunctionPosPerp(zArr, kArr, L, omega, wLO, wTO, epsInf):
 
 def waveFunctionNegPerp(zArr, kArr, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(L, omega, wLO, wTO, epsInf, "TMRes")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TMRes")
     kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     func = np.sqrt(eps * omega**2 / (consts.c**2 * kDArr[None, :]**2) + 1) * 0.5 * ( np.exp(kDArr[None, :] * zArr[:, None]) +  np.exp(-kDArr[None, :] * (zArr[:, None] + L))) * np.sin(kArr[None, :] * L / 2.)
@@ -145,7 +145,7 @@ def plotDosTMSPhP(zArr, dos, L, omega, wLO, wTO, epsInf):
 
 def createPlotDosTMRes():
 
-    omega = 2 * 1e12
+    omega = 3.5 * 1e12
     wLO = 3. * 1e12
     wTO = 1. * 1e12
     epsInf = 2.

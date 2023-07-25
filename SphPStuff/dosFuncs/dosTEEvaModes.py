@@ -56,7 +56,7 @@ def NormSqr(kVal, L, omega, wLO, wTO, epsInf):
 
 def dosSumPos(zArr, kArr, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(L, omega, wLO, wTO, epsInf, "TEEva")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TEEva")
     kDArr = epsFunc.kDFromKEva(kArr, omega, wLO, wTO, epsInf)
     func = 0.5 * (np.exp(- kArr[None, :] * zArr[:, None]) - np.exp(kArr * zArr[:, None] - kArr[None, :] * L)) * np.sin(kDArr[None, :] * L / 2.)
     diffFac = (1. + consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
@@ -64,7 +64,7 @@ def dosSumPos(zArr, kArr, L, omega, wLO, wTO, epsInf):
 
 def dosSumNeg(zArr, kArr, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(L, omega, wLO, wTO, epsInf, "TEEva")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TEEva")
     kDArr = epsFunc.kDFromKEva(kArr, omega, wLO, wTO, epsInf)
     func = np.sin(kDArr[None, :] * (L / 2. + zArr[:, None])) * 0.5 * (1 - np.exp(- kArr[None, :] * L))
     diffFac = (1. + consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])

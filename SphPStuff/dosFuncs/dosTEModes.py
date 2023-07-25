@@ -117,13 +117,13 @@ def plotDosTESPhP(zArr, dos, L, omega, wLO, wTO, epsInf):
 
 def createPlotDosTE():
 
-    omega = 4. * 1e11
+    omega = .1 * 1e12
     wLO = 3. * 1e12
     wTO = 1. * 1e12
     epsInf = 4.
     L = .1
 
-    zArr = np.linspace(-L / 2., L / 2., 500)
+    zArr = np.linspace(-L / 2000., L / 2000., 500)
 
     dos = calcDosTE(zArr, L, omega, wLO, wTO, epsInf)
     plotDosTESPhP(zArr, dos, L, omega, wLO, wTO, epsInf)

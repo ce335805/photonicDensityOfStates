@@ -53,7 +53,7 @@ def plotRootFuncWithRoots(kArr, rootFuncVals, lines, omega, mode, nameAdd):
         ax.axvline(line * consts.c / omega, color ='gray', lw = 0.4)
 
     ax.plot(kArr * consts.c / omega, rootFuncVals, color='indianred', lw=0.8)
-
+    ax.axhline(0, lw = 0.5, color = "gray")
 
     ax.set_xlabel(r'$k_z \, [\frac{\omega}{c}]$')
     ax.set_ylabel(r'$K(\omega)$')
