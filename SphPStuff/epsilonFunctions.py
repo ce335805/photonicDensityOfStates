@@ -42,9 +42,6 @@ def epsilon(omega, wLO, wTO, epsInf):
 def kDFromK(kVal, omega, wLO, wTO, epsInf):
     return np.sqrt((epsilon(omega, wLO, wTO, epsInf) - 1) * omega ** 2 / consts.c ** 2 + kVal ** 2)
 
-def kFromKD(kVal, omega, wLO, wTO, epsInf):
-    return np.sqrt(1)
-
 def kDFromKEva(kVal, omega, wLO, wTO, epsInf):
     return np.sqrt((epsilon(omega, wLO, wTO, epsInf) - 1) * omega ** 2 / consts.c ** 2 - kVal ** 2)
 

@@ -13,10 +13,13 @@ def rootFuncTE(k, L, omega, wLO, wTO, epsInf):
     term2 = kD * np.cos(kD * L / 2.) * np.sin(k * L / 2.)
     return  term1 + term2
 
-def rootFuncTEEva(k, L, omega, wLO, wTO, epsInf):
-    kD = epsFunc.kDFromKEva(k, omega, wLO, wTO, epsInf)
-    term1 = k * np.sin(kD * L / 2)
-    term2 = kD * np.cos(kD * L / 2) * np.tanh(k * L / 2)
+def rootFuncTEEva(kD, L, omega, wLO, wTO, epsInf):
+    #kD = epsFunc.kDFromKEva(k, omega, wLO, wTO, epsInf)
+    #term1 = k * np.sin(kD * L / 2)
+    #term2 = kD * np.cos(kD * L / 2) * np.tanh(k * L / 2)
+    kVal = epsFunc.kDFromKEva(kD, omega, wLO, wTO, epsInf)
+    term1 = kVal * np.sin(kD * L / 2)
+    term2 = kD * np.cos(kD * L / 2) * np.tanh(kVal * L / 2)
     return term1 + term2
 
 def rootFuncTERes(k, L, omega, wLO, wTO, epsInf):
@@ -32,10 +35,14 @@ def rootFuncTM(k, L, omega, wLO, wTO, epsInf):
     term2 = np.cos(k * L / 2.) * np.sin(kD * L / 2)
     return term1 + term2
 
-def rootFuncTMEva(k, L, omega, wLO, wTO, epsInf):
-    kD = epsFunc.kDFromKEva(k, omega, wLO, wTO, epsInf)
+def rootFuncTMEva(kD, L, omega, wLO, wTO, epsInf):
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    term1 = eps * k * np.tanh(k * L / 2) * np.cos(kD * L / 2)
+    #kD = epsFunc.kDFromKEva(k, omega, wLO, wTO, epsInf)
+    #term1 = eps * k * np.tanh(k * L / 2) * np.cos(kD * L / 2)
+    #term2 = kD * np.sin(kD * L / 2)
+
+    kVal = epsFunc.kDFromKEva(kD, omega, wLO, wTO, epsInf)
+    term1 = eps * kVal * np.tanh(kVal * L / 2) * np.cos(kD * L / 2)
     term2 = kD * np.sin(kD * L / 2)
     return term1 - term2
 
@@ -131,6 +138,9 @@ def getRoots(L, omega, wLO, wTO, epsInf, mode):
     if(roots[0] == 0.):
         return roots[1:]
 
+    if (mode == "TEEva" or mode == "TMEva"):
+        roots = epsFunc.kDFromKEva(roots, omega, wLO, wTO, epsInf)
+
     return roots
 
 
@@ -167,6 +177,7 @@ def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
     roots = getRoots(L, omega, wLO, wTO, epsInf, mode)
     createRootsFuncPlotWithLines(roots, L, omega, wLO, wTO, epsInf, mode, "Roots")
     print("Number of roots found for {} mode = {}".format(mode, len(roots)))
+    print(roots)
     return roots
 
 def findKsDerivativeW(roots, L, omega, wLO, wTO, epsInf, mode):

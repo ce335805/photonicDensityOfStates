@@ -32,8 +32,8 @@ def SPhPMain():
     #dosTEEva.createPlotDosTEEva()
     #dosTERes.createPlotDosTERes()
     #dosTM.createPlotDosTM()
-    #dosTMEva.createPlotDosTMEva()
-    dosTMRes.createPlotDosTMRes()
+    dosTMEva.createPlotDosTMEva()
+    #dosTMRes.createPlotDosTMRes()
     #dosTMSurf.createPlotDosTMSurf()
 
     #combPlots.plotTEWhole()
