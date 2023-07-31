@@ -12,7 +12,6 @@ import matplotlib.colors
 import h5py
 from matplotlib import gridspec
 from matplotlib.patches import ConnectionPatch
-import complexIntegral
 import scipy.integrate as integrate
 import scipy.optimize as opt
 import scipy.constants as consts
@@ -42,11 +41,11 @@ mpl.rcParams['text.latex.preamble'] = [
     #    r'\everymath={\sf}'
 ]
 
-import SphPStuff.dosFuncs.dosTEModes as dosTE
-import SphPStuff.dosFuncs.dosTEEvaModes as dosTEEva
-import SphPStuff.dosFuncs.dosTMModes as dosTM
-import SphPStuff.dosFuncs.dosTMEvaModes as dosTMEva
-import SphPStuff.epsilonFunctions as epsFunc
+import dosFuncs.dosTEModes as dosTE
+import dosFuncs.dosTEEvaModes as dosTEEva
+import dosFuncs.dosTMModes as dosTM
+import dosFuncs.dosTMEvaModes as dosTMEva
+import epsilonFunctions as epsFunc
 
 def plotTEWhole():
     omega = 6 * 1e12

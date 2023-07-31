@@ -1,23 +1,25 @@
-from SphPStuff.wfFuncs import TEWavefunctionSPhP as TE, TEWavefunctionEvaSPhP as TEEva, TEWavefunctionResSPhP as TERes
-from SphPStuff.wfFuncs import TMWavefunctionSPhP as TM
-from SphPStuff.wfFuncs import TMWavefunctionEvaSPhP as TMEva
-from SphPStuff.wfFuncs import TMWavefunctionResSPhP as TMRes
-from SphPStuff.wfFuncs import TMWavefunctionSurf as Surf
+from wfFuncs import TEWavefunctionSPhP as TE, TEWavefunctionEvaSPhP as TEEva, TEWavefunctionResSPhP as TERes
+from wfFuncs import TMWavefunctionSPhP as TM
+from wfFuncs import TMWavefunctionSPhP as TM
+from wfFuncs import TMWavefunctionEvaSPhP as TMEva
+from wfFuncs import TMWavefunctionResSPhP as TMRes
+from wfFuncs import TMWavefunctionSurf as Surf
 
-from SphPStuff.dosFuncs import dosTEModes as dosTE
-from SphPStuff.dosFuncs import dosTEEvaModes as dosTEEva
-from SphPStuff.dosFuncs import dosTEResModes as dosTERes
-from SphPStuff.dosFuncs import dosTMModes as dosTM
-from SphPStuff.dosFuncs import dosTMEvaModes as dosTMEva
-from SphPStuff.dosFuncs import dosTMResModes as dosTMRes
-from SphPStuff.dosFuncs import dosTMSurfModes as dosTMSurf
-from SphPStuff.dosFuncs import combinedDosPlots as combPlots
+from dosFuncs import dosTEModes as dosTE
+from dosFuncs import dosTEEvaModes as dosTEEva
+from dosFuncs import dosTEResModes as dosTERes
+from dosFuncs import dosTMModes as dosTM
+from dosFuncs import dosTMEvaModes as dosTMEva
+from dosFuncs import dosTMResModes as dosTMRes
+from dosFuncs import dosTMSurfModes as dosTMSurf
+from dosFuncs import combinedDosPlots as combPlots
 
-from SphPStuff.asOfFrequency import dosAsOfFreq
+from asOfFrequency import dosAsOfFreq
+from asOfFrequency import performFreqIntegral
+from plotTotalAsOfZ import dosTotalAsOfZ
 
 
-
-def SPhPMain():
+def main():
     print("Compute full Dos and all modes")
 
     #TE.createPlotTE()
@@ -32,7 +34,7 @@ def SPhPMain():
     #dosTEEva.createPlotDosTEEva()
     #dosTERes.createPlotDosTERes()
     #dosTM.createPlotDosTM()
-    dosTMEva.createPlotDosTMEva()
+    #dosTMEva.createPlotDosTMEva()
     #dosTMRes.createPlotDosTMRes()
     #dosTMSurf.createPlotDosTMSurf()
 
@@ -40,6 +42,9 @@ def SPhPMain():
     #combPlots.plotTMWhole()
 
     #dosAsOfFreq.createPlotAsOfOmega()
+    performFreqIntegral.freqIntegral()
+    #dosTotalAsOfZ()
 
 
-SPhPMain()
+if __name__ == "__main__":
+    main()

@@ -109,22 +109,23 @@ def getRoots(L, omega, wLO, wTO, epsInf, mode):
     lowerBound = getLowerBound(mode, omega, wLO, wTO, epsInf)
 
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    NDiscrete = 1 * int(omega / consts.c * (np.sqrt(np.abs(eps)) + 1.) * L + 17)
+    NDiscrete =  int(1. * omega / consts.c * (np.sqrt(np.abs(eps)) + 1.) * L + 17)
     iteration = 0
     lenIntervalsOld = 0
     intervals = np.zeros((0, 2))
     while(iteration < 10):
-        print("NDiscrete = {} at iteration {}".format(NDiscrete, iteration))
+        #print("NDiscrete = {} at iteration {}".format(NDiscrete, iteration))
         subdivision = np.linspace(lowerBound, upperBound, NDiscrete, endpoint=True)
         rootFuncAtPoints = rootFunc(subdivision, L, omega, wLO, wTO, epsInf)
         signs = rootFuncAtPoints[:-1] * rootFuncAtPoints[1:]
         indsSigns = np.where(signs < 0)[0]
+        #print("Numer of Roots = {} at iteration {}".format(len(indsSigns), iteration))
         intervals = np.append([subdivision[indsSigns]], [subdivision[indsSigns + 1]], axis = 0)
-        if(lenIntervalsOld == intervals.shape[0]):
+        if(lenIntervalsOld == indsSigns.shape[0]):
             break
         else:
             NDiscrete = 2 * NDiscrete
-            lenIntervalsOld = intervals.shape[0]
+            lenIntervalsOld = indsSigns.shape[0]
             iteration += 1
 
     intervals = numpy.swapaxes(intervals, 0, 1)
@@ -135,7 +136,7 @@ def getRoots(L, omega, wLO, wTO, epsInf, mode):
         tempRoot = scipy.optimize.root_scalar(rootFunc, args = (L, omega, wLO, wTO, epsInf), bracket=tuple(intervals[rootInd, :]))
         roots[rootInd] = tempRoot.root
 
-    if(roots[0] == 0.):
+    if(roots[0] < 1e-13):
         return roots[1:]
 
     if (mode == "TEEva" or mode == "TMEva"):
@@ -175,13 +176,12 @@ def createRootsFuncPlotWithLines(lines, L, omega, wLO, wTO, epsInf, mode, nameAd
 
 def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
     roots = getRoots(L, omega, wLO, wTO, epsInf, mode)
-    createRootsFuncPlotWithLines(roots, L, omega, wLO, wTO, epsInf, mode, "Roots")
-    print("Number of roots found for {} mode = {}".format(mode, len(roots)))
-    print(roots)
+    #createRootsFuncPlotWithLines(roots, L, omega, wLO, wTO, epsInf, mode, "Roots")
+    #print("Number of roots found for {} mode = {}".format(mode, len(roots)))
     return roots
 
 def findKsDerivativeW(roots, L, omega, wLO, wTO, epsInf, mode):
-    delOm = omega * 1e-5
+    delOm = omega * 1e-7
     rootsPlus = getRoots(L, omega + delOm, wLO, wTO, epsInf, mode)
     rootsPlus = rootsPlus[:len(roots)]
     return (rootsPlus - roots) / (delOm)

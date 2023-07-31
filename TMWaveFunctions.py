@@ -12,7 +12,6 @@ import matplotlib.colors
 import h5py
 from matplotlib import gridspec
 from matplotlib.patches import ConnectionPatch
-import complexIntegral
 import scipy.integrate as integrate
 import scipy.optimize as opt
 import scipy.constants as consts

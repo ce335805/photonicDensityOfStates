@@ -14,7 +14,6 @@ from matplotlib import gridspec
 from matplotlib.patches import ConnectionPatch
 
 import TMEvaWaveFunction
-import complexIntegral
 import scipy.integrate as integrate
 import scipy.optimize as opt
 import scipy.constants as consts
