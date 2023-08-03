@@ -11,7 +11,7 @@ from dosFuncs import dosTMEvaModes as dosTMEva
 from dosFuncs import dosTMResModes as dosTMRes
 from dosFuncs import dosTMSurfModes as dosTMSurf
 
-import asOfFrequency.plotAsOfFreq as plotFreq
+import plotAsOfFreq as plotFreq
 
 
 

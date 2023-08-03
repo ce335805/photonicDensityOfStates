@@ -13,17 +13,15 @@ from dosFuncs import dosTMEvaModes as dosTMEva
 from dosFuncs import dosTMResModes as dosTMRes
 from dosFuncs import dosTMSurfModes as dosTMSurf
 
-import asOfFrequency.plotAsOfFreq as plotFreq
-
-from asOfFrequency import dosAsOfFreq
-
-import asOfFrequency.produceFreqData as prod
+import plotAsOfFreq as plotFreq
+import dosAsOfFreq
+import produceFreqData as prod
 
 def freqIntegral():
     wLO = 3. * 1e12
     wTO = 1. * 1e12
     epsInf = 1.
-    L = 1.
+    L = 10.
     zArr = np.logspace(np.log10(L / 4), -10, 50, endpoint=True, base = 10)
     #zArr = np.logspace(-3, -9, 100)
 
@@ -41,14 +39,15 @@ def freqIntegral():
 
 def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
 
-    arrBelow, arrWithin, arrAboveClose, arrAboveFar, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
+    arrBelow, arrWithin, arrAboveClose, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAboveClose)
-    wArr = np.append(wArr, arrAboveFar)
 
     dosTETotal = prod.retrieveDosTE()
     dosTMTotal = prod.retrieveDosTM()
     dosSurf = prod.retrieveDosSurf()
+
+
 
     dosIntTE = np.zeros(dosTETotal.shape)
     dosIntTM = np.zeros(dosTMTotal.shape)
@@ -74,28 +73,29 @@ def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
 
     for zInd, zVal in enumerate(zArr):
         for wInd, wVal in enumerate(wArr):
-            wArrPart = wArr[:wInd]
+            wArrPart = wArr[:wInd] * 1e-12
             #prefac = 2. * consts.fine_structure / np.pi * latConst ** 2 / consts.c ** 2 * wArrPart
-            prefacFieldStrength = consts.hbar * wArrPart**3 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)
-            #prefacFieldStrength = 1.
-            intFuncTE = prefacFieldStrength * (dosTETotal[:wInd, zInd] - .5)
-            dosIntTE[wInd, zInd] = np.trapz(intFuncTE, wArrPart, axis = 0)
-            intFuncTM = prefacFieldStrength * (dosTMTotal[:wInd, zInd] - .5)
-            dosIntTM[wInd, zInd] = np.trapz(intFuncTM, wArrPart, axis = 0)
+            prefacFieldStrength = consts.hbar * wArrPart**1 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)
+            prefacFieldStrength = wArrPart ** 3
+            #intFuncTE = prefacFieldStrength * (dosTETotal[:wInd, zInd] - .5)
+            intFuncTE = prefacFieldStrength * (dosTETotal[:wInd, zInd] - dosTETotal[:wInd, 0])
+            dosIntTE[wInd, zInd] = np.trapz(intFuncTE, x=wArrPart, axis = 0)
+            #intFuncTM = prefacFieldStrength * (dosTMTotal[:wInd, zInd] - .5)
+            intFuncTM = prefacFieldStrength * (dosTMTotal[:wInd, zInd] - dosTMTotal[:wInd, 0])
+            dosIntTM[wInd, zInd] = np.trapz(intFuncTM, x=wArrPart, axis = 0)
 
     #dosIntTM = dosIntTM + dosIntSurf
 
-    filename = "TEIntField"
-    plotFreq.plotDosAsOfFreqDosTotal(dosIntTE, zArr, L, wArr, wLO, wTO, epsInf, filename)
-    filename = "TMIntField"
-    plotFreq.plotDosAsOfFreqDosTotal(dosIntTM, zArr, L, wArr, wLO, wTO, epsInf, filename)
+    filename = "TEField"
+    plotFreq.plotDosIntegratedAsOfCutoff(dosIntTE, zArr, L, wArr, wLO, wTO, epsInf, filename)
+    filename = "TMField"
+    plotFreq.plotDosIntegratedAsOfCutoff(dosIntTM, zArr, L, wArr, wLO, wTO, epsInf, filename)
 
 def computeLocalFieldStrength(zArr, wLO, wTO, epsInf, L):
 
-    arrBelow, arrWithin, arrAboveClose, arrAboveFar, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
+    arrBelow, arrWithin, arrAboveClose, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAboveClose)
-    wArr = np.append(wArr, arrAboveFar)
 
     dosTETotal = prod.retrieveDosTE()
     dosTMTotal = prod.retrieveDosTM()
@@ -115,8 +115,8 @@ def computeLocalFieldStrength(zArr, wLO, wTO, epsInf, L):
             dosIntSurf[wInd, zInd] = np.trapz(intFuncSurf, wSurfPart, axis=0)
 
     patchBelow = np.zeros((len(arrBelow), len(zArr)))
-    patchAbove = np.ones((len(arrAboveClose) + len(arrAboveFar), len(zArr)))
-    for wInd in range(len(arrAboveClose) + len(arrAboveFar)):
+    patchAbove = np.ones((len(arrAboveClose), len(zArr)))
+    for wInd in range(len(arrAboveClose)):
         patchAbove[wInd, :] = patchAbove[wInd, :] * dosIntSurf[-1, :]
     dosIntSurf = np.append(patchBelow, dosIntSurf, axis = 0)
     dosIntSurf = np.append(dosIntSurf, patchAbove, axis = 0)
@@ -141,18 +141,16 @@ def computeLocalFieldStrength(zArr, wLO, wTO, epsInf, L):
 
 def producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L):
 
-    arrBelow, arrWithin, arrAboveClose, arrAboveFar, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
+    arrBelow, arrWithin, arrAboveClose, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAboveClose)
-    wArr = np.append(wArr, arrAboveFar)
 
     dosTETotal = prod.retrieveDosTE()
     dosTMTotal = prod.retrieveDosTM()
-    dosSurf = prod.retrieveDosSurf()
 
-    dosSurf = patchDosSurfWithZeros(dosSurf, zArr, arrBelow, arrAboveClose, arrAboveFar)
-
-    dosTMTotal = dosTMTotal + dosSurf
+    #dosSurf = prod.retrieveDosSurf()
+    #dosSurf = patchDosSurfWithZeros(dosSurf, zArr, arrBelow, arrAboveClose, arrAboveFar)
+    #dosTMTotal = dosTMTotal + dosSurf
 
     filename = "TE"
     plotFreq.plotDosAsOfFreqDosTotal(dosTETotal, zArr, L, wArr, wLO, wTO, epsInf, filename)
@@ -188,9 +186,9 @@ def computeSPhPIntAsOfZ(zArr, wLO, wTO, epsInf):
 
     return (intAna, intNum)
 
-def patchDosSurfWithZeros(dosSurf, zArr, arrBelow, arrAboveClose, arrAboveFar):
+def patchDosSurfWithZeros(dosSurf, zArr, arrBelow, arrAboveClose):
     patchBelow = np.zeros((len(arrBelow), len(zArr)))
-    patchAbove = np.zeros((len(arrAboveClose) + len(arrAboveFar), len(zArr)))
+    patchAbove = np.zeros((len(arrAboveClose), len(zArr)))
     dosSurf = np.append(patchBelow, dosSurf, axis = 0)
     dosSurf = np.append(dosSurf, patchAbove, axis = 0)
     return dosSurf

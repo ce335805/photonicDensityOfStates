@@ -1,21 +1,7 @@
 import numpy as np
 import h5py
-import scipy.constants as consts
-import scipy.integrate
 
-import epsilonFunctions as epsFunc
-
-from dosFuncs import dosTEModes as dosTE
-from dosFuncs import dosTEEvaModes as dosTEEva
-from dosFuncs import dosTEResModes as dosTERes
-from dosFuncs import dosTMModes as dosTM
-from dosFuncs import dosTMEvaModes as dosTMEva
-from dosFuncs import dosTMResModes as dosTMRes
-from dosFuncs import dosTMSurfModes as dosTMSurf
-
-import asOfFrequency.plotAsOfFreq as plotFreq
-
-from asOfFrequency import dosAsOfFreq
+from SphPStuff import dosAsOfFreq
 import plotAsOfZ as plotAsOfZ
 
 def dosTotalAsOfZ():

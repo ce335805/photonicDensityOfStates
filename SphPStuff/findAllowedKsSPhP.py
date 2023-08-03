@@ -111,9 +111,10 @@ def getRoots(L, omega, wLO, wTO, epsInf, mode):
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     NDiscrete =  int(1. * omega / consts.c * (np.sqrt(np.abs(eps)) + 1.) * L + 17)
     iteration = 0
+    maxIters = 10
     lenIntervalsOld = 0
     intervals = np.zeros((0, 2))
-    while(iteration < 10):
+    while(iteration < maxIters):
         #print("NDiscrete = {} at iteration {}".format(NDiscrete, iteration))
         subdivision = np.linspace(lowerBound, upperBound, NDiscrete, endpoint=True)
         rootFuncAtPoints = rootFunc(subdivision, L, omega, wLO, wTO, epsInf)
@@ -129,6 +130,12 @@ def getRoots(L, omega, wLO, wTO, epsInf, mode):
             iteration += 1
 
     intervals = numpy.swapaxes(intervals, 0, 1)
+
+    if(iteration == maxIters):
+        print("Warning: reach maximum number of iterations")
+
+    #print("NDiscrete = {} after iter = {}".format(NDiscrete, iteration))
+    #print("N Intervals = {}".format(intervals.shape[0]))
 
     nRoots = intervals.shape[0]
     roots = np.zeros(nRoots)
