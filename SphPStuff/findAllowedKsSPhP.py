@@ -188,7 +188,7 @@ def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
     return roots
 
 def findKsDerivativeW(roots, L, omega, wLO, wTO, epsInf, mode):
-    delOm = omega * 1e-7
+    delOm = omega * 1e-8
     rootsPlus = getRoots(L, omega + delOm, wLO, wTO, epsInf, mode)
     rootsPlus = rootsPlus[:len(roots)]
     return (rootsPlus - roots) / (delOm)
