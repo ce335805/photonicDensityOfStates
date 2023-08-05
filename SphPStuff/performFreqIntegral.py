@@ -21,7 +21,7 @@ def freqIntegral():
     wLO = 3. * 1e12
     wTO = 1. * 1e12
     epsInf = 1.
-    L = 10.
+    L = 4.
     zArr = np.logspace(np.log10(L / 4), -10, 50, endpoint=True, base = 10)
     #zArr = np.logspace(-3, -9, 100)
 
@@ -34,17 +34,17 @@ def freqIntegral():
 
     prod.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
     producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L)
-    #computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L)
+    computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L)
 
 
 def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
 
-    arrBelow, arrWithin, arrAboveClose, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
+    arrBelow, arrWithin, arrAbove, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
     wArr = np.append(arrBelow, arrWithin)
-    wArr = np.append(wArr, arrAboveClose)
+    wArr = np.append(wArr, arrAbove)
 
-    dosTETotal = prod.retrieveDosTE()
-    dosTMTotal = prod.retrieveDosTM()
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L)
+    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L)
     dosSurf = prod.retrieveDosSurf()
 
 
@@ -141,12 +141,12 @@ def computeLocalFieldStrength(zArr, wLO, wTO, epsInf, L):
 
 def producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L):
 
-    arrBelow, arrWithin, arrAboveClose, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
+    arrBelow, arrWithin, arrAbove, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
     wArr = np.append(arrBelow, arrWithin)
-    wArr = np.append(wArr, arrAboveClose)
+    wArr = np.append(wArr, arrAbove)
 
-    dosTETotal = prod.retrieveDosTE()
-    dosTMTotal = prod.retrieveDosTM()
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L)
+    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L)
 
     #dosSurf = prod.retrieveDosSurf()
     #dosSurf = patchDosSurfWithZeros(dosSurf, zArr, arrBelow, arrAboveClose, arrAboveFar)
