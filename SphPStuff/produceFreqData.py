@@ -39,7 +39,7 @@ def defineFreqArrays(wLO, wTO, epsInf):
     arrWithin = np.linspace(wTO, wLO, 100, endpoint=False)
     arrWithin = arrWithin[1:]
     #wEpsEq1 = np.sqrt((epsInf * wLO ** 2 - wTO ** 2) / (epsInf - 1))
-    arrAbove = np.linspace(wLO, 10. * wLO, 1000, endpoint=False)
+    arrAbove = np.linspace(wLO, 10. * wLO, 300, endpoint=False)
     arrAbove = arrAbove[1:]
 
     #surfFreqArr = np.linspace(wTO, wLO, 500 + 1, endpoint=False)
@@ -81,7 +81,7 @@ def produceFreqDataAbove(wArrAbove, zArr, wLO, wTO, epsInf, L):
 
 def produceFreqDataTE(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
 
-    with Pool(1) as pool:
+    with Pool() as pool:
         dosTEVals = np.array(pool.starmap(dosAsOfFreq.getDosTE, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
         dosTEEvaVals = np.array(pool.starmap(dosAsOfFreq.getDosTEEva, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
         dosTEResVals = np.array(pool.starmap(dosAsOfFreq.getDosTERes, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
@@ -103,7 +103,7 @@ def produceFreqDataTE(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
 
 def produceFreqDataTM(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
 
-    with Pool(1) as pool:
+    with Pool() as pool:
         dosTMVals = np.array(pool.starmap(dosAsOfFreq.getDosTM, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
         dosTMEvaVals = np.array(pool.starmap(dosAsOfFreq.getDosTMEva, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
         dosTMResVals = np.array(pool.starmap(dosAsOfFreq.getDosTMRes, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
@@ -131,8 +131,8 @@ def retrieveDosTE(wMaxBelow, wMaxWithin, wMAxAbove, L):
 
     parameterStr = parameterName(wMaxBelow, L)
 
-    dir = "savedData/clusterFreqDataNoSPhP/"
-    dir = "savedData/"
+    dir = "savedData/clusterFreqDataNoSPhPNew/"
+    #dir = "savedData/"
 
     filenameTE = dir + 'dosTE' + parameterStr + '.h5'
     h5f = h5py.File(filenameTE, 'r')
@@ -159,8 +159,8 @@ def retrieveDosTM(wMaxBelow, wMaxWithin, wMAxAbove, L):
 
     parameterStr = parameterName(wMaxBelow, L)
 
-    dir = "savedData/clusterFreqDataNoSPhP/"
-    dir = "savedData/"
+    dir = "savedData/clusterFreqDataNoSPhPNew/"
+    #dir = "savedData/"
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')

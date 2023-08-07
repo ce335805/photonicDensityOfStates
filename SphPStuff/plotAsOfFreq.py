@@ -101,7 +101,7 @@ def plotDosAsOfFreqDosTotal(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filename):
     ax.axhline(0., color = 'blue', lw = .3, zorder = 1000)
 
     #ax.set_xlim(np.amin(omegaArr), np.amax(omegaArr))
-    ax.set_xlim(np.amin(omegaArr), 90)
+    ax.set_xlim(np.amin(omegaArr), 30)
     ax.set_ylim(-20, 20.)
 
     ax.set_xlabel(r"$\omega[\mathrm{THz}]$")
@@ -174,7 +174,7 @@ def plotDosIntegratedAsOfCutoff(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filena
     cmapBone = cm.get_cmap('bone')
 
     zArr = zArr[15 : 20]
-    dos = dos[:, 15:20]
+    dos = dos[:, 15 : 20]
 
     for zInd, zVal in enumerate(zArr):
         if(zVal < 1e-9):
@@ -190,7 +190,7 @@ def plotDosIntegratedAsOfCutoff(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filena
 #    ax.axvline(np.sqrt((epsInf * wLO ** 2 - wTO ** 2) / (epsInf - 1)) * 1e-12, lw=0.5, color='gray')
 
     #ax.set_xlim(np.amin(omegaArr), np.amax(omegaArr))
-    ax.set_xlim(np.amin(omegaArr), 90)
+    ax.set_xlim(np.amin(omegaArr), 30)
     ax.set_ylim(-50, 50)
 
     ax.set_xlabel(r"$\omega[\mathrm{THz}]$")
