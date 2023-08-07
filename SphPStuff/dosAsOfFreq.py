@@ -16,11 +16,11 @@ import plotAsOfFreq as plotFreq
 
 
 def getDosTE(omega, zArr, L, wLO, wTO, epsInf):
-    if(omega < wTO or omega > wLO ):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    if(eps > 0):
         return dosTE.calcDosTE(zArr, L, omega, wLO, wTO, epsInf)
     else:
         return np.zeros(len(zArr))
-
 
 def getDosTEEva(omega, zArr, L, wLO, wTO, epsInf):
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
@@ -28,7 +28,6 @@ def getDosTEEva(omega, zArr, L, wLO, wTO, epsInf):
         return dosTEEva.calcDosTE(zArr, L, omega, wLO, wTO, epsInf)
     else:
         return np.zeros(len(zArr))
-
 
 def getDosTERes(omega, zArr, L, wLO, wTO, epsInf):
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
@@ -38,7 +37,8 @@ def getDosTERes(omega, zArr, L, wLO, wTO, epsInf):
         return np.zeros(len(zArr))
 
 def getDosTM(omega, zArr, L, wLO, wTO, epsInf):
-    if(omega < wTO or omega > wLO ):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    if(eps > 0):
         return dosTM.calcDosTM(zArr, L, omega, wLO, wTO, epsInf)
     else:
         return np.zeros(len(zArr))

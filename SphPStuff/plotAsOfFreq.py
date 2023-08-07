@@ -5,6 +5,8 @@ from matplotlib import gridspec
 import matplotlib as mpl
 import matplotlib.cm as cm
 import matplotlib.colors
+import matplotlib.patches as patch
+import scipy.constants as consts
 
 fontsize = 8
 
@@ -82,17 +84,17 @@ def plotDosAsOfFreqDosTotal(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filename):
     cmapBone = cm.get_cmap('bone')
 
     #dos = dos[:, :] - (dos[:, 0])[:, None] * np.ones(50)[None, :]
+    zArr = zArr[ : 11 : 2]
+    dos = dos[:,  : 11 : 2]
 
     for zInd, zVal in enumerate(zArr):
-        if(zVal < 1e-9):
-            continue
         if(zInd == 0):
             ax.plot(omegaArr, dos[:, zInd], color='black', lw=.6, linestyle='-', zorder = 666,  label = r'$z = $'+'{0:.1g}'.format(zVal) + '$\mathrm{m}$')
             continue
-        #if(zInd < 15 or zInd > 18):
-        #    continue
-        color = cmapPink((zInd + 1.) / (len(zArr) + 1.))
-        ax.plot(omegaArr, dos[:, zInd], color=color, lw=.8, linestyle='-')
+        color = cmapPink((zInd + 1.) / (len(zArr) + 4.))
+        ax.plot(omegaArr, dos[:, zInd], color=color, lw=.8, linestyle='-', label = r'$z = $'+'{0:.1g}'.format(zVal) + '$\mathrm{m}$')
+        arrow = patch.FancyArrow(0., 0.3 - 0.05 * zInd, consts.c / zVal * 1e-12, 0., color = color, width = 0.002, head_width = 0.01, head_length=0.3)
+        ax.add_patch(arrow)
     #ax.axvline(wLO * 1e-12, lw=0.5, color='gray')
     #ax.axvline(wTO * 1e-12, lw=0.5, color='gray')
 #    print("eps = 1 at {}THz".format(np.sqrt((epsInf * wLO ** 2 - wTO ** 2) / (epsInf - 1)) * 1e-12))
@@ -102,15 +104,15 @@ def plotDosAsOfFreqDosTotal(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filename):
 
     #ax.set_xlim(np.amin(omegaArr), np.amax(omegaArr))
     ax.set_xlim(np.amin(omegaArr), 30)
-    ax.set_ylim(-20, 20.)
+    #ax.set_ylim(-20, 20.)
 
     ax.set_xlabel(r"$\omega[\mathrm{THz}]$")
     ax.set_ylabel(r"$\rho / \rho_0$")
 
-    #legend = ax.legend(fontsize=fontsize-2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=2)
-    #legend.get_frame().set_alpha(0.)
-    #legend.get_frame().set_boxstyle('Square', pad=0.1)
-    #legend.get_frame().set_linewidth(0.0)
+    legend = ax.legend(fontsize=fontsize-2, loc='upper right', bbox_to_anchor=(.97, .7), edgecolor='black', ncol=2)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
 
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
@@ -173,8 +175,8 @@ def plotDosIntegratedAsOfCutoff(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filena
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
 
-    zArr = zArr[15 : 20]
-    dos = dos[:, 15 : 20]
+    zArr = zArr[ : 11 : 2]
+    dos = dos[:,  : 11 : 2]
 
     for zInd, zVal in enumerate(zArr):
         if(zVal < 1e-9):
@@ -189,8 +191,8 @@ def plotDosIntegratedAsOfCutoff(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filena
 #    print("eps = 1 at {}THz".format(np.sqrt((epsInf * wLO ** 2 - wTO ** 2) / (epsInf - 1)) * 1e-12))
 #    ax.axvline(np.sqrt((epsInf * wLO ** 2 - wTO ** 2) / (epsInf - 1)) * 1e-12, lw=0.5, color='gray')
 
-    #ax.set_xlim(np.amin(omegaArr), np.amax(omegaArr))
-    ax.set_xlim(np.amin(omegaArr), 30)
+    ax.set_xlim(np.amin(omegaArr), np.amax(omegaArr))
+    #ax.set_xlim(np.amin(omegaArr), 30)
     ax.set_ylim(-50, 50)
 
     ax.set_xlabel(r"$\omega[\mathrm{THz}]$")

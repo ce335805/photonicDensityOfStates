@@ -20,11 +20,10 @@ import produceFreqData as prod
 def freqIntegral():
     wLO = 3. * 1e12
     wTO = 1. * 1e12
-    epsInf = 1.
-    L = 1.
+    epsInf = 2.
+    L = .1
     zArr = np.logspace(-3, -9, 20, endpoint=True, base = 10)
     zArr = np.append([L / 4.], zArr)
-    print(zArr)
 
     #zArr = np.logspace(-3, -9, 100)
 
@@ -46,8 +45,8 @@ def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAbove)
 
-    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L)
-    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L)
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
     dosSurf = prod.retrieveDosSurf()
 
 
@@ -96,12 +95,12 @@ def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
 
 def computeLocalFieldStrength(zArr, wLO, wTO, epsInf, L):
 
-    arrBelow, arrWithin, arrAboveClose, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
+    arrBelow, arrWithin, arrAbove, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
     wArr = np.append(arrBelow, arrWithin)
-    wArr = np.append(wArr, arrAboveClose)
+    wArr = np.append(wArr, arrAbove)
 
-    dosTETotal = prod.retrieveDosTE()
-    dosTMTotal = prod.retrieveDosTM()
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
     dosSurf = prod.retrieveDosSurf()
 
     dosIntTE = np.zeros(dosTETotal.shape)
@@ -118,8 +117,8 @@ def computeLocalFieldStrength(zArr, wLO, wTO, epsInf, L):
             dosIntSurf[wInd, zInd] = np.trapz(intFuncSurf, wSurfPart, axis=0)
 
     patchBelow = np.zeros((len(arrBelow), len(zArr)))
-    patchAbove = np.ones((len(arrAboveClose), len(zArr)))
-    for wInd in range(len(arrAboveClose)):
+    patchAbove = np.ones((len(arrAbove), len(zArr)))
+    for wInd in range(len(arrAbove)):
         patchAbove[wInd, :] = patchAbove[wInd, :] * dosIntSurf[-1, :]
     dosIntSurf = np.append(patchBelow, dosIntSurf, axis = 0)
     dosIntSurf = np.append(dosIntSurf, patchAbove, axis = 0)
@@ -148,8 +147,8 @@ def producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L):
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAbove)
 
-    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L)
-    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L)
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
 
     #dosSurf = prod.retrieveDosSurf()
     #dosSurf = patchDosSurfWithZeros(dosSurf, zArr, arrBelow, arrAboveClose, arrAboveFar)
