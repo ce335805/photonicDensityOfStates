@@ -11,21 +11,8 @@ import matplotlib.cm as cm
 import matplotlib.colors
 import h5py
 from matplotlib import gridspec
-from matplotlib.patches import ConnectionPatch
 
-import TMEvaWaveFunction
-import scipy.integrate as integrate
-import scipy.optimize as opt
 import scipy.constants as consts
-
-import dosFresnel
-import findAllowedKs
-import dosBox
-import TEEvaWaveFunction
-import dosEvanescentTE
-import dosEvanescentTM
-import TEWaveFunction
-import TMWaveFunctions
 
 fontsize = 8
 
@@ -70,7 +57,7 @@ def plotDosAsOfZ(zArr, dosFP, omega, L):
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
 
-    plt.savefig("./FPStuff/FPPlotsSaved/dosFPAsOfZ.png")
+    plt.savefig("FPPlotsSaved/dosFPAsOfZ.png")
 
 def plotDosAsOfZSeveralOm(dosFP, zArr, omArr, L):
 
@@ -99,7 +86,7 @@ def plotDosAsOfZSeveralOm(dosFP, zArr, omArr, L):
     legend.get_frame().set_boxstyle('Square', pad=0.1)
     legend.get_frame().set_linewidth(0.0)
 
-    plt.savefig("./FPStuff/FPPlotsSaved/dosFPAsOfZOmegas.png")
+    plt.savefig("FPPlotsSaved/dosFPAsOfZOmegas.png")
 
 
 def plotDosAsOfOm(omArr, dosFP, L):
@@ -123,5 +110,113 @@ def plotDosAsOfOm(omArr, dosFP, L):
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
 
-    plt.savefig("./FPStuff/FPPlotsSaved/dosFPAsOfOm.png")
+    plt.savefig("FPPlotsSaved/dosFPAsOfOm.png")
+
+
+def plotDosCompare(omArr, dosFP1, dosFP2, L1, L2):
+
+    omArr = omArr * 1e-12
+
+    lambda1 = 2. * L1
+    freq1 = 2. * np.pi * consts.c / (lambda1)
+    lambda2 = 2. * L2
+    freq2 = 2. * np.pi * consts.c / (lambda2)
+
+    print("res1 = {}THz".format(freq1))
+    print("res2 = {}THz".format(freq2))
+
+
+    fig = plt.figure(figsize=(3., 2.), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.28, right=0.96)
+    ax = plt.subplot(gs[0, 0])
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+
+    ax.plot(omArr, dosFP1, color=cmapPink(.5), lw=1., label = "$d = $" + "{}".format(int(L1 * 1e6)) + r"$\mu \mathrm{m}$")
+    ax.plot(omArr, dosFP2, color=cmapBone(.5), lw=1., label = "$d = $" + "{}".format(int(L2 * 1e6)) + r"$\mu \mathrm{m}$")
+    #ax.plot(omArr, (dosFP1 - 0.5) * omArr**0, color=cmapPink(.5), lw=1., label = "$d = $" + "{}".format(int(L1 * 1e6)) + r"$\mu \mathrm{m}$")
+    #ax.plot(omArr, (dosFP2 - 0.5) * omArr**0, color=cmapBone(.5), lw=1., label = "$d = $" + "{}".format(int(L2 * 1e6)) + r"$\mu \mathrm{m}$")
+    ax.set_xlim(np.amin(omArr), np.amax(omArr))
+    ax.axhline(.5, color = 'black', lw = .5, zorder = -666)
+    #ax.set_xscale("log")
+
+    ax.set_ylim(0, 1.1)
+
+    ax.set_xlabel(r"$\omega \, \left[\mathrm{THz}\right]$")
+    #ax.set_ylabel(r"$\left(\rho / \rho_0 - 0.5\right) \times \omega^3$")
+    ax.set_ylabel(r"$\rho / \rho_0$")
+
+    legend = ax.legend(fontsize=fontsize-2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+
+    plt.savefig("FPPlotsSaved/dosFPCompareTE.png")
+
+
+def plotDosWithCutoff(omArr, dos):
+    omArr = omArr * 1e-12
+    fig = plt.figure(figsize=(3., 2.), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.22, right=0.96)
+    ax = plt.subplot(gs[0, 0])
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+    ax.plot(omArr, dos, color=cmapPink(.5), lw=1.)
+    ax.set_xlim(np.amin(omArr), np.amax(omArr))
+    ax.axhline(.5, color='black', lw=.5, zorder=-666)
+    # ax.set_xscale("log")
+    ax.set_xlabel(r"$\omega \, \left[\mathrm{THz}\right]$")
+    ax.set_ylabel(r"$\rho / \rho_0$")
+
+    #legend = ax.legend(fontsize=fontsize - 2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black',
+    #                   ncol=1)
+    #legend.get_frame().set_alpha(0.)
+    #legend.get_frame().set_boxstyle('Square', pad=0.1)
+    #legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+
+    plt.savefig("FPPlotsSaved/dosFPWithCutoff.png")
+
+def plotFieldIntegrals(alphaArr, dosArr):
+
+    fig = plt.figure(figsize=(3., 2.), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.24, right=0.96)
+    ax = plt.subplot(gs[0, 0])
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+    ax.plot(alphaArr * 1e-12, dosArr, color=cmapPink(.5), linestyle = '', marker = 'x', markersize = 2.)
+    ax.axhline(0., color = 'red', lw = 0.4)
+    #ax.set_ylim(-0.0001, 0.)
+    ax.set_xscale('log')
+
+    ax.set_xlabel(r"$\mathrm{cutoff} \; \left[ \mathrm{THz} \right]$")
+    ax.set_ylabel(r"$\langle E^2 \rangle \left[ \frac{\mathrm{V}^2}{\mathrm{m}^2} \right] $")
+
+    #ax.text(1e-1, 10, r"$d = 100 \mu \mathrm{m}$")
+    #ax.text(1e-1, 7.5, r"$\omega_0 = 9.41 \mathrm{THz}$")
+
+    #legend = ax.legend(fontsize=fontsize - 2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black',
+    #                   ncol=1)
+    #legend.get_frame().set_alpha(0.)
+    #legend.get_frame().set_boxstyle('Square', pad=0.1)
+    #legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+
+    plt.savefig("FPPlotsSaved/fieldInt.png")
+    #plt.savefig("FPPlotsSaved/fieldIntParallelE.png")
+    #plt.savefig("FPPlotsSaved/fieldIntPerpE.png")
+    #plt.savefig("FPPlotsSaved/fieldIntTEE.png")
+    #plt.savefig("FPPlotsSaved/fieldIntTME.png")
+
 

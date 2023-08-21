@@ -51,14 +51,15 @@ def plotDosAsOfFreqDosTotal(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filename):
 
     ax.axvline(0., lw=0.5, color='gray')
     ax.axhline(0.5, lw=0.5, color='gray')
+    ax.axhline(0.5 * np.sqrt(2.), lw=0.5, color='gray')
 
     ax.set_xlim(np.amin(zArr), np.amax(zArr))
-    ax.set_ylim(-0.3, 5)
+    #ax.set_ylim(-0.3, 5)
 
     ax.set_xlabel(r"$z[\mathrm{m}]$")
     ax.set_ylabel(r"$\rho / \rho_0$")
 
-    legend = ax.legend(fontsize=fontsize-2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=1)
+    legend = ax.legend(fontsize=fontsize-2, loc='upper right', bbox_to_anchor=(.97, .97), edgecolor='black', ncol=1)
     legend.get_frame().set_alpha(0.)
     legend.get_frame().set_boxstyle('Square', pad=0.1)
     legend.get_frame().set_linewidth(0.0)
@@ -66,4 +67,4 @@ def plotDosAsOfFreqDosTotal(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filename):
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
 
-    plt.savefig("./SPhPPlotsSaved/dosTotalAsOfZ" + filename + ".png")
+    plt.savefig("./SPhPPlotsSaved/dosTotalAsOfZDielectric" + filename + ".png")

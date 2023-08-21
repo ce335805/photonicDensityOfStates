@@ -1,5 +1,5 @@
 import performFreqIntegral
-
+import plotTotalAsOfZ
 
 def main():
     print("Compute full Dos and all modes")
@@ -25,7 +25,7 @@ def main():
 
     #dosAsOfFreq.createPlotAsOfOmega()
     performFreqIntegral.freqIntegral()
-    #dosTotalAsOfZ()
+    #plotTotalAsOfZ.dosTotalAsOfZ()
 
 
 if __name__ == "__main__":

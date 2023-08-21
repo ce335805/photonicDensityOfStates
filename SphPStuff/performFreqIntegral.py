@@ -20,10 +20,10 @@ import produceFreqData as prod
 def freqIntegral():
     wLO = 3. * 1e12
     wTO = 1. * 1e12
-    epsInf = 2.
-    L = .1
+    epsInf = 1.
+    L = 2.
     zArr = np.logspace(-3, -9, 20, endpoint=True, base = 10)
-    zArr = np.append([L / 4.], zArr)
+    #zArr = np.append([L / 4.], zArr)
 
     #zArr = np.logspace(-3, -9, 100)
 
@@ -31,10 +31,10 @@ def freqIntegral():
     #print("intNum = {}".format(intNum[0] * 1e-20))
     #print("intNum Err = {}".format(intNum[1] * 1e-20))
 #
-    #dosAna, dosNum = computeSPhPIntAsOfZ(zArr, wLO, wTO, epsInf)
-    #plotFreq.compareSPhPInt(dosAna * 1e-20, dosNum * 1e-20, zArr, "SPhPComp")
+    dosAna, dosNum = computeSPhPIntAsOfZ(zArr, wLO, wTO, epsInf)
+    plotFreq.compareSPhPInt(dosAna, dosNum, zArr, "SPhPFieldA")
 
-    prod.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
+    #prod.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
     #producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L)
     #computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L)
 
@@ -47,7 +47,7 @@ def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
 
     dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
     dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosSurf = prod.retrieveDosSurf()
+    #dosSurf = prod.retrieveDosSurf()
 
 
 
@@ -75,10 +75,10 @@ def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
 
     for zInd, zVal in enumerate(zArr):
         for wInd, wVal in enumerate(wArr):
-            wArrPart = wArr[:wInd] * 1e-12
+            wArrPart = wArr[:wInd]# * 1e-12
             #prefac = 2. * consts.fine_structure / np.pi * latConst ** 2 / consts.c ** 2 * wArrPart
-            prefacFieldStrength = consts.hbar * wArrPart**1 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)
-            prefacFieldStrength = wArrPart ** 3
+            prefacFieldStrength = consts.hbar * wArrPart**3 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)
+            #prefacFieldStrength = wArrPart ** 1
             #intFuncTE = prefacFieldStrength * (dosTETotal[:wInd, zInd] - .5)
             intFuncTE = prefacFieldStrength * (dosTETotal[:wInd, zInd] - dosTETotal[:wInd, 0])
             dosIntTE[wInd, zInd] = np.trapz(intFuncTE, x=wArrPart, axis = 0)
@@ -166,8 +166,8 @@ def intFuncEffectiveHopping(omega, zVal, wLO, wTO, epsInf):
     return prefac * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
 
 def intFuncFieldStrength(omega, zVal, wLO, wTO, epsInf):
-    prefac = consts.hbar / 2. / consts.fine_structure
-    return prefac * omega**3 * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
+    prefacField = consts.hbar * omega**1 / (2. * consts.epsilon_0 * np.pi**2 * consts.c**3) * 1e24
+    return prefacField * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
 
 def performSPhPIntegralNum(zVal, wLO, wTO, epsInf):
     wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
@@ -175,18 +175,23 @@ def performSPhPIntegralNum(zVal, wLO, wTO, epsInf):
     #return scipy.integrate.quad(intFuncEffectiveHopping, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 500)
 
 def performSPhPIntegralAna(zVal, wLO, wTO, epsInf):
-    prefac = 2. * np.pi * consts.fine_structure * consts.c
-    num = epsInf* np.sqrt(1 + epsInf) * (wLO**2 - wTO**2)
-    denom = 4. * np.pi * np.sqrt(epsInf * wLO**2 + wTO**2) * (2. * epsInf * wLO**2 + (1 + epsInf**2) * wTO**2) * zVal**3
-    return prefac * num / denom
+    wInf = np.sqrt(wLO**2 + wTO**2) / np.sqrt(2)
+    prefacField = consts.hbar * wInf**1 / (2. * consts.epsilon_0 * np.pi**2 * consts.c**3) * 1e24
+    rho0Prefac = np.pi ** 2 * consts.c **3 / wInf**2
+    rho = 1. / (8. * np.pi) * (wLO**2 - wTO**2) / wLO**2 / zVal**3
+    return prefacField * rho0Prefac * rho
+    #prefac = 2. * np.pi * consts.fine_structure * consts.c
+    #num = epsInf* np.sqrt(1 + epsInf) * (wLO**2 - wTO**2)
+    #denom = 4. * np.pi * np.sqrt(epsInf * wLO**2 + wTO**2) * (2. * epsInf * wLO**2 + (1 + epsInf**2) * wTO**2) * zVal**3
+    #return prefac * num / denom
 
 def computeSPhPIntAsOfZ(zArr, wLO, wTO, epsInf):
     intAna = performSPhPIntegralAna(zArr, wLO, wTO, epsInf)
-    intNum = np.zeros(intAna.shape)
+    intNum = np.zeros(len(zArr))
     for zInd, zVal in enumerate(zArr):
         intNum[zInd] = performSPhPIntegralNum(zVal, wLO, wTO, epsInf)[0]
 
-    return (intAna, intNum)
+    return ( intAna, intNum)
 
 def patchDosSurfWithZeros(dosSurf, zArr, arrBelow, arrAboveClose):
     patchBelow = np.zeros((len(arrBelow), len(zArr)))

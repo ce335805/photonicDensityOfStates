@@ -14,19 +14,7 @@ import h5py
 from matplotlib import gridspec
 from matplotlib.patches import ConnectionPatch
 
-import TMEvaWaveFunction
-import scipy.integrate as integrate
-import scipy.optimize as opt
 import scipy.constants as consts
-
-import dosFresnel
-import findAllowedKs
-import dosBox
-import TEEvaWaveFunction
-import dosEvanescentTE
-import dosEvanescentTM
-import TEWaveFunction
-import TMWaveFunctions
 
 fontsize = 8
 
