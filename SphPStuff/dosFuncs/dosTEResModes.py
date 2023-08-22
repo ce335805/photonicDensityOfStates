@@ -53,18 +53,18 @@ def NormSqr(kArr, L, omega, wLO, wTO, epsInf):
     term2 = normPrefac * brack2 * np.sin(kArr * L / 2) ** 2
     return L / 4 * (term1 + term2)
 
-def dosSumPos(zArr, kArr, L, omega, wLO, wTO, epsInf):
+def dosSumPos(zArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TERes")
+    #kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TERes")
     kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
     func = np.sin(kArr[None, :] * (L / 2. - zArr[:, None])) * 0.5 * (1 - np.exp(- kDArr[None, :] * L))
     diffFac = (1. - consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
     #diffFac = 1.
     return np.sum(1. / NSqr[None, :] * func**2 * diffFac, axis = 1)
 
-def dosSumNeg(zArr, kArr, L, omega, wLO, wTO, epsInf):
+def dosSumNeg(zArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TERes")
+    #kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TERes")
     kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
     func = 0.5 * (np.exp(kDArr[None, :] * zArr[:, None]) - np.exp(-kDArr[None, :] * zArr[:, None] - kDArr[None, :] * L)) * np.sin(kArr[None, :] * L / 2.)
     diffFac = (1. - consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
@@ -75,14 +75,15 @@ def dosSumNeg(zArr, kArr, L, omega, wLO, wTO, epsInf):
 def calcDosTE(zArr, L, omega, wLO, wTO, epsInf):
 
     kArr = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TERes")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TERes")
 
     indNeg = np.where(zArr < 0)
     indPos = np.where(zArr >= 0)
     zPosArr = zArr[indPos]
     zNegArr = zArr[indNeg]
 
-    dosPos = dosSumPos(zPosArr, kArr, L, omega, wLO, wTO, epsInf)
-    dosNeg = dosSumNeg(zNegArr, kArr, L, omega, wLO, wTO, epsInf)
+    dosPos = dosSumPos(zPosArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
+    dosNeg = dosSumNeg(zNegArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
 
     dos = np.pi * consts.c / (2. * omega) * np.append(dosNeg, dosPos)
     return dos

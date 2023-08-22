@@ -15,6 +15,8 @@ from matplotlib.patches import ConnectionPatch
 import scipy.integrate as integrate
 import scipy.optimize as opt
 import scipy.constants as consts
+from time import perf_counter
+
 
 import findAllowedKsSPhP as findAllowedKsSPhP
 import epsilonFunctions as epsFunc
@@ -51,18 +53,16 @@ def NormSqr(kArr, L, omega, wLO, wTO, epsInf):
     term2 = normPrefac * (1 - np.sin(kDVal * L) / (kDVal * L)) * np.sin(kArr * L / 2) ** 2
     return L / 4 * (term1 + term2)
 
-def dosSumPos(zArr, kArr, L, omega, wLO, wTO, epsInf):
+def dosSumPos(zArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TE")
     kDArr = epsFunc.kDFromK(kArr, omega, wLO, wTO, epsInf)
     func = np.sin(kArr[None, :] * (L / 2 - zArr[:, None])) * np.sin(kDArr[None, :] * L / 2.)
     diffFac = (1. - consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
     #diffFac = 1.
     return np.sum(1. / NSqr[None, :] * func**2 * diffFac, axis = 1)
 
-def dosSumNeg(zArr, kArr, L, omega, wLO, wTO, epsInf):
+def dosSumNeg(zArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf):
     NSqr = NormSqr(kArr, L, omega, wLO, wTO, epsInf)
-    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TE")
     kDArr = epsFunc.kDFromK(kArr, omega, wLO, wTO, epsInf)
     func = np.sin(kDArr[None, :] * (L / 2. + zArr[:, None])) * np.sin(kArr[None, :] * L / 2.)
     diffFac = (1. - consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
@@ -71,15 +71,25 @@ def dosSumNeg(zArr, kArr, L, omega, wLO, wTO, epsInf):
 
 def calcDosTE(zArr, L, omega, wLO, wTO, epsInf):
 
+    t_start = perf_counter()
     kArr = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TE")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TE")
+    t_stop = perf_counter()
+    print("Time to find kVals TE: {}".format(t_stop - t_start))
+
+
+    #print("len kArr TE = {}".format(len(kArr)))
 
     indNeg = np.where(zArr < 0)
     indPos = np.where(zArr >= 0)
     zPosArr = zArr[indPos]
     zNegArr = zArr[indNeg]
 
-    dosPos = dosSumPos(zPosArr, kArr, L, omega, wLO, wTO, epsInf)
-    dosNeg = dosSumNeg(zNegArr, kArr, L, omega, wLO, wTO, epsInf)
+    t_start = perf_counter()
+    dosPos = dosSumPos(zPosArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
+    dosNeg = dosSumNeg(zNegArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
+    t_stop = perf_counter()
+    print("Time to find perform dos sums TE: {}".format(t_stop - t_start))
 
     dos = np.pi * consts.c / (2. * omega) * np.append(dosNeg, dosPos)
     return dos

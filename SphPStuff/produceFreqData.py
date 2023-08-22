@@ -36,11 +36,11 @@ def produceFreqIntegralData(zArr, wLO, wTO, epsInf, L):
     #produceFreqDataSurf(surfFreqArr, zArr, wLO, wTO, epsInf, L)
 
 def defineFreqArrays(wLO, wTO, epsInf):
-    arrBelow = np.linspace(wTO * 1e-1, wTO - 1e-3 * wTO, 100, endpoint=False)
-    arrWithin = np.linspace(wTO, wLO, 100, endpoint=False)
+    arrBelow = np.linspace(wTO * 1e-1, wTO - 1e-3 * wTO, 2, endpoint=False)
+    arrWithin = np.linspace(wTO, wLO, 2, endpoint=False)
     arrWithin = arrWithin[1:]
     #wEpsEq1 = np.sqrt((epsInf * wLO ** 2 - wTO ** 2) / (epsInf - 1))
-    arrAbove = np.linspace(wLO, 20. * wLO, 600, endpoint=False)
+    arrAbove = np.linspace(wLO, 20. * wLO, 2, endpoint=False)
     arrAbove = arrAbove[1:]
 
     #surfFreqArr = np.linspace(wTO, wLO, 500 + 1, endpoint=False)
@@ -82,11 +82,19 @@ def produceFreqDataAbove(wArrAbove, zArr, wLO, wTO, epsInf, L):
 
 def produceFreqDataTE(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
 
-    with Pool() as pool:
+    with Pool(1) as pool:
+        t_start = perf_counter()
         dosTEVals = np.array(pool.starmap(dosAsOfFreq.getDosTE, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
+        t_stop = perf_counter()
+        #print("Time to evaluate TE: {}".format(t_stop - t_start))
+        t_start = perf_counter()
         dosTEEvaVals = np.array(pool.starmap(dosAsOfFreq.getDosTEEva, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
+        t_stop = perf_counter()
+        #print("Time to evaluate TEEva: {}".format(t_stop - t_start))
+        t_start = perf_counter()
         dosTEResVals = np.array(pool.starmap(dosAsOfFreq.getDosTERes, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
-
+        t_stop = perf_counter()
+        #print("Time to evaluate TERes: {}".format(t_stop - t_start))
     #dosTEVals = np.zeros((len(omegaArr), len(zArr)))
     #dosTEEvaVals = np.zeros((len(omegaArr), len(zArr)))
     #dosTEResVals = np.zeros((len(omegaArr), len(zArr)))
@@ -104,10 +112,19 @@ def produceFreqDataTE(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
 
 def produceFreqDataTM(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
 
-    with Pool() as pool:
+    with Pool(1) as pool:
+        t_start = perf_counter()
         dosTMVals = np.array(pool.starmap(dosAsOfFreq.getDosTM, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
+        t_stop = perf_counter()
+        #print("Time to evaluate TM: {}".format(t_stop - t_start))
+        t_start = perf_counter()
         dosTMEvaVals = np.array(pool.starmap(dosAsOfFreq.getDosTMEva, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
+        t_stop = perf_counter()
+        #print("Time to evaluate TM Eva: {}".format(t_stop - t_start))
+        t_start = perf_counter()
         dosTMResVals = np.array(pool.starmap(dosAsOfFreq.getDosTMRes, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
+        t_stop = perf_counter()
+        #print("Time to evaluate TMRes: {}".format(t_stop - t_start))
         #dosTMSurfVals = np.array(pool.starmap(dosAsOfFreq.getDosTMSurf, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
 
     #dosTMVals = np.zeros((len(omegaArr), len(zArr)))
