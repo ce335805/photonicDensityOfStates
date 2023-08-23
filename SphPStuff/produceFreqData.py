@@ -36,11 +36,11 @@ def produceFreqIntegralData(zArr, wLO, wTO, epsInf, L):
     #produceFreqDataSurf(surfFreqArr, zArr, wLO, wTO, epsInf, L)
 
 def defineFreqArrays(wLO, wTO, epsInf):
-    arrBelow = np.linspace(wTO * 1e-1, wTO - 1e-3 * wTO, 2, endpoint=False)
-    arrWithin = np.linspace(wTO, wLO, 2, endpoint=False)
+    arrBelow = np.linspace(wTO * 1e-1, wTO - 1e-3 * wTO, 100, endpoint=False)
+    arrWithin = np.linspace(wTO, wLO, 100, endpoint=False)
     arrWithin = arrWithin[1:]
     #wEpsEq1 = np.sqrt((epsInf * wLO ** 2 - wTO ** 2) / (epsInf - 1))
-    arrAbove = np.linspace(wLO, 20. * wLO, 2, endpoint=False)
+    arrAbove = np.linspace(wLO, 20. * wLO, 100, endpoint=False)
     arrAbove = arrAbove[1:]
 
     #surfFreqArr = np.linspace(wTO, wLO, 500 + 1, endpoint=False)
@@ -82,7 +82,7 @@ def produceFreqDataAbove(wArrAbove, zArr, wLO, wTO, epsInf, L):
 
 def produceFreqDataTE(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
 
-    with Pool(1) as pool:
+    with Pool() as pool:
         t_start = perf_counter()
         dosTEVals = np.array(pool.starmap(dosAsOfFreq.getDosTE, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
         t_stop = perf_counter()
@@ -103,7 +103,7 @@ def produceFreqDataTE(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
     #   dosTEVals[omegaInd, :] = dosAsOfFreq.getDosTE(omegaVal, zArr, L, wLO, wTO, epsInf)
     #   dosTEEvaVals[omegaInd, :] = dosAsOfFreq.getDosTEEva(omegaVal, zArr, L, wLO, wTO, epsInf)
     #   dosTEResVals[omegaInd, :] = dosAsOfFreq.getDosTERes(omegaVal, zArr, L, wLO, wTO, epsInf)
-    #   #print("")
+    ##   #print("")
 
     dosTETotal = dosTEVals + dosTEEvaVals + dosTEResVals
     h5f = h5py.File(filename, 'w')
@@ -112,7 +112,7 @@ def produceFreqDataTE(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
 
 def produceFreqDataTM(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
 
-    with Pool(1) as pool:
+    with Pool() as pool:
         t_start = perf_counter()
         dosTMVals = np.array(pool.starmap(dosAsOfFreq.getDosTM, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
         t_stop = perf_counter()
@@ -136,7 +136,7 @@ def produceFreqDataTM(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
     #   dosTMVals[omegaInd, :] = dosAsOfFreq.getDosTM(omegaVal, zArr, L, wLO, wTO, epsInf)
     #   dosTMEvaVals[omegaInd, :] = dosAsOfFreq.getDosTMEva(omegaVal, zArr, L, wLO, wTO, epsInf)
     #   dosTMResVals[omegaInd, :] = dosAsOfFreq.getDosTMRes(omegaVal, zArr, L, wLO, wTO, epsInf)
-    #   dosTMSurfVals[omegaInd, :] = dosAsOfFreq.getDosTMSurf(omegaVal, zArr, L, wLO, wTO, epsInf)
+    #   #dosTMSurfVals[omegaInd, :] = dosAsOfFreq.getDosTMSurf(omegaVal, zArr, L, wLO, wTO, epsInf)
     #   #print("")
 
     dosTMTotal = dosTMVals + dosTMEvaVals + dosTMResVals# + dosTMSurfVals
@@ -149,8 +149,8 @@ def retrieveDosTE(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
 
     parameterStr = parameterName(wMaxBelow, L, epsInf)
 
-    dir = "savedData/clusterFreqDataNoSPhPNew/"
-    #dir = "savedData/"
+    #dir = "savedData/clusterFreqDataNoSPhPNew/"
+    dir = "savedData/"
 
     filenameTE = dir + 'dosTE' + parameterStr + '.h5'
     h5f = h5py.File(filenameTE, 'r')
@@ -177,8 +177,8 @@ def retrieveDosTM(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
 
     parameterStr = parameterName(wMaxBelow, L, epsInf)
 
-    dir = "savedData/clusterFreqDataNoSPhPNew/"
-    #dir = "savedData/"
+    #dir = "savedData/clusterFreqDataNoSPhPNew/"
+    dir = "savedData/"
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')

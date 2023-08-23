@@ -83,7 +83,7 @@ def plotDosAsOfFreqDosTotal(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filename):
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
 
-    dos = dos[:, :] - (dos[:, 0])[:, None] * np.ones(21)[None, :]
+    dos = dos[:, :] - (dos[:, 0])[:, None] * np.ones(len(zArr))[None, :]
     zArr = zArr[ : 11 : 2]
     dos = dos[:,  : 11 : 2]
 
@@ -103,8 +103,8 @@ def plotDosAsOfFreqDosTotal(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filename):
     ax.axhline(0., color = 'black', lw = .3, zorder = 1000)
 
     #ax.set_xlim(np.amin(omegaArr), np.amax(omegaArr))
-    ax.set_xlim(np.amin(omegaArr), 60)
-    ax.set_ylim(-14.2, 14.2)
+    ax.set_xlim(np.amin(omegaArr), np.amax(omegaArr))
+    #ax.set_ylim(-14.2, 14.2)
 
     ax.set_xlabel(r"$\omega[\mathrm{THz}]$")
     ax.set_ylabel(r"$\left(\rho / \rho_0 - 0.5\right) \times \omega^3$")

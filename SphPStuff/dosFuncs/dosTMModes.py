@@ -99,13 +99,12 @@ def calcDosTM(zArr, L, omega, wLO, wTO, epsInf):
     kArr = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TM")
     kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TM")
     t_stop = perf_counter()
-    print("Time to find kVals TM: {}".format(t_stop - t_start))
+    #print("Time to find kVals TM: {}".format(t_stop - t_start))
 
     #print("len kArr TM = {}".format(len(kArr)))
 
     if(len(kArr) == 0):
         return 0
-
 
     indNeg = np.where(zArr < 0)
     indPos = np.where(zArr >= 0)
@@ -118,7 +117,7 @@ def calcDosTM(zArr, L, omega, wLO, wTO, epsInf):
     dosPos += waveFunctionPosPerp(zPosArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
     dosNeg += waveFunctionNegPerp(zNegArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
     t_stop = perf_counter()
-    print("Time to find perform dos sums TM: {}".format(t_stop - t_start))
+    #print("Time to find perform dos sums TM: {}".format(t_stop - t_start))
     dos = np.pi * consts.c / (2. * omega) * np.append(dosNeg, dosPos)
     return dos
 

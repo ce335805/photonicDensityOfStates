@@ -75,7 +75,7 @@ def calcDosTE(zArr, L, omega, wLO, wTO, epsInf):
     kArr = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TE")
     kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TE")
     t_stop = perf_counter()
-    print("Time to find kVals TE: {}".format(t_stop - t_start))
+    #print("Time to find kVals TE: {}".format(t_stop - t_start))
 
 
     #print("len kArr TE = {}".format(len(kArr)))
@@ -89,7 +89,7 @@ def calcDosTE(zArr, L, omega, wLO, wTO, epsInf):
     dosPos = dosSumPos(zPosArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
     dosNeg = dosSumNeg(zNegArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
     t_stop = perf_counter()
-    print("Time to find perform dos sums TE: {}".format(t_stop - t_start))
+    #print("Time to find perform dos sums TE: {}".format(t_stop - t_start))
 
     dos = np.pi * consts.c / (2. * omega) * np.append(dosNeg, dosPos)
     return dos

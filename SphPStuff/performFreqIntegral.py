@@ -21,7 +21,7 @@ def freqIntegral():
     wLO = 3. * 1e12
     wTO = 1. * 1e12
     epsInf = 1.
-    L = 2.
+    L = .5
     zArr = np.logspace(-3, -9, 50, endpoint=True, base = 10)
     #zArr = np.append([L / 4.], zArr)
 
@@ -35,7 +35,7 @@ def freqIntegral():
     #plotFreq.compareSPhPInt(dosAna, dosNum, zArr, "SPhPFieldA")
 
     prod.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
-    #producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L)
+    producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L)
     #computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L)
 
 
