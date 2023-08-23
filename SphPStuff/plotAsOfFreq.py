@@ -193,7 +193,7 @@ def plotDosIntegratedAsOfCutoff(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filena
 
     ax.set_xlim(np.amin(omegaArr), np.amax(omegaArr))
     #ax.set_xlim(np.amin(omegaArr), 30)
-    ax.set_ylim(-7, 1.)
+    #ax.set_ylim(-7, 1.)
 
     ax.set_xlabel(r"$\Lambda[\mathrm{THz}]$")
     ax.set_ylabel(r"$ \langle E^2(r) \rangle_{\Lambda} \, \left[\frac{\mathrm{V}}{\mathrm{m}}\right] $")

@@ -21,7 +21,7 @@ def freqIntegral():
     wLO = 3. * 1e12
     wTO = 1. * 1e12
     epsInf = 1.
-    L = .5
+    L = 4.
     zArr = np.logspace(-3, -9, 50, endpoint=True, base = 10)
     #zArr = np.append([L / 4.], zArr)
 
@@ -34,9 +34,9 @@ def freqIntegral():
     #dosAna, dosNum = computeSPhPIntAsOfZ(zArr, wLO, wTO, epsInf)
     #plotFreq.compareSPhPInt(dosAna, dosNum, zArr, "SPhPFieldA")
 
-    prod.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
+    #prod.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
     producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L)
-    #computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L)
+    computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L)
 
 
 def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
@@ -77,7 +77,7 @@ def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
         for wInd, wVal in enumerate(wArr):
             wArrPart = wArr[:wInd]# * 1e-12
             #prefac = 2. * consts.fine_structure / np.pi * latConst ** 2 / consts.c ** 2 * wArrPart
-            prefacFieldStrength = consts.hbar * wArrPart**3 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)
+            prefacFieldStrength = consts.hbar * wArrPart**3 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)# * 1e24
             #prefacFieldStrength = wArrPart ** 1
             #intFuncTE = prefacFieldStrength * (dosTETotal[:wInd, zInd] - .5)
             intFuncTE = prefacFieldStrength * (dosTETotal[:wInd, zInd] - dosTETotal[:wInd, 0])

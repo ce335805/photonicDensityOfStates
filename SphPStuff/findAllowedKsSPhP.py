@@ -78,79 +78,6 @@ def getLowerBound(mode, omega, wLO, wTO, epsInf):
 
     return lowerBound
 
-def getRoots(L, omega, wLO, wTO, epsInf, mode):
-    rootFunc = rootFuncTE
-    if(mode == "TE"):
-        rootFunc = rootFuncTE
-    elif (mode == "TM"):
-        rootFunc = rootFuncTM
-    elif(mode == "TEEva"):
-        rootFunc = rootFuncTEEva
-    elif (mode == "TMEva"):
-        rootFunc = rootFuncTMEva
-    elif (mode == "TERes"):
-        rootFunc = rootFuncTERes
-    elif (mode == "TMRes"):
-        rootFunc = rootFuncTMRes
-    elif (mode == "Surf"):
-        rootFunc = rootFuncSurf
-    else:
-        print("Error: specified mode doesn't exist!!!!!!!!!!!!!!!!")
-        exit()
-
-    upperBound = getUpperBound(mode, omega, wLO, wTO, epsInf)
-    lowerBound = getLowerBound(mode, omega, wLO, wTO, epsInf)
-
-    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    NDiscrete =  int(1. * omega / consts.c * (np.sqrt(np.abs(eps)) + 1.) * L + 17)
-    iteration = 0
-    maxIters = 20
-    lenIntervalsOld = -1
-    lenIntervalsOl2 = -1
-    #intervals = np.zeros((0, 2))
-    indsSigns = np.zeros(0)
-    subdivision = np.zeros(0)
-    while(iteration < maxIters):
-        #print("NDiscrete = {} at iteration {}".format(NDiscrete, iteration))
-        subdivision = np.linspace(lowerBound, upperBound, NDiscrete, endpoint=True)
-        rootFuncAtPoints = rootFunc(subdivision, L, omega, wLO, wTO, epsInf)
-        signs = rootFuncAtPoints[:-1] * rootFuncAtPoints[1:]
-        indsSigns = np.where(signs < 0)[0]
-        #print("Numer of Roots = {} at iteration {}".format(len(indsSigns), iteration))
-        if(lenIntervalsOld == indsSigns.shape[0] and lenIntervalsOld == lenIntervalsOl2):
-            break
-        else:
-            NDiscrete = int(1.8 * NDiscrete)
-            lenIntervalsOl2 = lenIntervalsOld
-            lenIntervalsOld = indsSigns.shape[0]
-            iteration += 1
-    intervals = np.append([subdivision[indsSigns]], [subdivision[indsSigns + 1]], axis = 0)
-    intervals = numpy.swapaxes(intervals, 0, 1)
-
-    if(iteration == maxIters):
-        print("Warning: reach maximum number of iterations")
-
-    #print("NDiscrete = {} after iter = {}".format(NDiscrete, iteration))
-    #print("N Intervals = {}".format(intervals.shape[0]))
-
-    nRoots = intervals.shape[0]
-    roots = np.zeros(nRoots)
-    for rootInd, root in enumerate(roots):
-        tempRoot = scipy.optimize.root_scalar(rootFunc, args = (L, omega, wLO, wTO, epsInf), bracket=tuple(intervals[rootInd, :]))
-        roots[rootInd] = tempRoot.root
-
-    if (mode == "TEEva" or mode == "TMEva"):
-        roots = epsFunc.kDFromKEva(roots, omega, wLO, wTO, epsInf)
-
-    if(mode == "TE" or mode == "TEEva" or mode == "TERes"):
-        if(roots[0] < 1e-13):
-            roots = roots[1:]
-    if(lowerBound < 1e-13 and (mode == "TM" or mode == "TMEva" or mode == "TMRes")):
-        if(roots[0] > 1e-13):
-            roots = np.append([1e-12], roots)
-
-    return roots
-
 #def getRoots(L, omega, wLO, wTO, epsInf, mode):
 #    rootFunc = rootFuncTE
 #    if(mode == "TE"):
@@ -175,41 +102,36 @@ def getRoots(L, omega, wLO, wTO, epsInf, mode):
 #    lowerBound = getLowerBound(mode, omega, wLO, wTO, epsInf)
 #
 #    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-#    NCoarse =  int(1. * omega / consts.c * (np.sqrt(np.abs(eps)) + 1.) * L + 3) // 10
-#    NCoarse = 100
-#    coarseDisvision = np.linspace(lowerBound, upperBound, NCoarse, endpoint=True)
+#    NDiscrete =  int(1. * omega / consts.c * (np.sqrt(np.abs(eps)) + 1.) * L + 17)
 #    iteration = 0
 #    maxIters = 20
-#    intervals = np.zeros((0, 2))
-#    for indCoarse in range(NCoarse - 1):
-#        subdivision = np.zeros(0)
-#        indsSigns = np.zeros(0)
-#        NDivision = int(1. * omega / consts.c * (np.sqrt(np.abs(eps)) + 1.) * L + 3) // NCoarse
-#        numRootsOld = -1
-#        while(iteration < maxIters):
-#            #print("NDiscrete = {} at iteration {}".format(NDiscrete, iteration))
-#            subdivision = np.linspace(coarseDisvision[indCoarse], coarseDisvision[indCoarse + 1], NDivision, endpoint=True)
-#            rootFuncAtPoints = rootFunc(subdivision, L, omega, wLO, wTO, epsInf)
-#            signs = rootFuncAtPoints[:-1] * rootFuncAtPoints[1:]
-#            indsSigns = np.where(signs < 0)[0]
-#            #print("Numer of Roots = {} at iteration {}".format(len(indsSigns), iteration))
-#            if(numRootsOld == indsSigns.shape[0]):
-#                break
-#            else:
-#                NDivision = 2 * NDivision
-#                numRootsOld = indsSigns.shape[0]
-#                iteration += 1
-#        iteration = 0
-#        intervalsTemp = np.append([subdivision[indsSigns]], [subdivision[indsSigns + 1]], axis=0)
-#        #print("N IntervalsTemp.shape = {}".format(intervalsTemp.shape))
-#
-#        intervals = np.append(intervals, np.swapaxes(intervalsTemp, 0, 1), axis = 0)
+#    lenIntervalsOld = -1
+#    lenIntervalsOl2 = -1
+#    #intervals = np.zeros((0, 2))
+#    indsSigns = np.zeros(0)
+#    subdivision = np.zeros(0)
+#    while(iteration < maxIters):
+#        #print("NDiscrete = {} at iteration {}".format(NDiscrete, iteration))
+#        subdivision = np.linspace(lowerBound, upperBound, NDiscrete, endpoint=True)
+#        rootFuncAtPoints = rootFunc(subdivision, L, omega, wLO, wTO, epsInf)
+#        signs = rootFuncAtPoints[:-1] * rootFuncAtPoints[1:]
+#        indsSigns = np.where(signs < 0)[0]
+#        #print("Numer of Roots = {} at iteration {}".format(len(indsSigns), iteration))
+#        if(lenIntervalsOld == indsSigns.shape[0] and lenIntervalsOld == lenIntervalsOl2):
+#            break
+#        else:
+#            NDiscrete = int(1.8 * NDiscrete)
+#            lenIntervalsOl2 = lenIntervalsOld
+#            lenIntervalsOld = indsSigns.shape[0]
+#            iteration += 1
+#    intervals = np.append([subdivision[indsSigns]], [subdivision[indsSigns + 1]], axis = 0)
+#    intervals = numpy.swapaxes(intervals, 0, 1)
 #
 #    if(iteration == maxIters):
 #        print("Warning: reach maximum number of iterations")
 #
 #    #print("NDiscrete = {} after iter = {}".format(NDiscrete, iteration))
-#    #print("N Intervals.shape = {}".format(intervals.shape))
+#    #print("N Intervals = {}".format(intervals.shape[0]))
 #
 #    nRoots = intervals.shape[0]
 #    roots = np.zeros(nRoots)
@@ -217,13 +139,95 @@ def getRoots(L, omega, wLO, wTO, epsInf, mode):
 #        tempRoot = scipy.optimize.root_scalar(rootFunc, args = (L, omega, wLO, wTO, epsInf), bracket=tuple(intervals[rootInd, :]))
 #        roots[rootInd] = tempRoot.root
 #
-#    if(roots[0] < 1e-13):
-#        return roots[1:]
-#
 #    if (mode == "TEEva" or mode == "TMEva"):
 #        roots = epsFunc.kDFromKEva(roots, omega, wLO, wTO, epsInf)
 #
+#    if(mode == "TE" or mode == "TEEva" or mode == "TERes"):
+#        if(roots[0] < 1e-13):
+#            roots = roots[1:]
+#    if(lowerBound < 1e-13 and (mode == "TM" or mode == "TMEva" or mode == "TMRes")):
+#        if(roots[0] > 1e-13):
+#            roots = np.append([1e-12], roots)
+#
 #    return roots
+
+def getRoots(L, omega, wLO, wTO, epsInf, mode):
+    rootFunc = rootFuncTE
+    if(mode == "TE"):
+        rootFunc = rootFuncTE
+    elif (mode == "TM"):
+        rootFunc = rootFuncTM
+    elif(mode == "TEEva"):
+        rootFunc = rootFuncTEEva
+    elif (mode == "TMEva"):
+        rootFunc = rootFuncTMEva
+    elif (mode == "TERes"):
+        rootFunc = rootFuncTERes
+    elif (mode == "TMRes"):
+        rootFunc = rootFuncTMRes
+    elif (mode == "Surf"):
+        rootFunc = rootFuncSurf
+    else:
+        print("Error: specified mode doesn't exist!!!!!!!!!!!!!!!!")
+        exit()
+
+    upperBound = getUpperBound(mode, omega, wLO, wTO, epsInf)
+    lowerBound = getLowerBound(mode, omega, wLO, wTO, epsInf)
+
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    NCoarse = 10
+    coarseDisvision = np.linspace(lowerBound, upperBound, NCoarse, endpoint=True)
+    iteration = 0
+    maxIters = 20
+    intervals = np.zeros((0, 2))
+    for indCoarse in range(NCoarse - 1):
+        subdivision = np.zeros(0)
+        indsSigns = np.zeros(0)
+        NDivision = int(1. * omega / consts.c * (np.sqrt(np.abs(eps)) + 1.) * L + 3) // NCoarse
+        numRootsOld = -1
+        numRootsOld2 = -1
+        while(iteration < maxIters):
+            #print("NDiscrete = {} at iteration {}".format(NDiscrete, iteration))
+            subdivision = np.linspace(coarseDisvision[indCoarse], coarseDisvision[indCoarse + 1], NDivision, endpoint=True)
+            rootFuncAtPoints = rootFunc(subdivision, L, omega, wLO, wTO, epsInf)
+            signs = rootFuncAtPoints[:-1] * rootFuncAtPoints[1:]
+            indsSigns = np.where(signs < 0)[0]
+            #print("Numer of Roots = {} at iteration {}".format(len(indsSigns), iteration))
+            if(numRootsOld == indsSigns.shape[0] and numRootsOld == numRootsOld2):
+                break
+            else:
+                NDiscrete = int(1.5 * NDivision)
+                numRootsOld2 = numRootsOld
+                numRootsOld = indsSigns.shape[0]
+                iteration += 1
+        iteration = 0
+        intervalsTemp = np.append([subdivision[indsSigns]], [subdivision[indsSigns + 1]], axis=0)
+        #print("N IntervalsTemp.shape = {}".format(intervalsTemp.shape))
+        intervals = np.append(intervals, np.swapaxes(intervalsTemp, 0, 1), axis = 0)
+
+    if(iteration == maxIters):
+        print("Warning: reach maximum number of iterations")
+
+    #print("NDiscrete = {} after iter = {}".format(NDiscrete, iteration))
+    #print("N Intervals.shape = {}".format(intervals.shape))
+
+    nRoots = intervals.shape[0]
+    roots = np.zeros(nRoots)
+    for rootInd, root in enumerate(roots):
+        tempRoot = scipy.optimize.root_scalar(rootFunc, args = (L, omega, wLO, wTO, epsInf), bracket=tuple(intervals[rootInd, :]))
+        roots[rootInd] = tempRoot.root
+
+    if (mode == "TEEva" or mode == "TMEva"):
+        roots = epsFunc.kDFromKEva(roots, omega, wLO, wTO, epsInf)
+
+    if(mode == "TE" or mode == "TEEva" or mode == "TERes"):
+        if(roots[0] < 1e-13):
+            roots = roots[1:]
+    if(lowerBound < 1e-13 and (mode == "TM" or mode == "TMEva" or mode == "TMRes")):
+        if(roots[0] > 1e-13):
+            roots = np.append([1e-12], roots)
+
+    return roots
 
 def allowedKSurf(L, omega, wLO, wTO, epsInf):
     epsAbs = np.abs(epsFunc.epsilon(omega, wLO, wTO, epsInf))

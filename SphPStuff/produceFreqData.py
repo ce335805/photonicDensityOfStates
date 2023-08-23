@@ -149,8 +149,8 @@ def retrieveDosTE(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
 
     parameterStr = parameterName(wMaxBelow, L, epsInf)
 
-    #dir = "savedData/clusterFreqDataNoSPhPNew/"
-    dir = "savedData/"
+    dir = "savedData/clusterFreqData/"
+    #dir = "savedData/"
 
     filenameTE = dir + 'dosTE' + parameterStr + '.h5'
     h5f = h5py.File(filenameTE, 'r')
@@ -177,8 +177,8 @@ def retrieveDosTM(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
 
     parameterStr = parameterName(wMaxBelow, L, epsInf)
 
-    #dir = "savedData/clusterFreqDataNoSPhPNew/"
-    dir = "savedData/"
+    dir = "savedData/clusterFreqData/"
+    #dir = "savedData/"
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')
