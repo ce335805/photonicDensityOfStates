@@ -120,7 +120,7 @@ def getLowerBound(mode, omega, wLO, wTO, epsInf):
 #        if(lenIntervalsOld == indsSigns.shape[0] and lenIntervalsOld == lenIntervalsOl2):
 #            break
 #        else:
-#            NDiscrete = int(1.8 * NDiscrete)
+#            NDiscrete = int(1.5 * NDiscrete)
 #            lenIntervalsOl2 = lenIntervalsOld
 #            lenIntervalsOld = indsSigns.shape[0]
 #            iteration += 1
@@ -175,7 +175,7 @@ def getRoots(L, omega, wLO, wTO, epsInf, mode):
     lowerBound = getLowerBound(mode, omega, wLO, wTO, epsInf)
 
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    NCoarse = 10
+    NCoarse = 2
     coarseDisvision = np.linspace(lowerBound, upperBound, NCoarse, endpoint=True)
     iteration = 0
     maxIters = 20
@@ -196,7 +196,7 @@ def getRoots(L, omega, wLO, wTO, epsInf, mode):
             if(numRootsOld == indsSigns.shape[0] and numRootsOld == numRootsOld2):
                 break
             else:
-                NDiscrete = int(1.5 * NDivision)
+                NDivision = int(1.5 * NDivision)
                 numRootsOld2 = numRootsOld
                 numRootsOld = indsSigns.shape[0]
                 iteration += 1

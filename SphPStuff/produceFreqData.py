@@ -40,7 +40,7 @@ def defineFreqArrays(wLO, wTO, epsInf):
     arrWithin = np.linspace(wTO, wLO, 100, endpoint=False)
     arrWithin = arrWithin[1:]
     #wEpsEq1 = np.sqrt((epsInf * wLO ** 2 - wTO ** 2) / (epsInf - 1))
-    arrAbove = np.linspace(wLO, 20. * wLO, 100, endpoint=False)
+    arrAbove = np.linspace(wLO, 3. * wLO, 100, endpoint=False)
     arrAbove = arrAbove[1:]
 
     #surfFreqArr = np.linspace(wTO, wLO, 500 + 1, endpoint=False)
@@ -105,7 +105,7 @@ def produceFreqDataTE(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
     #   dosTEResVals[omegaInd, :] = dosAsOfFreq.getDosTERes(omegaVal, zArr, L, wLO, wTO, epsInf)
     ##   #print("")
 
-    dosTETotal = dosTEVals + dosTEEvaVals + dosTEResVals
+    dosTETotal = 1. * dosTEVals + 1. * dosTEEvaVals + 1. * dosTEResVals
     h5f = h5py.File(filename, 'w')
     h5f.create_dataset('dosTE', data=dosTETotal)
     h5f.close()
@@ -139,7 +139,7 @@ def produceFreqDataTM(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
     #   #dosTMSurfVals[omegaInd, :] = dosAsOfFreq.getDosTMSurf(omegaVal, zArr, L, wLO, wTO, epsInf)
     #   #print("")
 
-    dosTMTotal = dosTMVals + dosTMEvaVals + dosTMResVals# + dosTMSurfVals
+    dosTMTotal = 1. * dosTMVals + 1. * dosTMEvaVals + 1. * dosTMResVals# + dosTMSurfVals
     h5f = h5py.File(filename, 'w')
     h5f.create_dataset('dosTM', data=dosTMTotal)
     h5f.close()
@@ -149,8 +149,8 @@ def retrieveDosTE(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
 
     parameterStr = parameterName(wMaxBelow, L, epsInf)
 
-    dir = "savedData/clusterFreqData/"
-    #dir = "savedData/"
+    #dir = "savedData/clusterFreqData/"
+    dir = "savedData/"
 
     filenameTE = dir + 'dosTE' + parameterStr + '.h5'
     h5f = h5py.File(filenameTE, 'r')
@@ -177,8 +177,8 @@ def retrieveDosTM(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
 
     parameterStr = parameterName(wMaxBelow, L, epsInf)
 
-    dir = "savedData/clusterFreqData/"
-    #dir = "savedData/"
+    #dir = "savedData/clusterFreqData/"
+    dir = "savedData/"
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')

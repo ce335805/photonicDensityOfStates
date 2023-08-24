@@ -159,7 +159,7 @@ def plotDosTotalWithSurfExtra(dos, dosSurf, zArr, L, omegaArr, surfFreqArr, wLO,
     # legend.get_frame().set_boxstyle('Square', pad=0.1)
     # legend.get_frame().set_linewidth(0.0)
 
-    plt.savefig("./SPhPPlotsSaved/dosTotal" + filename + ".png")
+    plt.savefig("./SPhPPlotsSaved/dosTotal2" + filename + ".png")
 
 
 

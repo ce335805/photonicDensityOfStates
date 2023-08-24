@@ -59,7 +59,6 @@ def dosSumPos(zArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf):
     kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
     func = np.sin(kArr[None, :] * (L / 2. - zArr[:, None])) * 0.5 * (1 - np.exp(- kDArr[None, :] * L))
     diffFac = (1. - consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
-    #diffFac = 1.
     return np.sum(1. / NSqr[None, :] * func**2 * diffFac, axis = 1)
 
 def dosSumNeg(zArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf):
@@ -68,7 +67,6 @@ def dosSumNeg(zArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf):
     kDArr = epsFunc.kDFromKRes(kArr, omega, wLO, wTO, epsInf)
     func = 0.5 * (np.exp(kDArr[None, :] * zArr[:, None]) - np.exp(-kDArr[None, :] * zArr[:, None] - kDArr[None, :] * L)) * np.sin(kArr[None, :] * L / 2.)
     diffFac = (1. - consts.c ** 2 * kArr[None, :] / omega * kzArrDel[None, :])
-    #diffFac = 1.
     return np.sum(1. / NSqr[None, :] * func**2 * diffFac, axis = 1)
 
 
