@@ -84,8 +84,8 @@ def plotDosAsOfFreqDosTotal(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filename):
     cmapBone = cm.get_cmap('bone')
 
     dos = dos[:, :] - (dos[:, 0])[:, None] * np.ones(len(zArr))[None, :]
-    zArr = zArr[ : 11 : 2]
-    dos = dos[:,  : 11 : 2]
+    zArr = zArr[ : 21 : 4]
+    dos = dos[:,  : 21 : 4]
 
     for zInd, zVal in enumerate(zArr):
         if(zInd == 0):
@@ -109,10 +109,10 @@ def plotDosAsOfFreqDosTotal(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filename):
     ax.set_xlabel(r"$\omega[\mathrm{THz}]$")
     ax.set_ylabel(r"$\left(\rho / \rho_0 - 0.5\right) \times \omega^3$")
 
-    #legend = ax.legend(fontsize=fontsize-2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=2)
-    #legend.get_frame().set_alpha(0.)
-    #legend.get_frame().set_boxstyle('Square', pad=0.1)
-    #legend.get_frame().set_linewidth(0.0)
+    legend = ax.legend(fontsize=fontsize-2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=2)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
 
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
@@ -175,8 +175,8 @@ def plotDosIntegratedAsOfCutoff(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filena
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
 
-    zArr = zArr[ : 11 : 2]
-    dos = dos[:,  : 11 : 2]
+    zArr = zArr[11 : 31 : 3]
+    dos = dos[:,11  : 31 : 3]
 
     for zInd, zVal in enumerate(zArr):
         if(zVal < 1e-9):
@@ -186,6 +186,7 @@ def plotDosIntegratedAsOfCutoff(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filena
             continue
         color = cmapPink((zInd + 1.) / (len(zArr) + 1.))
         ax.plot(omegaArr, dos[:, zInd], color=color, lw=.8, linestyle='-',  label = r'$z = $'+'{0:.1g}'.format(zVal) + '$\mathrm{m}$')
+    ax.axhline(0., lw = 0.5, color = 'black')
     #ax.axvline(wLO * 1e-12, lw=0.5, color='gray')
     #ax.axvline(wTO * 1e-12, lw=0.5, color='gray')
 #    print("eps = 1 at {}THz".format(np.sqrt((epsInf * wLO ** 2 - wTO ** 2) / (epsInf - 1)) * 1e-12))
@@ -193,10 +194,76 @@ def plotDosIntegratedAsOfCutoff(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filena
 
     ax.set_xlim(np.amin(omegaArr), np.amax(omegaArr))
     #ax.set_xlim(np.amin(omegaArr), 30)
-    #ax.set_ylim(-7, 1.)
+    ax.set_ylim(-10000, 100.)
 
     ax.set_xlabel(r"$\Lambda[\mathrm{THz}]$")
     ax.set_ylabel(r"$ \langle E^2(r) \rangle_{\Lambda} \, \left[\frac{\mathrm{V}}{\mathrm{m}}\right] $")
+
+    legend = ax.legend(fontsize=fontsize-2, loc='upper right', bbox_to_anchor=(.97, 1.1), edgecolor='black', ncol=3)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./SPhPPlotsSaved/dosIntegrated" + filename + ".png")
+
+def plotDosIntegratedFixedCutoff(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename):
+
+    fig = plt.figure(figsize=(3.4, 2.), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.2, right=0.95)
+    ax = plt.subplot(gs[0, 0])
+    #axRight = ax.twinx()
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+    ax.plot(zArr, np.abs(dosTot) * 1e-12, color=cmapBone(.6), linestyle='', marker='x', markersize=2., label = r"$\langle E^2 \rangle_{\mathrm{tot}} - \langle E^2 \rangle_{\mathrm{vac}}$")
+    #axRight.plot(zArr, dosNoSurf, color=cmapPink(.6), linestyle='', marker='x', markersize=2.)
+    ax.plot(zArr, np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle E^2 \rangle_{\mathrm{no \, surf.}} - \langle E^2 \rangle_{\mathrm{vac}} \right)$")
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlim(np.amin(zArr), np.amax(zArr))
+    #ax.set_xlim(np.amin(omegaArr), 30)
+    #ax.set_ylim(-1e-10, 1e-10)
+
+    ax.set_xlabel(r"$z[\mathrm{m}]$")
+    ax.set_ylabel(r"$ \langle E^2(r) \rangle \, \left[\frac{\mathrm{MV}^2}{\mathrm{m}^2}\right] $")
+    #axRight.set_ylabel(r"$ \langle E^2(r) \rangle \, \left[\frac{\mathrm{V}^2}{\mathrm{m}^2}\right] $")
+
+    legend = ax.legend(fontsize=fontsize-2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+        #axRight.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./SPhPPlotsSaved/dosIntegrated" + filename + ".png")
+
+
+def plotDosIntegratedHopping(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename):
+
+    fig = plt.figure(figsize=(3.4, 2.), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.2, right=0.85)
+    ax = plt.subplot(gs[0, 0])
+    axRight = ax.twinx()
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+    ax.plot(zArr, -dosTot, color=cmapBone(.6), linestyle='', marker='x', markersize=2.)
+    axRight.plot(zArr, -dosNoSurf, color=cmapPink(.6), linestyle='', marker='x', markersize=2.)
+    ax.set_xscale("log")
+    ax.set_xlim(np.amin(zArr), np.amax(zArr))
+    #ax.set_xlim(np.amin(omegaArr), 30)
+    ax.set_ylim(-0.15, 0.)
+
+    ax.set_xlabel(r"$z[\mathrm{m}]$")
+    ax.set_ylabel(r"$ \frac {\Delta t}{t_0} $")
+    axRight.set_ylabel(r"$ \frac {\Delta t}{t_0} $")
 
     #legend = ax.legend(fontsize=fontsize-2, loc='upper right', bbox_to_anchor=(.97, 1.1), edgecolor='black', ncol=3)
     #legend.get_frame().set_alpha(0.)
@@ -205,8 +272,11 @@ def plotDosIntegratedAsOfCutoff(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filena
 
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
+        axRight.spines[axis].set_linewidth(.5)
 
     plt.savefig("./SPhPPlotsSaved/dosIntegrated" + filename + ".png")
+
+
 
 
 def compareSPhPInt(dosAna, dosNum, zArr, filename):

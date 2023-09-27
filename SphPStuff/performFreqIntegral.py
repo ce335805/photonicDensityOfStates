@@ -21,7 +21,10 @@ def freqIntegral():
     wLO = 3. * 1e12
     wTO = 1. * 1e12
     epsInf = 1.
-    L = 0.1
+    #wLO = 32.04 * 1e12
+    #wTO = 7.92 * 1e12
+    #epsInf = 6.3
+    L = 40.
     zArr = np.logspace(-3, -9, 50, endpoint=True, base = 10)
     #zArr = np.append([L / 4.], zArr)
 
@@ -34,9 +37,12 @@ def freqIntegral():
     #dosAna, dosNum = computeSPhPIntAsOfZ(zArr, wLO, wTO, epsInf)
     #plotFreq.compareSPhPInt(dosAna, dosNum, zArr, "SPhPFieldA")
 
-    prod.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
+    #prod.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
     producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L)
-    computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L)
+    #computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L)
+    cutoff = 241.8 * 1e12# 1eV cutoff
+    computeFreqIntegralFixedCutoff(zArr, cutoff, wLO, wTO, epsInf, L)
+    #computeEffectiveHopping(zArr, cutoff, wLO, wTO, epsInf, L)
 
 
 def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
@@ -53,37 +59,16 @@ def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
 
     dosIntTE = np.zeros(dosTETotal.shape)
     dosIntTM = np.zeros(dosTMTotal.shape)
-    dosIntSurf = np.zeros((len(arrWithin), len(zArr)))
     latConst = 1e-10
-
-    #integrate surface part separately on finer grid
-    #for zInd, zVal in enumerate(zArr):
-    #    for wInd, wVal in enumerate(arrWithin):
-    #        wInds = np.where(surfFreqArr < wVal)[0]
-    #        wSurfPart = surfFreqArr[wInds]
-    #        prefac = 2. * consts.fine_structure / 3. / np.pi * latConst ** 2 / consts.c ** 2 * wSurfPart
-    #        intFuncSurf = prefac * dosSurf[wInds, zInd]
-    #        dosIntSurf[wInd, zInd] = np.trapz(intFuncSurf, wSurfPart, axis=0)
-
-    #patching
-    #patchBelow = np.zeros((len(arrBelow), len(zArr)))
-    #patchAbove = np.ones((len(arrAboveClose) + len(arrAboveFar), len(zArr)))
-    #for wInd in range(len(arrAboveClose) + len(arrAboveFar)):
-    #    patchAbove[wInd, :] = patchAbove[wInd, :] * dosIntSurf[-1, :]
-    #dosIntSurf = np.append(patchBelow, dosIntSurf, axis = 0)
-    #dosIntSurf = np.append(dosIntSurf, patchAbove, axis = 0)
 
     for zInd, zVal in enumerate(zArr):
         for wInd, wVal in enumerate(wArr):
             wArrPart = wArr[:wInd]# * 1e-12
             #prefac = 2. * consts.fine_structure / np.pi * latConst ** 2 / consts.c ** 2 * wArrPart
             prefacFieldStrength = consts.hbar * wArrPart**3 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)# * 1e24
-            #prefacFieldStrength = wArrPart ** 1
-            #intFuncTE = prefacFieldStrength * (dosTETotal[:wInd, zInd] - .5)
-            intFuncTE = prefacFieldStrength * (dosTETotal[:wInd, zInd] - dosTETotal[:wInd, 0])
+            intFuncTE = prefacFieldStrength * (dosTETotal[:wInd, zInd] - .5)
             dosIntTE[wInd, zInd] = np.trapz(intFuncTE, x=wArrPart, axis = 0)
-            #intFuncTM = prefacFieldStrength * (dosTMTotal[:wInd, zInd] - .5)
-            intFuncTM = prefacFieldStrength * (dosTMTotal[:wInd, zInd] - dosTMTotal[:wInd, 0])
+            intFuncTM = prefacFieldStrength * (dosTMTotal[:wInd, zInd] - .5)
             dosIntTM[wInd, zInd] = np.trapz(intFuncTM, x=wArrPart, axis = 0)
 
     #dosIntTM = dosIntTM + dosIntSurf
@@ -92,6 +77,74 @@ def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
     plotFreq.plotDosIntegratedAsOfCutoff(dosIntTE, zArr, L, wArr, wLO, wTO, epsInf, filename)
     filename = "TMField"
     plotFreq.plotDosIntegratedAsOfCutoff(dosIntTM, zArr, L, wArr, wLO, wTO, epsInf, filename)
+
+def computeFreqIntegralFixedCutoff(zArr, cutoff, wLO, wTO, epsInf, L):
+
+    arrBelow, arrWithin, arrAbove, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
+    wArr = np.append(arrBelow, arrWithin)
+    wArr = np.append(wArr, arrAbove)
+
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+
+    dosIntTE = np.zeros(zArr.shape)
+    dosIntTM = np.zeros(zArr.shape)
+
+    for zInd, zVal in enumerate(zArr):
+        #prefac = 2. * consts.fine_structure / np.pi * latConst ** 2 / consts.c ** 2 * wArrPart
+        prefacFieldStrength = consts.hbar * wArr**3 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)# * 1e24
+        cutoffFac = np.exp(- wArr**2 / cutoff**2)
+        intFuncTE = prefacFieldStrength * (dosTETotal[ : , zInd] - .5) * cutoffFac
+        dosIntTE[zInd] = np.trapz(intFuncTE, x=wArr, axis = 0)
+        intFuncTM = prefacFieldStrength * (dosTMTotal[ : , zInd] - .5) * cutoffFac
+        dosIntTM[zInd] = np.trapz(intFuncTM, x=wArr, axis = 0)
+
+    dosSurf = np.zeros(len(zArr))
+    for zInd, zVal in enumerate(zArr):
+        dosSurf[zInd] = performSPhPIntegralNum(zVal, wLO, wTO, epsInf)[0]
+
+    dosTot = dosIntTE + dosIntTM + dosSurf
+    dosNoSurf = dosIntTE + dosIntTM
+
+    filename = "TEEFieldCutoff"
+    plotFreq.plotDosIntegratedFixedCutoff(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename)
+    #filename = "TMEFieldCutoff"
+    #plotFreq.plotDosIntegratedAsOfCutoff(dosIntTM, zArr, L, wArr, wLO, wTO, epsInf, filename)
+
+def computeEffectiveHopping(zArr, cutoff, wLO, wTO, epsInf, L):
+
+    arrBelow, arrWithin, arrAbove, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
+    wArr = np.append(arrBelow, arrWithin)
+    wArr = np.append(wArr, arrAbove)
+
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+
+    dosIntTE = np.zeros(zArr.shape)
+    dosIntTM = np.zeros(zArr.shape)
+
+    aLat = 1e-10
+
+    for zInd, zVal in enumerate(zArr):
+        hopFac = 0.5 * 2. * consts.fine_structure * aLat ** 2 / (3. * np.pi * consts.c ** 2) * wArr
+        cutoffFac = np.exp(- wArr**2 / cutoff**2)
+        intFuncTE = hopFac * (dosTETotal[ : , zInd] - .5) * cutoffFac
+        dosIntTE[zInd] = np.trapz(intFuncTE, x=wArr, axis = 0)
+        intFuncTM = hopFac * (dosTMTotal[ : , zInd] - .5) * cutoffFac
+        dosIntTM[zInd] = np.trapz(intFuncTM, x=wArr, axis = 0)
+
+    dosSurf = np.zeros(len(zArr))
+    for zInd, zVal in enumerate(zArr):
+        dosSurf[zInd] = performSPhPIntegralHopping(zVal, wLO, wTO, epsInf)[0]
+
+    dosTot = dosIntTE + dosIntTM + dosSurf
+    dosNoSurf = dosIntTE + dosIntTM
+
+    filename = "HoppingCutoff"
+    plotFreq.plotDosIntegratedHopping(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename)
+    #filename = "TMEFieldCutoff"
+    #plotFreq.plotDosIntegratedAsOfCutoff(dosIntTM, zArr, L, wArr, wLO, wTO, epsInf, filename)
+
 
 def computeLocalFieldStrength(zArr, wLO, wTO, epsInf, L):
 
@@ -166,13 +219,22 @@ def intFuncEffectiveHopping(omega, zVal, wLO, wTO, epsInf):
     return prefac * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
 
 def intFuncFieldStrength(omega, zVal, wLO, wTO, epsInf):
-    prefacField = consts.hbar * omega**1 / (2. * consts.epsilon_0 * np.pi**2 * consts.c**3) * 1e24
+    prefacField = consts.hbar * omega**3 / (2. * consts.epsilon_0 * np.pi**2 * consts.c**3)
     return prefacField * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
+
+def intFuncHopping(omega, zVal, wLO, wTO, epsInf):
+    aLat = 1e-10
+    hopFac = 0.5 * 2. * consts.fine_structure * aLat ** 2 / (3. * np.pi * consts.c ** 2) * omega
+    return hopFac * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
 
 def performSPhPIntegralNum(zVal, wLO, wTO, epsInf):
     wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
-    return scipy.integrate.quad(intFuncFieldStrength, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 500)
+    return scipy.integrate.quad(intFuncFieldStrength, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 1000)
     #return scipy.integrate.quad(intFuncEffectiveHopping, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 500)
+
+def performSPhPIntegralHopping(zVal, wLO, wTO, epsInf):
+    wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
+    return scipy.integrate.quad(intFuncHopping, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 1000)
 
 def performSPhPIntegralAna(zVal, wLO, wTO, epsInf):
     wInf = np.sqrt(wLO**2 + wTO**2) / np.sqrt(2)
@@ -191,7 +253,7 @@ def computeSPhPIntAsOfZ(zArr, wLO, wTO, epsInf):
     for zInd, zVal in enumerate(zArr):
         intNum[zInd] = performSPhPIntegralNum(zVal, wLO, wTO, epsInf)[0]
 
-    return ( intAna, intNum)
+    return (intAna, intNum)
 
 def patchDosSurfWithZeros(dosSurf, zArr, arrBelow, arrAboveClose):
     patchBelow = np.zeros((len(arrBelow), len(zArr)))

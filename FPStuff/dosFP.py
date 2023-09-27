@@ -23,14 +23,14 @@ def dosFPMain():
 #    dosFPForOmegas = dosForSeveralOmAsOfZ(zArr, omegaArr, L)
 #    plotDosFP.plotDosAsOfZSeveralOm(dosFPForOmegas, zArr, omegaArr, L)
 #
-    upBound = 3. * 1e14
-    omArr = np.linspace(1e12, upBound, 10000, endpoint=True)
-    L1 = 1e-4
-    freq = np.pi * consts.c / L1
-    print("base freq = {}THz".format(freq * 1e-12))
-    print("number of Points minimum: {}".format(upBound / freq))
+    #upBound = 3. * 1e14
+    #omArr = np.linspace(1e12, upBound, 10000, endpoint=True)
+    #L1 = 1e-4
+    #freq = np.pi * consts.c / L1
+    #print("base freq = {}THz".format(freq * 1e-12))
+    #print("number of Points minimum: {}".format(upBound / freq))
 
-    dosFP1 = computeDosFP.dosTEAsOfFeq(np.array([L1 / 2.]), omArr, L1)
+    #dosFP1 = computeDosFP.dosTEAsOfFeq(np.array([L1 / 2.]), omArr, L1)
     #cutoffArr, FieldInt = integratedDos.numericalIntegral(L1 / 2, upBound, L1)
     #handleIntegralData.writeData(cutoffArr, FieldInt, "dosTME")
     #cutoffArr, FieldInt = handleIntegralData.retrieveData("dosTME")
@@ -40,9 +40,9 @@ def dosFPMain():
     #dosParallel = computeDosFP.dosParallelAsOfFeq(np.array([L1 / 2.]), omArr, L1)
     #integratedDos.computeIntegral(omArr, dosParallel, L1)
 
-    L2 = 1e-5
-    dosFP2 = computeDosFP.dosTEAsOfFeq(np.array([L2 / 2.]), omArr, L2)
-    plotDosFP.plotDosCompare(omArr, dosFP1, dosFP2, L1, L2)
+    #L2 = 1e-5
+    #dosFP2 = computeDosFP.dosTEAsOfFeq(np.array([L2 / 2.]), omArr, L2)
+    #plotDosFP.plotDosCompare(omArr, dosFP1, dosFP2, L1, L2)
 
 
 #    Lambda = 100 * 1e12
@@ -51,5 +51,29 @@ def dosFPMain():
 #    dtEff = effectiveMassFP.integrateDosDifference(L, omArr)
 #    print("dt = {}".format(dtEff))
 #    effectiveMassFP.plotEffectiveMassIntegrad(L, omArr)
+
+#### compute field strength using a fixed cutoff
+
+    #dArr = np.logspace(-3, -6, 100)
+    #cutoff = 241.8 * 1e12
+    #filename = "dataFixedCutoff"
+    ##fieldArr = integratedDos.numericalIntegralFixedCutoff(cutoff, dArr, )
+    ##fieldArr = integratedDos.numericalIntegralFixedCutoff(cutoff, dArr, )
+    ##handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fieldArr, filename)
+    #cutoff, dArr, fieldArr = handleIntegralData.retrieveDataFixedCutoff(filename)
+    #freqArr = np.pi * consts.c / dArr
+    #plotDosFP.plotFieldWithFixedCutoff(dArr, fieldArr, freqArr)
+
+#### compute effective hopping using a fixed cutoff
+
+    dArr = np.logspace(-3, -6, 100)
+    cutoff = 241.8 * 1e12
+    filename = "hoppingFixedCutoff"
+    #hopArr = integratedDos.numericalIntegralHopping(cutoff, dArr, )
+    #handleIntegralData.writeDataFixedCutoff(cutoff, dArr, hopArr, filename)
+    cutoff, dArr, hopArr = handleIntegralData.retrieveDataFixedCutoff(filename)
+    freqArr = np.pi * consts.c / dArr
+    plotDosFP.plotHoppingWithFixedCutoff(dArr, hopArr, freqArr)
+
 
 dosFPMain()

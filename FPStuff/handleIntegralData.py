@@ -22,3 +22,27 @@ def writeData(cutoff, dosInt, fileName):
     h5f.create_dataset('cutoff', data=cutoff)
     h5f.create_dataset('dosInt', data=dosInt)
     h5f.close()
+
+def retrieveDataFixedCutoff(fileName):
+
+    dir = "savedData/"
+
+    fileName = dir + fileName + ".h5"
+    h5f = h5py.File(fileName, 'r')
+    cutoff = h5f['cutoff'][:]
+    dArr = h5f['distance'][:]
+    fieldArr = h5f['field'][:]
+    h5f.close()
+
+    return (cutoff, dArr, fieldArr)
+
+def writeDataFixedCutoff(cutoff, dArr, fieldArr, fileName):
+
+    dir = "savedData/"
+    fileName = dir + fileName + ".h5"
+
+    h5f = h5py.File(fileName, 'w')
+    h5f.create_dataset('cutoff', data=np.array([cutoff]))
+    h5f.create_dataset('distance', data=dArr)
+    h5f.create_dataset('field', data=fieldArr)
+    h5f.close()
