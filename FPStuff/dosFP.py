@@ -64,6 +64,13 @@ def dosFPMain():
     #freqArr = np.pi * consts.c / dArr
     #plotDosFP.plotFieldWithFixedCutoff(dArr, fieldArr, freqArr)
 
+
+    #would like some estimate for diamagnetic shift
+    lz = 1e-6
+    print("me = {}".format(consts.m_e))
+    shift = 4. * np.pi * consts.fine_structure * consts.hbar * consts.c / consts.m_e * 1e20 * 1. / lz
+    print("diamagnetic shift for lz = {}m: om = {}THz".format(lz, np.sqrt(shift) * 1e-12))
+    exit()
 #### compute effective hopping using a fixed cutoff
 
     dArr = np.logspace(-3, -6, 100)
