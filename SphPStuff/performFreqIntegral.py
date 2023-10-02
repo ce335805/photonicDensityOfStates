@@ -92,11 +92,13 @@ def computeFreqIntegralFixedCutoff(zArr, cutoff, wLO, wTO, epsInf, L):
 
     for zInd, zVal in enumerate(zArr):
         #prefac = 2. * consts.fine_structure / np.pi * latConst ** 2 / consts.c ** 2 * wArrPart
-        prefacFieldStrength = consts.hbar * wArr**3 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)# * 1e24
+        prefacE = consts.hbar * wArr**3 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)
+        prefacA = consts.hbar * wArr**1 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3) * 1e24
+        prefacMass = 8. / (3. * np.pi) * consts.hbar / (consts.c**2 * consts.m_e)
         cutoffFac = np.exp(- wArr**2 / cutoff**2)
-        intFuncTE = prefacFieldStrength * (dosTETotal[ : , zInd] - .5) * cutoffFac
+        intFuncTE = prefacMass * (dosTETotal[ : , zInd] - .5)# * cutoffFac
         dosIntTE[zInd] = np.trapz(intFuncTE, x=wArr, axis = 0)
-        intFuncTM = prefacFieldStrength * (dosTMTotal[ : , zInd] - .5) * cutoffFac
+        intFuncTM = prefacMass * (dosTMTotal[ : , zInd] - .5)# * cutoffFac
         dosIntTM[zInd] = np.trapz(intFuncTM, x=wArr, axis = 0)
 
     dosSurf = np.zeros(len(zArr))
@@ -104,10 +106,11 @@ def computeFreqIntegralFixedCutoff(zArr, cutoff, wLO, wTO, epsInf, L):
         dosSurf[zInd] = performSPhPIntegralNum(zVal, wLO, wTO, epsInf)[0]
 
     dosTot = dosIntTE + dosIntTM + dosSurf
-    dosNoSurf = dosIntTE + dosIntTM
+    dosNoSurf = dosIntTE# + dosIntTM
 
-    filename = "TEEFieldCutoff"
-    plotFreq.plotDosIntegratedFixedCutoff(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename)
+    filename = "EffectiveMass"
+    #plotFreq.plotDosIntegratedFixedCutoff(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename)
+    plotFreq.plotEffectiveMass(dosTot, zArr, L, wLO, wTO, epsInf, filename)
     #filename = "TMEFieldCutoff"
     #plotFreq.plotDosIntegratedAsOfCutoff(dosIntTM, zArr, L, wArr, wLO, wTO, epsInf, filename)
 
@@ -219,8 +222,12 @@ def intFuncEffectiveHopping(omega, zVal, wLO, wTO, epsInf):
     return prefac * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
 
 def intFuncFieldStrength(omega, zVal, wLO, wTO, epsInf):
-    prefacField = consts.hbar * omega**3 / (2. * consts.epsilon_0 * np.pi**2 * consts.c**3)
+    prefacField = consts.hbar * omega**1 / (2. * consts.epsilon_0 * np.pi**2 * consts.c**3) * 1e24
     return prefacField * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
+
+def intFuncMass(omega, zVal, wLO, wTO, epsInf):
+    prefacMass = 8. / (3. * np.pi) * consts.hbar / (consts.m_e * consts.c**2)
+    return prefacMass * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
 
 def intFuncHopping(omega, zVal, wLO, wTO, epsInf):
     aLat = 1e-10
@@ -229,7 +236,8 @@ def intFuncHopping(omega, zVal, wLO, wTO, epsInf):
 
 def performSPhPIntegralNum(zVal, wLO, wTO, epsInf):
     wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
-    return scipy.integrate.quad(intFuncFieldStrength, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 1000)
+    #return scipy.integrate.quad(intFuncFieldStrength, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 1000)
+    return scipy.integrate.quad(intFuncMass, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 1000)
     #return scipy.integrate.quad(intFuncEffectiveHopping, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 500)
 
 def performSPhPIntegralHopping(zVal, wLO, wTO, epsInf):

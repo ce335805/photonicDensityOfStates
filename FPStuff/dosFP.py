@@ -54,16 +54,19 @@ def dosFPMain():
 
 #### compute field strength using a fixed cutoff
 
-    #dArr = np.logspace(-3, -6, 100)
-    #cutoff = 241.8 * 1e12
-    #filename = "dataFixedCutoff"
-    ##fieldArr = integratedDos.numericalIntegralFixedCutoff(cutoff, dArr, )
-    ##fieldArr = integratedDos.numericalIntegralFixedCutoff(cutoff, dArr, )
-    ##handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fieldArr, filename)
-    #cutoff, dArr, fieldArr = handleIntegralData.retrieveDataFixedCutoff(filename)
-    #freqArr = np.pi * consts.c / dArr
-    #plotDosFP.plotFieldWithFixedCutoff(dArr, fieldArr, freqArr)
+    dArr = np.logspace(-3, -6, 100)
+    cutoff = 1. * 241.8 * 1e12
+    filename = "dataFixedCutoff"
+    dosInt = integratedDos.numericalIntegralFixedCutoff(cutoff, dArr)
+    handleIntegralData.writeDataFixedCutoff(cutoff, dArr, dosInt, filename)
+    #cutoff, dArr, dosInt = handleIntegralData.retrieveDataFixedCutoff(filename)
+    freqArr = np.pi * consts.c / dArr
+    massfac = 8. / (3. * np.pi) * consts.hbar / (consts.m_e * consts.c ** 2)
+    delMOverM = massfac * dosInt
+    #plotDosFP.plotFieldWithFixedCutoff(dArr, delMOverM, freqArr)
+    plotDosFP.plotEffectiveMass(dArr, delMOverM, freqArr)
 
+    exit()
 
     #would like some estimate for diamagnetic shift
     lz = 1e-6

@@ -253,6 +253,41 @@ def plotFieldWithFixedCutoff(dArr, dosArr, freqArr):
 
     plt.savefig("FPPlotsSaved/EFieldAsOfD.png")
 
+def plotEffectiveMass(dArr, delMOverM, freqArr):
+
+    fig = plt.figure(figsize=(3.4, 2.), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.22, left=0.18, right=0.85)
+    ax = plt.subplot(gs[0, 0])
+    axRight = ax.twinx()
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+    ax.plot(dArr, delMOverM, color=cmapBone(.6), linestyle = '', marker = 'x', markersize = 2.)
+    axRight.plot(dArr, freqArr * 1e-12, color='red', linestyle = '-', lw = 0.5)
+    axRight.axhline(241.8, color = 'black', lw = 0.4)
+    #ax.set_ylim(0., .55 * 1e7 * 1e-6)
+    ax.set_xlim(np.amin(dArr), np.amax(dArr))
+    ax.set_xscale('log')
+
+    ax.set_xlabel(r"$d \, \left[ \mathrm{m} \right]$")
+    ax.set_ylabel(r"$\frac{\Delta m}{m} $")
+    axRight.set_ylabel(r"$\omega \left[ \mathrm{THz} \right] $")
+
+    axRight.text(1e-4, 260, r"$\mathrm{cutoff} = 1 \mathrm{eV}$")
+    #ax.text(1e-1, 7.5, r"$\omega_0 = 9.41 \mathrm{THz}$")
+
+    #legend = ax.legend(fontsize=fontsize - 2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black',
+    #                   ncol=1)
+    #legend.get_frame().set_alpha(0.)
+    #legend.get_frame().set_boxstyle('Square', pad=0.1)
+    #legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+
+    plt.savefig("FPPlotsSaved/effectiveMass.png")
+
+
 def plotHoppingWithFixedCutoff(dArr, dosArr, freqArr):
 
     fig = plt.figure(figsize=(3.4, 2.), dpi=800)

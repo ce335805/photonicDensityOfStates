@@ -11,7 +11,8 @@ def computeAlpha2FMain():
 
     #set parameters
 
-    qArr = np.linspace(np.pi * 1e4, np.pi * 1e7, 100)
+    qArr = np.linspace(np.pi * 1e4, np.pi * 1e7, 200)
+    qArr = np.logspace(1, 9, 200)
     OmArr = np.array([0.])
 
     dArr = np.logspace(-6., 0., 7, endpoint=True)

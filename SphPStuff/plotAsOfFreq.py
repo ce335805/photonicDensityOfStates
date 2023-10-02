@@ -7,6 +7,7 @@ import matplotlib.cm as cm
 import matplotlib.colors
 import matplotlib.patches as patch
 import scipy.constants as consts
+import scipy.optimize
 
 fontsize = 8
 
@@ -217,16 +218,30 @@ def plotDosIntegratedFixedCutoff(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, f
     ax = plt.subplot(gs[0, 0])
     #axRight = ax.twinx()
 
+
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
-    ax.plot(zArr, np.abs(dosTot) * 1e-12, color=cmapBone(.6), linestyle='', marker='x', markersize=2., label = r"$\langle E^2 \rangle_{\mathrm{tot}} - \langle E^2 \rangle_{\mathrm{vac}}$")
+    #ax.plot(zArr, np.abs(dosTot) * 1e-12, color=cmapBone(.6), linestyle='', marker='x', markersize=2., label = r"$\langle E^2 \rangle_{\mathrm{tot}} - \langle E^2 \rangle_{\mathrm{vac}}$")
     #axRight.plot(zArr, dosNoSurf, color=cmapPink(.6), linestyle='', marker='x', markersize=2.)
-    ax.plot(zArr, np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle E^2 \rangle_{\mathrm{no \, surf.}} - \langle E^2 \rangle_{\mathrm{vac}} \right)$")
-    ax.set_xscale("log")
-    ax.set_yscale("log")
-    ax.set_xlim(np.amin(zArr), np.amax(zArr))
+    #ax.plot(zArr, np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle E^2 \rangle_{\mathrm{no \, surf.}} - \langle E^2 \rangle_{\mathrm{vac}} \right)$")
+    ax.plot(np.log(zArr), np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle E^2 \rangle_{\mathrm{no \, surf.}} - \langle E^2 \rangle_{\mathrm{vac}} \right)$")
+    #ax.set_xscale("log")
+    #ax.set_yscale("log")
+    #ax.set_xlim(np.amin(zArr), np.amax(zArr))
     #ax.set_xlim(np.amin(omegaArr), 30)
-    #ax.set_ylim(-1e-10, 1e-10)
+    #ax.set_ylim(1e-14, 1e-12)
+
+    ydat = np.abs(dosNoSurf) * 1e-12
+
+    #ax.plot(zArr, np.abs(dosTot[-1]) * 1e-12 * zArr[-1]**3 / zArr**3, color = 'red', lw = 0.5)
+    fitInd = 22
+    #ax.plot(zArr, np.abs(dosNoSurf[fitInd]) * 1e-12 * zArr[fitInd] / zArr, color = 'red', lw = 0.5)
+    #ax.plot(zArr[fitInd:], np.abs(dosNoSurf[fitInd]) * 1e-12 / (np.log(1. / zArr[fitInd]) - np.log(1. / zArr[fitInd-1])) * (np.log(1. / zArr[fitInd:]) - np.log(1. / zArr[fitInd])), color = 'red', lw = 0.5)
+    logZArr = np.log(zArr)
+    slope = (ydat[fitInd] - ydat[fitInd - 1]) / (logZArr[fitInd] - logZArr[fitInd - 1])
+    offset = ydat[fitInd] - slope * logZArr[fitInd]
+    ax.plot(logZArr, slope * logZArr + offset, color = 'red', lw = 0.5)
+
 
     ax.set_xlabel(r"$z[\mathrm{m}]$")
     ax.set_ylabel(r"$ \langle E^2(r) \rangle \, \left[\frac{\mathrm{MV}^2}{\mathrm{m}^2}\right] $")
@@ -242,6 +257,88 @@ def plotDosIntegratedFixedCutoff(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, f
         #axRight.spines[axis].set_linewidth(.5)
 
     plt.savefig("./SPhPPlotsSaved/dosIntegrated" + filename + ".png")
+
+def plotFluctuationsWithFit(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename):
+
+    fig = plt.figure(figsize=(3.4, 2.), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.2, right=0.95)
+    ax = plt.subplot(gs[0, 0])
+    #axRight = ax.twinx()
+
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+    #ax.plot(zArr, np.abs(dosTot) * 1e-12, color=cmapBone(.6), linestyle='', marker='x', markersize=2., label = r"$\langle E^2 \rangle_{\mathrm{tot}} - \langle E^2 \rangle_{\mathrm{vac}}$")
+    #axRight.plot(zArr, dosNoSurf, color=cmapPink(.6), linestyle='', marker='x', markersize=2.)
+    #ax.plot(zArr, np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle E^2 \rangle_{\mathrm{no \, surf.}} - \langle E^2 \rangle_{\mathrm{vac}} \right)$")
+    ax.plot(np.log(zArr), np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle E^2 \rangle_{\mathrm{no \, surf.}} - \langle E^2 \rangle_{\mathrm{vac}} \right)$")
+    #ax.set_xscale("log")
+    #ax.set_yscale("log")
+    #ax.set_xlim(np.amin(zArr), np.amax(zArr))
+    #ax.set_xlim(np.amin(omegaArr), 30)
+    #ax.set_ylim(1e-14, 1e-12)
+
+    ydat = np.abs(dosNoSurf) * 1e-12
+
+    #ax.plot(zArr, np.abs(dosTot[-1]) * 1e-12 * zArr[-1]**3 / zArr**3, color = 'red', lw = 0.5)
+    fitInd = 22
+    #ax.plot(zArr, np.abs(dosNoSurf[fitInd]) * 1e-12 * zArr[fitInd] / zArr, color = 'red', lw = 0.5)
+    #ax.plot(zArr[fitInd:], np.abs(dosNoSurf[fitInd]) * 1e-12 / (np.log(1. / zArr[fitInd]) - np.log(1. / zArr[fitInd-1])) * (np.log(1. / zArr[fitInd:]) - np.log(1. / zArr[fitInd])), color = 'red', lw = 0.5)
+    logZArr = np.log(zArr)
+    slope = (ydat[fitInd] - ydat[fitInd - 1]) / (logZArr[fitInd] - logZArr[fitInd - 1])
+    offset = ydat[fitInd] - slope * logZArr[fitInd]
+    ax.plot(logZArr, slope * logZArr + offset, color = 'red', lw = 0.5)
+
+
+    ax.set_xlabel(r"$z[\mathrm{m}]$")
+    ax.set_ylabel(r"$ \langle E^2(r) \rangle \, \left[\frac{\mathrm{MV}^2}{\mathrm{m}^2}\right] $")
+    #axRight.set_ylabel(r"$ \langle E^2(r) \rangle \, \left[\frac{\mathrm{V}^2}{\mathrm{m}^2}\right] $")
+
+    legend = ax.legend(fontsize=fontsize-2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+        #axRight.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./SPhPPlotsSaved/dosIntegrated" + filename + ".png")
+
+def plotEffectiveMass(delMOverM, zArr, L, wLO, wTO, epsInf, filename):
+
+    fig = plt.figure(figsize=(3.4, 2.), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.2, right=0.95)
+    ax = plt.subplot(gs[0, 0])
+    #axRight = ax.twinx()
+
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+    ax.plot(zArr, delMOverM, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$\mathrm{all}$")
+    ax.axhline(1., lw = 0.3, color = 'red')
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlim(np.amin(zArr), np.amax(zArr))
+    #ax.set_xlim(np.amin(omegaArr), 30)
+    #ax.set_ylim(1e-14, 1e-12)
+
+    ax.set_xlabel(r"$z[\mathrm{m}]$")
+    ax.set_ylabel(r"$ \frac{\Delta m}{m} $")
+
+    legend = ax.legend(fontsize=fontsize-2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+        #axRight.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./SPhPPlotsSaved/dosIntegrated" + filename + ".png")
+
 
 
 def plotDosIntegratedHopping(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename):
