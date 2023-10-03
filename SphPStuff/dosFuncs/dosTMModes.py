@@ -121,6 +121,36 @@ def calcDosTM(zArr, L, omega, wLO, wTO, epsInf):
     dos = np.pi * consts.c / (2. * omega) * np.append(dosNeg, dosPos)
     return dos
 
+def calcDosTMParaPerp(zArr, L, omega, wLO, wTO, epsInf):
+
+    t_start = perf_counter()
+    kArr = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TM")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TM")
+    t_stop = perf_counter()
+    #print("Time to find kVals TM: {}".format(t_stop - t_start))
+
+    #print("len kArr TM = {}".format(len(kArr)))
+
+    if(len(kArr) == 0):
+        return 0
+
+    indNeg = np.where(zArr < 0)
+    indPos = np.where(zArr >= 0)
+    zPosArr = zArr[indPos]
+    zNegArr = zArr[indNeg]
+
+    t_start = perf_counter()
+    dosPosPara = waveFunctionPosPara(zPosArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
+    dosNegPara = waveFunctionNegPara(zNegArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
+    dosPosPerp = waveFunctionPosPerp(zPosArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
+    dosNegPerp = waveFunctionNegPerp(zNegArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
+    t_stop = perf_counter()
+    #print("Time to find perform dos sums TM: {}".format(t_stop - t_start))
+    dosPara = np.pi * consts.c / (2. * omega) * np.append(dosNegPara, dosPosPara)
+    dosPerp = np.pi * consts.c / (2. * omega) * np.append(dosNegPerp, dosPosPerp)
+    return (dosPara, dosPerp)
+
+
 def plotDosTMSPhP(zArr, dos, L, omega, wLO, wTO, epsInf):
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)

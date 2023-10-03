@@ -110,6 +110,25 @@ def calcDosTM(zArr, L, omega, wLO, wTO, epsInf):
     dos = np.pi * consts.c / (2. * omega) * np.append(dosNeg, dosPos)
     return dos
 
+def calcDosTMParaPerp(zArr, L, omega, wLO, wTO, epsInf):
+
+    kArr = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TMEva")
+    kzArrDel = findAllowedKsSPhP.findKsDerivativeW(kArr, L, omega, wLO, wTO, epsInf, "TMEva")
+
+    indNeg = np.where(zArr < 0)
+    indPos = np.where(zArr >= 0)
+    zPosArr = zArr[indPos]
+    zNegArr = zArr[indNeg]
+
+    dosPosPara = waveFunctionPosPara(zPosArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
+    dosNegPara = waveFunctionNegPara(zNegArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
+    dosPosPerp = waveFunctionPosPerp(zPosArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
+    dosNegPerp = waveFunctionNegPerp(zNegArr, kArr, kzArrDel, L, omega, wLO, wTO, epsInf)
+    dosPara = np.pi * consts.c / (2. * omega) * np.append(dosNegPara, dosPosPara)
+    dosPerp = np.pi * consts.c / (2. * omega) * np.append(dosNegPerp, dosPosPerp)
+    return (dosPara, dosPerp)
+
+
 def plotDosTMSPhP(zArr, dos, L, omega, wLO, wTO, epsInf):
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)

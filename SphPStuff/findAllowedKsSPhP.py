@@ -217,6 +217,7 @@ def getRoots(L, omega, wLO, wTO, epsInf, mode):
         tempRoot = scipy.optimize.root_scalar(rootFunc, args = (L, omega, wLO, wTO, epsInf), bracket=tuple(intervals[rootInd, :]))
         roots[rootInd] = tempRoot.root
 
+
     if (mode == "TEEva" or mode == "TMEva"):
         roots = epsFunc.kDFromKEva(roots, omega, wLO, wTO, epsInf)
 
@@ -224,7 +225,9 @@ def getRoots(L, omega, wLO, wTO, epsInf, mode):
         if(roots[0] < 1e-13):
             roots = roots[1:]
     if(lowerBound < 1e-13 and (mode == "TM" or mode == "TMEva" or mode == "TMRes")):
-        if(roots[0] > 1e-13):
+        if(len(roots) == 0):
+            roots = np.array([1e-12])
+        elif(roots[0] > 1e-12):
             roots = np.append([1e-12], roots)
 
     return roots

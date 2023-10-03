@@ -40,7 +40,7 @@ def defineFreqArrays(wLO, wTO, epsInf):
     arrWithin = np.linspace(wTO, wLO, 100, endpoint=False)
     arrWithin = arrWithin[1:]
     #wEpsEq1 = np.sqrt((epsInf * wLO ** 2 - wTO ** 2) / (epsInf - 1))
-    arrAbove = np.linspace(wLO, 150. * wLO, 1500, endpoint=False)
+    arrAbove = np.linspace(wLO, 2. * wLO, 100, endpoint=False)
     arrAbove = arrAbove[1:]
 
     #surfFreqArr = np.linspace(wTO, wLO, 500 + 1, endpoint=False)
@@ -83,18 +83,10 @@ def produceFreqDataAbove(wArrAbove, zArr, wLO, wTO, epsInf, L):
 def produceFreqDataTE(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
 
     with Pool() as pool:
-        t_start = perf_counter()
         dosTEVals = np.array(pool.starmap(dosAsOfFreq.getDosTE, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
-        t_stop = perf_counter()
-        #print("Time to evaluate TE: {}".format(t_stop - t_start))
-        t_start = perf_counter()
         dosTEEvaVals = np.array(pool.starmap(dosAsOfFreq.getDosTEEva, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
-        t_stop = perf_counter()
-        #print("Time to evaluate TEEva: {}".format(t_stop - t_start))
-        t_start = perf_counter()
         dosTEResVals = np.array(pool.starmap(dosAsOfFreq.getDosTERes, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
-        t_stop = perf_counter()
-        #print("Time to evaluate TERes: {}".format(t_stop - t_start))
+
     #dosTEVals = np.zeros((len(omegaArr), len(zArr)))
     #dosTEEvaVals = np.zeros((len(omegaArr), len(zArr)))
     #dosTEResVals = np.zeros((len(omegaArr), len(zArr)))
@@ -105,43 +97,54 @@ def produceFreqDataTE(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
     #   dosTEResVals[omegaInd, :] = dosAsOfFreq.getDosTERes(omegaVal, zArr, L, wLO, wTO, epsInf)
     ##   #print("")
 
-    dosTETotal = 1. * dosTEVals + 1. * dosTEEvaVals + 1. * dosTEResVals
     h5f = h5py.File(filename, 'w')
-    h5f.create_dataset('dosTE', data=dosTETotal)
+    h5f.create_dataset('dosTE', data=dosTEVals)
+    h5f.create_dataset('dosTEEva', data=dosTEEvaVals)
+    h5f.create_dataset('dosTERes', data=dosTEResVals)
     h5f.close()
 
 def produceFreqDataTM(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
 
     with Pool() as pool:
-        t_start = perf_counter()
-        dosTMVals = np.array(pool.starmap(dosAsOfFreq.getDosTM, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
-        t_stop = perf_counter()
-        #print("Time to evaluate TM: {}".format(t_stop - t_start))
-        t_start = perf_counter()
-        dosTMEvaVals = np.array(pool.starmap(dosAsOfFreq.getDosTMEva, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
-        t_stop = perf_counter()
-        #print("Time to evaluate TM Eva: {}".format(t_stop - t_start))
-        t_start = perf_counter()
-        dosTMResVals = np.array(pool.starmap(dosAsOfFreq.getDosTMRes, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
-        t_stop = perf_counter()
-        #print("Time to evaluate TMRes: {}".format(t_stop - t_start))
-        #dosTMSurfVals = np.array(pool.starmap(dosAsOfFreq.getDosTMSurf, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
 
-    #dosTMVals = np.zeros((len(omegaArr), len(zArr)))
-    #dosTMEvaVals = np.zeros((len(omegaArr), len(zArr)))
-    #dosTMResVals = np.zeros((len(omegaArr), len(zArr)))
-    #dosTMSurfVals = np.zeros((len(omegaArr), len(zArr)))
+        #dosTMVals = np.array(pool.starmap(dosAsOfFreq.getDosTM, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
+        retTM = np.array(pool.starmap(dosAsOfFreq.getDosTMParaPerp, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
+        #dosTMEvaVals = np.array(pool.starmap(dosAsOfFreq.getDosTMEva, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
+        retTMEva = np.array(pool.starmap(dosAsOfFreq.getDosTMEvaParaPerp, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
+        #dosTMResVals = np.array(pool.starmap(dosAsOfFreq.getDosTMRes, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
+        retTMRes = np.array(pool.starmap(dosAsOfFreq.getDosTMResParaPerp, zip(omegaArr, repeat(zArr), repeat(L), repeat(wLO), repeat(wTO), repeat(epsInf))))
+
+
+    dosTMValsPara = retTM[:, 0, :]
+    dosTMValsPerp = retTM[:, 1, :]
+    dosTMEvaValsPara = retTMEva[:, 0, :]
+    dosTMEvaValsPerp = retTMEva[:, 1, :]
+    dosTMResValsPara = retTMRes[:, 0, :]
+    dosTMResValsPerp = retTMRes[:, 1, :]
+
+    #dosTMValsPara = np.zeros((len(omegaArr), len(zArr)))
+    #dosTMValsPerp = np.zeros((len(omegaArr), len(zArr)))
+    #dosTMEvaValsPara = np.zeros((len(omegaArr), len(zArr)))
+    #dosTMEvaValsPerp = np.zeros((len(omegaArr), len(zArr)))
+    #dosTMResValsPara = np.zeros((len(omegaArr), len(zArr)))
+    #dosTMResValsPerp = np.zeros((len(omegaArr), len(zArr)))
     #for omegaInd, omegaVal in enumerate(omegaArr):
     #   #print("omega = {}THz".format(omegaVal * 1e-12))
-    #   dosTMVals[omegaInd, :] = dosAsOfFreq.getDosTM(omegaVal, zArr, L, wLO, wTO, epsInf)
-    #   dosTMEvaVals[omegaInd, :] = dosAsOfFreq.getDosTMEva(omegaVal, zArr, L, wLO, wTO, epsInf)
-    #   dosTMResVals[omegaInd, :] = dosAsOfFreq.getDosTMRes(omegaVal, zArr, L, wLO, wTO, epsInf)
-    #   #dosTMSurfVals[omegaInd, :] = dosAsOfFreq.getDosTMSurf(omegaVal, zArr, L, wLO, wTO, epsInf)
+    #   (dosTMValsPara[omegaInd, :], dosTMValsPerp[omegaInd, :]) = dosAsOfFreq.getDosTMParaPerp(omegaVal, zArr, L, wLO, wTO, epsInf)
+    #   (dosTMEvaValsPara[omegaInd, :], dosTMEvaValsPerp[omegaInd, :]) = dosAsOfFreq.getDosTMEvaParaPerp(omegaVal, zArr, L, wLO, wTO, epsInf)
+    #   (dosTMResValsPara[omegaInd, :], dosTMResValsPerp[omegaInd, :]) = dosAsOfFreq.getDosTMResParaPerp(omegaVal, zArr, L, wLO, wTO, epsInf)
     #   #print("")
 
-    dosTMTotal = 1. * dosTMVals + 1. * dosTMEvaVals + 1. * dosTMResVals# + dosTMSurfVals
+    dosTMParaTotal = dosTMValsPara + dosTMEvaValsPara + dosTMResValsPara
+    dosTMPerpTotal = dosTMValsPerp + dosTMEvaValsPerp + dosTMResValsPerp
+
     h5f = h5py.File(filename, 'w')
-    h5f.create_dataset('dosTM', data=dosTMTotal)
+    h5f.create_dataset('dosTMPara', data=dosTMValsPara)
+    h5f.create_dataset('dosTMEvaPara', data=dosTMEvaValsPara)
+    h5f.create_dataset('dosTMResPara', data=dosTMResValsPara)
+    h5f.create_dataset('dosTMPerp', data=dosTMValsPerp)
+    h5f.create_dataset('dosTMEvaPerp', data=dosTMEvaValsPerp)
+    h5f.create_dataset('dosTMResPerp', data=dosTMResValsPerp)
     h5f.close()
 
 
@@ -149,31 +152,31 @@ def retrieveDosTE(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
 
     parameterStr = parameterName(wMaxBelow, L, epsInf)
 
-    dir = "savedData/clusterFreqData/"
-    #dir = "savedData/"
+    #dir = "savedData/clusterFreqData/"
+    dir = "savedData/"
 
     filenameTE = dir + 'dosTE' + parameterStr + '.h5'
     h5f = h5py.File(filenameTE, 'r')
-    dosTETotal = h5f['dosTE'][:]
+    dosTETotal = h5f['dosTE'][:] + h5f['dosTEEva'][:] + h5f['dosTERes'][:]
     h5f.close()
 
     parameterStr = parameterName(wMaxWithin, L, epsInf)
 
     filenameTE = dir + 'dosTE' + parameterStr + '.h5'
     h5f = h5py.File(filenameTE, 'r')
-    dosTETotal = np.append(dosTETotal, h5f['dosTE'][:], axis = 0)
+    dosTETotal = np.append(dosTETotal, h5f['dosTE'][:] + h5f['dosTEEva'][:] + h5f['dosTERes'][:], axis = 0)
     h5f.close()
 
     parameterStr = parameterName(wMAxAbove, L, epsInf)
 
     filenameTE = dir + 'dosTE' + parameterStr + '.h5'
     h5f = h5py.File(filenameTE, 'r')
-    dosTETotal = np.append(dosTETotal, h5f['dosTE'][:], axis = 0)
+    dosTETotal = np.append(dosTETotal, h5f['dosTE'][:] + h5f['dosTEEva'][:] + h5f['dosTERes'][:], axis = 0)
     h5f.close()
 
     return dosTETotal
 
-def retrieveDosTM(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
+def retrieveDosTMTotal(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
 
     parameterStr = parameterName(wMaxBelow, L, epsInf)
 
@@ -182,21 +185,50 @@ def retrieveDosTM(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')
-    dosTMTotal = h5f['dosTM'][:]
+    dosTMTotal = h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:] + h5f['dosTMPerp'][:] + h5f['dosTMEvaPerp'][:] + h5f['dosTMResPerp'][:]
     h5f.close()
 
     parameterStr = parameterName(wMaxWithin, L, epsInf)
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')
-    dosTMTotal = np.append(dosTMTotal, h5f['dosTM'][:], axis = 0)
+    dosTMTotal = np.append(dosTMTotal, h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:] + h5f['dosTMPerp'][:] + h5f['dosTMEvaPerp'][:] + h5f['dosTMResPerp'][:], axis = 0)
     h5f.close()
 
     parameterStr = parameterName(wMAxAbove, L, epsInf)
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')
-    dosTMTotal = np.append(dosTMTotal, h5f['dosTM'][:], axis = 0)
+    dosTMTotal = np.append(dosTMTotal, h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:] + h5f['dosTMPerp'][:] + h5f['dosTMEvaPerp'][:] + h5f['dosTMResPerp'][:], axis = 0)
+    h5f.close()
+
+    return dosTMTotal
+
+
+def retrieveDosTMPara(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
+
+    parameterStr = parameterName(wMaxBelow, L, epsInf)
+
+    #dir = "savedData/clusterFreqData/"
+    dir = "savedData/"
+
+    filenameTM = dir + 'dosTM' + parameterStr + '.h5'
+    h5f = h5py.File(filenameTM, 'r')
+    dosTMTotal = h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:]
+    h5f.close()
+
+    parameterStr = parameterName(wMaxWithin, L, epsInf)
+
+    filenameTM = dir + 'dosTM' + parameterStr + '.h5'
+    h5f = h5py.File(filenameTM, 'r')
+    dosTMTotal = np.append(dosTMTotal, h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:], axis = 0)
+    h5f.close()
+
+    parameterStr = parameterName(wMAxAbove, L, epsInf)
+
+    filenameTM = dir + 'dosTM' + parameterStr + '.h5'
+    h5f = h5py.File(filenameTM, 'r')
+    dosTMTotal = np.append(dosTMTotal, h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:], axis = 0)
     h5f.close()
 
     return dosTMTotal

@@ -43,6 +43,13 @@ def getDosTM(omega, zArr, L, wLO, wTO, epsInf):
     else:
         return np.zeros(len(zArr))
 
+def getDosTMParaPerp(omega, zArr, L, wLO, wTO, epsInf):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    if(eps > 0):
+        return dosTM.calcDosTMParaPerp(zArr, L, omega, wLO, wTO, epsInf)
+    else:
+        return (np.zeros(len(zArr)), np.zeros(len(zArr)))
+
 
 def getDosTMEva(omega, zArr, L, wLO, wTO, epsInf):
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
@@ -52,12 +59,29 @@ def getDosTMEva(omega, zArr, L, wLO, wTO, epsInf):
         return np.zeros(len(zArr))
 
 
+def getDosTMEvaParaPerp(omega, zArr, L, wLO, wTO, epsInf):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    if( eps > 1 ):
+        return dosTMEva.calcDosTMParaPerp(zArr, L, omega, wLO, wTO, epsInf)
+    else:
+        return (np.zeros(len(zArr)), np.zeros(len(zArr)))
+
+
 def getDosTMRes(omega, zArr, L, wLO, wTO, epsInf):
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     if(eps < 1.):
         return dosTMRes.calcDosTM(zArr, L, omega, wLO, wTO, epsInf)
     else:
         return np.zeros(len(zArr))
+
+
+def getDosTMResParaPerp(omega, zArr, L, wLO, wTO, epsInf):
+    eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    if(eps < 1.):
+        return dosTMRes.calcDosTMParaPerp(zArr, L, omega, wLO, wTO, epsInf)
+    else:
+        return (np.zeros(len(zArr)), np.zeros(len(zArr)))
+
 
 
 #def getDosTMSurf(zArr, L, omega, wLO, wTO, epsInf):
