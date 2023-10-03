@@ -17,28 +17,9 @@ import plotAsOfFreq as plotFreq
 import dosAsOfFreq
 import produceFreqData as prod
 
-def freqIntegral():
-    wLO = 3. * 1e12
-    wTO = 1. * 1e12
-    epsInf = 1.
-    #wLO = 32.04 * 1e12
-    #wTO = 7.92 * 1e12
-    #epsInf = 6.3
-    L = 40.
-    zArr = np.logspace(-3, -9, 50, endpoint=True, base = 10)
-    #zArr = np.append([L / 4.], zArr)
+def freqIntegral(zArr, wLO, wTO, epsInf, L):
 
-    #zArr = np.logspace(-3, -9, 100)
-
-    #intNum = performSPhPIntegralNum(1. * 1e-8, wLO, wTO, epsInf)
-    #print("intNum = {}".format(intNum[0] * 1e-20))
-    #print("intNum Err = {}".format(intNum[1] * 1e-20))
-#
-    #dosAna, dosNum = computeSPhPIntAsOfZ(zArr, wLO, wTO, epsInf)
-    #plotFreq.compareSPhPInt(dosAna, dosNum, zArr, "SPhPFieldA")
-
-    #prod.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
-    producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L)
+    #producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L)
     #computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L)
     cutoff = 241.8 * 1e12# 1eV cutoff
     computeFreqIntegralFixedCutoff(zArr, cutoff, wLO, wTO, epsInf, L)
@@ -52,7 +33,7 @@ def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
     wArr = np.append(wArr, arrAbove)
 
     dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTMTotal(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
     #dosSurf = prod.retrieveDosSurf()
 
 
@@ -85,7 +66,7 @@ def computeFreqIntegralFixedCutoff(zArr, cutoff, wLO, wTO, epsInf, L):
     wArr = np.append(wArr, arrAbove)
 
     dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
 
     dosIntTE = np.zeros(zArr.shape)
     dosIntTM = np.zeros(zArr.shape)
@@ -106,7 +87,7 @@ def computeFreqIntegralFixedCutoff(zArr, cutoff, wLO, wTO, epsInf, L):
         dosSurf[zInd] = performSPhPIntegralNum(zVal, wLO, wTO, epsInf)[0]
 
     dosTot = dosIntTE + dosIntTM + dosSurf
-    dosNoSurf = dosIntTE# + dosIntTM
+    dosNoSurf = dosIntTE + dosIntTM
 
     filename = "EffectiveMass"
     #plotFreq.plotDosIntegratedFixedCutoff(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename)
@@ -121,7 +102,7 @@ def computeEffectiveHopping(zArr, cutoff, wLO, wTO, epsInf, L):
     wArr = np.append(wArr, arrAbove)
 
     dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTMTotal(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
 
     dosIntTE = np.zeros(zArr.shape)
     dosIntTM = np.zeros(zArr.shape)
@@ -156,7 +137,7 @@ def computeLocalFieldStrength(zArr, wLO, wTO, epsInf, L):
     wArr = np.append(wArr, arrAbove)
 
     dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTMTotal(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
     dosSurf = prod.retrieveDosSurf()
 
     dosIntTE = np.zeros(dosTETotal.shape)
@@ -204,7 +185,7 @@ def producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L):
     wArr = np.append(wArr, arrAbove)
 
     dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTM(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTMTotal(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
 
     #dosSurf = prod.retrieveDosSurf()
     #dosSurf = patchDosSurfWithZeros(dosSurf, zArr, arrBelow, arrAboveClose, arrAboveFar)
@@ -226,8 +207,10 @@ def intFuncFieldStrength(omega, zVal, wLO, wTO, epsInf):
     return prefacField * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
 
 def intFuncMass(omega, zVal, wLO, wTO, epsInf):
+    epsilon = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    prefacPara = 1. / (1. + np.abs(epsilon))
     prefacMass = 8. / (3. * np.pi) * consts.hbar / (consts.m_e * consts.c**2)
-    return prefacMass * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
+    return prefacPara * prefacMass * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
 
 def intFuncHopping(omega, zVal, wLO, wTO, epsInf):
     aLat = 1e-10
