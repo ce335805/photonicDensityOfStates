@@ -19,8 +19,8 @@ import scipy.constants as consts
 #import findAllowedKsSPhP as findAllowedKsSPhP
 #import epsilonFunctions as epsFunc
 
-import SphPStuff.findAllowedKsSPhP as findAllowedKsSPhP
-import SphPStuff.epsilonFunctions as epsFunc
+import findAllowedKsSPhP as findAllowedKsSPhP
+import epsilonFunctions as epsFunc
 
 #import SphPStuff.findAllowedKsSPhP as findAllowedKsSPhP
 #import SphPStuff.epsilonFunctions as epsFunc
