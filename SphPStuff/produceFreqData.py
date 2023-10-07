@@ -39,12 +39,9 @@ def defineFreqArrays(wLO, wTO, epsInf):
     arrBelow = np.linspace(wTO * 1e-1, wTO - 1e-3 * wTO, 100, endpoint=False)
     arrWithin = np.linspace(wTO, wLO, 100, endpoint=False)
     arrWithin = arrWithin[1:]
-    #wEpsEq1 = np.sqrt((epsInf * wLO ** 2 - wTO ** 2) / (epsInf - 1))
-    arrAbove = np.linspace(wLO, 2. * wLO, 100, endpoint=False)
+    arrAbove = np.linspace(wLO, 10. * wLO, 1000, endpoint=False)
     arrAbove = arrAbove[1:]
 
-    #surfFreqArr = np.linspace(wTO, wLO, 500 + 1, endpoint=False)
-    #surfFreqArr = surfFreqArr[1:]
     surfFreqArr = arrWithin
 
     return (arrBelow, arrWithin, arrAbove, surfFreqArr)
@@ -152,8 +149,8 @@ def retrieveDosTE(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
 
     parameterStr = parameterName(wMaxBelow, L, epsInf)
 
-    #dir = "savedData/clusterFreqData/"
-    dir = "savedData/"
+    dir = "savedData/clusterFreqData/"
+    #dir = "savedData/"
 
     filenameTE = dir + 'dosTE' + parameterStr + '.h5'
     h5f = h5py.File(filenameTE, 'r')
@@ -209,8 +206,8 @@ def retrieveDosTMPara(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
 
     parameterStr = parameterName(wMaxBelow, L, epsInf)
 
-    #dir = "savedData/clusterFreqData/"
-    dir = "savedData/"
+    dir = "savedData/clusterFreqData/"
+    #dir = "savedData/"
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')

@@ -19,12 +19,10 @@ import produceFreqData as prod
 
 def freqIntegral(zArr, wLO, wTO, epsInf, L):
 
-    #producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L)
-    #computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L)
     cutoff = 241.8 * 1e12# 1eV cutoff
-    computeFreqIntegralFixedCutoff(zArr, cutoff, wLO, wTO, epsInf, L)
-    #computeEffectiveHopping(zArr, cutoff, wLO, wTO, epsInf, L)
-
+    #cutoff = 100 * 1e12# 1eV cutoff
+    computeEffectiveMass(zArr, cutoff, wLO, wTO, epsInf, L)
+    computeFluctuations(zArr, cutoff, wLO, wTO, epsInf, L)
 
 def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
 
@@ -59,7 +57,7 @@ def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
     filename = "TMField"
     plotFreq.plotDosIntegratedAsOfCutoff(dosIntTM, zArr, L, wArr, wLO, wTO, epsInf, filename)
 
-def computeFreqIntegralFixedCutoff(zArr, cutoff, wLO, wTO, epsInf, L):
+def computeEffectiveMass(zArr, cutoff, wLO, wTO, epsInf, L):
 
     arrBelow, arrWithin, arrAbove, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
     wArr = np.append(arrBelow, arrWithin)
@@ -72,9 +70,6 @@ def computeFreqIntegralFixedCutoff(zArr, cutoff, wLO, wTO, epsInf, L):
     dosIntTM = np.zeros(zArr.shape)
 
     for zInd, zVal in enumerate(zArr):
-        #prefac = 2. * consts.fine_structure / np.pi * latConst ** 2 / consts.c ** 2 * wArrPart
-        prefacE = consts.hbar * wArr**3 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)
-        prefacA = consts.hbar * wArr**1 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3) * 1e24
         prefacMass = 8. / (3. * np.pi) * consts.hbar / (consts.c**2 * consts.m_e)
         cutoffFac = np.exp(- wArr**2 / cutoff**2)
         intFuncTE = prefacMass * (dosTETotal[ : , zInd] - .5)# * cutoffFac
@@ -84,16 +79,54 @@ def computeFreqIntegralFixedCutoff(zArr, cutoff, wLO, wTO, epsInf, L):
 
     dosSurf = np.zeros(len(zArr))
     for zInd, zVal in enumerate(zArr):
-        dosSurf[zInd] = performSPhPIntegralNum(zVal, wLO, wTO, epsInf)[0]
+        dosSurf[zInd] = performSPhPIntegralMass(zVal, wLO, wTO, epsInf)[0]
 
     dosTot = dosIntTE + dosIntTM + dosSurf
-    dosNoSurf = dosIntTE + dosIntTM
 
     filename = "EffectiveMass"
-    #plotFreq.plotDosIntegratedFixedCutoff(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename)
     plotFreq.plotEffectiveMass(dosTot, zArr, L, wLO, wTO, epsInf, filename)
-    #filename = "TMEFieldCutoff"
-    #plotFreq.plotDosIntegratedAsOfCutoff(dosIntTM, zArr, L, wArr, wLO, wTO, epsInf, filename)
+
+def computeFluctuations(zArr, cutoff, wLO, wTO, epsInf, L):
+
+    arrBelow, arrWithin, arrAbove, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
+    wArr = np.append(arrBelow, arrWithin)
+    wArr = np.append(wArr, arrAbove)
+
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+
+    flucETE = np.zeros(zArr.shape)
+    flucETM = np.zeros(zArr.shape)
+    flucATE = np.zeros(zArr.shape)
+    flucATM = np.zeros(zArr.shape)
+
+    for zInd, zVal in enumerate(zArr):
+        prefacE = consts.hbar * wArr**3 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)
+        cutoffFac = np.exp(- wArr**2 / cutoff**2)
+        flucETEInt = prefacE * (dosTETotal[ : , zInd] - .5) * cutoffFac
+        flucETE[zInd] = np.trapz(flucETEInt, x=wArr, axis = 0)
+        flucETMInt = prefacE * (dosTMTotal[ : , zInd] - 1. / 3.) * cutoffFac
+        flucETM[zInd] = np.trapz(flucETMInt, x=wArr, axis = 0)
+        prefacA = consts.hbar * wArr**1 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3) * 1e24
+        flucATEInt = prefacA * (dosTETotal[ : , zInd] - .5) * cutoffFac
+        flucATE[zInd] = np.trapz(flucATEInt, x=wArr, axis = 0)
+        flucATMInt = prefacA * (dosTMTotal[ : , zInd] - 1. / 3.) * cutoffFac
+        flucATM[zInd] = np.trapz(flucATMInt, x=wArr, axis = 0)
+
+    flucESurf = np.zeros(len(zArr))
+    flucASurf = np.zeros(len(zArr))
+    for zInd, zVal in enumerate(zArr):
+        flucESurf[zInd] = performSPhPIntegralEFluc(zVal, wLO, wTO, epsInf)[0]
+        flucASurf[zInd] = performSPhPIntegralAFluc(zVal, wLO, wTO, epsInf)[0] * 1e24
+
+    flucE = flucETE + flucETM + flucESurf
+    flucENoSurf = flucETE + flucETM
+    flucA = flucATE + flucATM + flucASurf
+    flucANoSurf = flucATE + flucATM
+
+    plotFreq.plotFluctuationsE(flucENoSurf, flucE, zArr, L, wLO, wTO, epsInf)
+    plotFreq.plotFluctuationsA(flucANoSurf, flucA, zArr, L, wLO, wTO, epsInf)
+
 
 def computeEffectiveHopping(zArr, cutoff, wLO, wTO, epsInf, L):
 
@@ -202,9 +235,18 @@ def intFuncEffectiveHopping(omega, zVal, wLO, wTO, epsInf):
     prefac = 2. * consts.fine_structure / np.pi / consts.c ** 2 * omega # / 3.
     return prefac * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
 
-def intFuncFieldStrength(omega, zVal, wLO, wTO, epsInf):
-    prefacField = consts.hbar * omega**1 / (2. * consts.epsilon_0 * np.pi**2 * consts.c**3) * 1e24
-    return prefacField * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
+def intFuncFieldStrengthA(omega, zVal, wLO, wTO, epsInf):
+    epsilon = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    prefacPara = 1. / (1. + np.abs(epsilon))
+    prefacField = consts.hbar * omega**1 / (2. * consts.epsilon_0 * np.pi**2 * consts.c**3)
+    return prefacPara * prefacField * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
+
+def intFuncFieldStrengthE(omega, zVal, wLO, wTO, epsInf):
+    epsilon = epsFunc.epsilon(omega, wLO, wTO, epsInf)
+    prefacPara = 1. / (1. + np.abs(epsilon))
+    prefacField = consts.hbar * omega**3 / (2. * consts.epsilon_0 * np.pi**2 * consts.c**3)
+    return prefacPara * prefacField * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
+
 
 def intFuncMass(omega, zVal, wLO, wTO, epsInf):
     epsilon = epsFunc.epsilon(omega, wLO, wTO, epsInf)
@@ -217,11 +259,19 @@ def intFuncHopping(omega, zVal, wLO, wTO, epsInf):
     hopFac = 0.5 * 2. * consts.fine_structure * aLat ** 2 / (3. * np.pi * consts.c ** 2) * omega
     return hopFac * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
 
-def performSPhPIntegralNum(zVal, wLO, wTO, epsInf):
+def performSPhPIntegralMass(zVal, wLO, wTO, epsInf):
     wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
     #return scipy.integrate.quad(intFuncFieldStrength, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 1000)
     return scipy.integrate.quad(intFuncMass, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 1000)
     #return scipy.integrate.quad(intFuncEffectiveHopping, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 500)
+
+def performSPhPIntegralEFluc(zVal, wLO, wTO, epsInf):
+    wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
+    return scipy.integrate.quad(intFuncFieldStrengthE, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 1000)
+
+def performSPhPIntegralAFluc(zVal, wLO, wTO, epsInf):
+    wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
+    return scipy.integrate.quad(intFuncFieldStrengthA, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 1000)
 
 def performSPhPIntegralHopping(zVal, wLO, wTO, epsInf):
     wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
@@ -242,7 +292,7 @@ def computeSPhPIntAsOfZ(zArr, wLO, wTO, epsInf):
     intAna = performSPhPIntegralAna(zArr, wLO, wTO, epsInf)
     intNum = np.zeros(len(zArr))
     for zInd, zVal in enumerate(zArr):
-        intNum[zInd] = performSPhPIntegralNum(zVal, wLO, wTO, epsInf)[0]
+        intNum[zInd] = performSPhPIntegralMass(zVal, wLO, wTO, epsInf)[0]
 
     return (intAna, intNum)
 

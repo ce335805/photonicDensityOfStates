@@ -1,6 +1,7 @@
 import numpy as np
 import combinedDosPlots
 import produceFreqData
+import performFreqIntegral
 
 def main():
     print("Compute full Dos and all modes")
@@ -27,20 +28,15 @@ def main():
     wLO = 32.04 * 1e12
     wTO = 7.92 * 1e12
     #epsInf = 6.3
-    L = 1.
+    L = 10.
     zArr = np.logspace(-3, -9, 50, endpoint=True, base = 10)
     zArr = np.append(np.array([L / 4.]), zArr)
 
-    produceFreqData.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
-
+    #produceFreqData.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
 
     combinedDosPlots.plotDosWhole(zArr, wLO, wTO, epsInf, L)
-    #combPlots.plotTMWhole()
 
-    #dosAsOfFreq.createPlotAsOfOmega()
-    #performFreqIntegral.freqIntegral()
-    #plotTotalAsOfZ.dosTotalAsOfZ()
-
+    #performFreqIntegral.freqIntegral(zArr, wLO, wTO, epsInf, L)
 
 if __name__ == "__main__":
     main()

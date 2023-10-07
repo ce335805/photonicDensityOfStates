@@ -222,8 +222,9 @@ def getRoots(L, omega, wLO, wTO, epsInf, mode):
         roots = epsFunc.kDFromKEva(roots, omega, wLO, wTO, epsInf)
 
     if(mode == "TE" or mode == "TEEva" or mode == "TERes"):
-        if(roots[0] < 1e-13):
-            roots = roots[1:]
+        if(len(roots) != 0):
+            if(roots[0] < 1e-13):
+                roots = roots[1:]
     if(lowerBound < 1e-13 and (mode == "TM" or mode == "TMEva" or mode == "TMRes")):
         if(len(roots) == 0):
             roots = np.array([1e-12])

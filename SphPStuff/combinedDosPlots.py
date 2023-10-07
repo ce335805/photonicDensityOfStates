@@ -43,6 +43,8 @@ mpl.rcParams['text.latex.preamble'] = [
 
 import epsilonFunctions as epsFunc
 import produceFreqData as prod
+import dosFuncs.dosTMSurfModes as surfModes
+import dosAsOfFreq
 
 def plotDosWhole(zArr, wLO, wTO, epsInf, L):
 
@@ -53,8 +55,13 @@ def plotDosWhole(zArr, wLO, wTO, epsInf, L):
     dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
     dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
 
-    filename = "TMPara"
-    createDosPlotFreq(wArr, zArr, dosTMTotal + dosTETotal, filename, wLO, wTO)
+    dosSurf = np.zeros((len(wArr), len(zArr)))
+    for wInd, wVal in enumerate(wArr):
+        epsilon = epsFunc.epsilon(wVal, wLO, wTO, epsInf)
+        dosSurf[wInd, :] = 1. / (1. + np.abs(epsilon)) * dosAsOfFreq.getDosTMSurf(wVal, zArr, L, wLO, wTO, epsInf)
+
+    filename = "Para"
+    createDosPlotFreq(wArr, zArr, dosTMTotal + dosTETotal + dosSurf, filename, wLO, wTO)
 
 def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO):
 
@@ -66,19 +73,23 @@ def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO):
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
 
-    indArr = np.array([0, 5, 10, 15, 20], dtype = int)
-    print(dos[:, indArr[0]])
-    ax.plot(wArr * 1e-12, dos[:, indArr[0]], color=cmapPink(0.1), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[0]]))
-    ax.plot(wArr * 1e-12, dos[:, indArr[1]], color=cmapPink(0.3), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[1]]))
-    ax.plot(wArr * 1e-12, dos[:, indArr[2]], color=cmapPink(0.5), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[2]]))
-    ax.plot(wArr * 1e-12, dos[:, indArr[3]], color=cmapPink(0.6), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[3]]))
-    ax.plot(wArr * 1e-12, dos[:, indArr[4]], color=cmapPink(0.7), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[4]]))
+    indArr = np.array([0, 10, 15, 20, 25], dtype = int)
+    ax.plot(wArr * 1e-12, (dos[:, indArr[0]] - 2. / 3.) * (wArr * 1e-12)*3, color=cmapPink(0.1), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[0]]))
+    ax.plot(wArr * 1e-12, (dos[:, indArr[1]] - 2. / 3.) * (wArr * 1e-12)*3, color=cmapPink(0.3), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[1]]))
+    ax.plot(wArr * 1e-12, (dos[:, indArr[2]] - 2. / 3.) * (wArr * 1e-12)*3, color=cmapPink(0.5), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[2]]))
+    ax.plot(wArr * 1e-12, (dos[:, indArr[3]] - 2. / 3.) * (wArr * 1e-12)*3, color=cmapPink(0.6), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[3]]))
+    ax.plot(wArr * 1e-12, (dos[:, indArr[4]] - 2. / 3.) * (wArr * 1e-12)*3, color=cmapPink(0.7), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[4]]))
 
+    #ax.plot(wArr * 1e-12, dos[:, indArr[0]], color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.2g}".format(zArr[indArr[0]]))
+    #ax.plot(wArr * 1e-12, dos[:, indArr[1]], color=cmapPink(0.3), lw=.7, label="$z = $" + "{:1.2g}".format(zArr[indArr[1]]))
+    #ax.plot(wArr * 1e-12, dos[:, indArr[2]], color=cmapPink(0.5), lw=.7, label="$z = $" + "{:1.2g}".format(zArr[indArr[2]]))
+    #ax.plot(wArr * 1e-12, dos[:, indArr[3]], color=cmapPink(0.6), lw=.7, label="$z = $" + "{:1.2g}".format(zArr[indArr[3]]))
+    #ax.plot(wArr * 1e-12, dos[:, indArr[4]], color=cmapPink(0.7), lw=.7, label="$z = $" + "{:1.2g}".format(zArr[indArr[4]]))
 
     ax.axhline(2. / 3., lw = 0.5, color = 'gray', zorder = -666)
 
-    ax.set_xlim(np.amin(wArr * 1e-12), 2. * wLO * 1e-12)
-    ax.set_ylim(0., 10.)
+    ax.set_xlim(np.amin(wArr * 1e-12), 10. * wLO * 1e-12)
+    ax.set_ylim(-1e1, 1e1)
 
 
     ax.set_xlabel(r"$\omega \, [\mathrm{THz}]$")
@@ -88,6 +99,9 @@ def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO):
     legend.get_frame().set_alpha(0.)
     legend.get_frame().set_boxstyle('Square', pad=0.1)
     legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
 
     plt.savefig("./SPhPPlotsSaved/dosAsOfFreq" + filename + ".png")
 
