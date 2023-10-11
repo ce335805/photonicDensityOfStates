@@ -209,28 +209,6 @@ def computeLocalFieldStrength(zArr, wLO, wTO, epsInf, L):
     filename = "TMInt"
     plotFreq.plotDosAsOfFreqDosTotal(dosIntTM, zArr, L, wArr, wLO, wTO, epsInf, filename)
 
-
-
-def producePlotAsOfFreq(zArr, wLO, wTO, epsInf, L):
-
-    arrBelow, arrWithin, arrAbove, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
-    wArr = np.append(arrBelow, arrWithin)
-    wArr = np.append(wArr, arrAbove)
-
-    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTMTotal(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-
-    #dosSurf = prod.retrieveDosSurf()
-    #dosSurf = patchDosSurfWithZeros(dosSurf, zArr, arrBelow, arrAboveClose, arrAboveFar)
-    #dosTMTotal = dosTMTotal + dosSurf
-
-    filename = "TE"
-    plotFreq.plotDosAsOfFreqDosTotal(dosTETotal, zArr, L, wArr, wLO, wTO, epsInf, filename)
-    filename = "TM"
-    plotFreq.plotDosAsOfFreqDosTotal(dosTMTotal, zArr, L, wArr, wLO, wTO, epsInf, filename)
-    #plotFreq.plotDosTotalWithSurfExtra(dosTMTotal, dosSurf, zArr, L, wArr, surfFreqArr, wLO, wTO, epsInf, filename)
-
-
 def intFuncEffectiveHopping(omega, zVal, wLO, wTO, epsInf):
     prefac = 2. * consts.fine_structure / np.pi / consts.c ** 2 * omega # / 3.
     return prefac * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
