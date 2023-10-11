@@ -212,6 +212,10 @@ def plotDosIntegratedAsOfCutoff(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filena
 
 def plotFluctuationsE(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf):
 
+    zArr = zArr[1:]
+    dosNoSurf = dosNoSurf[1:]
+    dosTot = dosTot[1:]
+
     fig = plt.figure(figsize=(3.4, 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
                            wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.2, right=0.95)
@@ -247,6 +251,10 @@ def plotFluctuationsE(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf):
 
 def plotFluctuationsA(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf):
 
+    zArr = zArr[1:]
+    dosNoSurf = dosNoSurf[1:]
+    dosTot = dosTot[1:]
+
     fig = plt.figure(figsize=(3.4, 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
                            wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.2, right=0.95)
@@ -256,8 +264,8 @@ def plotFluctuationsA(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf):
 
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
-    ax.plot(zArr, np.abs(dosTot) * 1e-12, color=cmapBone(.6), linestyle='', marker='x', markersize=2., label = r"$\langle A^2 \rangle_{\mathrm{tot}} - \langle E^2 \rangle_{\mathrm{vac}}$")
-    ax.plot(zArr, np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle A^2 \rangle_{\mathrm{no \, surf.}} - \langle E^2 \rangle_{\mathrm{vac}} \right)$")
+    ax.plot(zArr, np.abs(dosTot) * 1e-12, color=cmapBone(.6), linestyle='', marker='x', markersize=2., label = r"$\langle A^2 \rangle_{\mathrm{tot}} - \langle A^2 \rangle_{\mathrm{vac}}$")
+    ax.plot(zArr, np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle A^2 \rangle_{\mathrm{no \, surf.}} - \langle A^2 \rangle_{\mathrm{vac}} \right)$")
     #ax.plot(np.log(zArr), np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle E^2 \rangle_{\mathrm{no \, surf.}} - \langle E^2 \rangle_{\mathrm{vac}} \right)$")
     ax.set_xscale("log")
     ax.set_yscale("log")

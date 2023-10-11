@@ -19,8 +19,8 @@ import produceFreqData as prod
 
 def freqIntegral(zArr, wLO, wTO, epsInf, L):
 
-    cutoff = 241.8 * 1e12# 1eV cutoff
-    #cutoff = 100 * 1e12# 1eV cutoff
+    #cutoff = 241.8 * 1e12# 1eV cutoff
+    cutoff = 200 * 1e12# 1eV cutoff
     computeEffectiveMass(zArr, cutoff, wLO, wTO, epsInf, L)
     computeFluctuations(zArr, cutoff, wLO, wTO, epsInf, L)
 
@@ -105,12 +105,12 @@ def computeFluctuations(zArr, cutoff, wLO, wTO, epsInf, L):
         cutoffFac = np.exp(- wArr**2 / cutoff**2)
         flucETEInt = prefacE * (dosTETotal[ : , zInd] - .5) * cutoffFac
         flucETE[zInd] = np.trapz(flucETEInt, x=wArr, axis = 0)
-        flucETMInt = prefacE * (dosTMTotal[ : , zInd] - 1. / 3.) * cutoffFac
+        flucETMInt = prefacE * (dosTMTotal[ : , zInd] - 1. / 6.) * cutoffFac
         flucETM[zInd] = np.trapz(flucETMInt, x=wArr, axis = 0)
         prefacA = consts.hbar * wArr**1 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3) * 1e24
         flucATEInt = prefacA * (dosTETotal[ : , zInd] - .5) * cutoffFac
         flucATE[zInd] = np.trapz(flucATEInt, x=wArr, axis = 0)
-        flucATMInt = prefacA * (dosTMTotal[ : , zInd] - 1. / 3.) * cutoffFac
+        flucATMInt = prefacA * (dosTMTotal[ : , zInd] - 1. / 6.) * cutoffFac
         flucATM[zInd] = np.trapz(flucATMInt, x=wArr, axis = 0)
 
     flucESurf = np.zeros(len(zArr))

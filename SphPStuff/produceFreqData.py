@@ -39,7 +39,7 @@ def defineFreqArrays(wLO, wTO, epsInf):
     arrBelow = np.linspace(wTO * 1e-1, wTO - 1e-3 * wTO, 100, endpoint=False)
     arrWithin = np.linspace(wTO, wLO, 100, endpoint=False)
     arrWithin = arrWithin[1:]
-    arrAbove = np.linspace(wLO, 10. * wLO, 1000, endpoint=False)
+    arrAbove = np.linspace(wLO, 100. * wLO, 1000, endpoint=False)
     arrAbove = arrAbove[1:]
 
     surfFreqArr = arrWithin
