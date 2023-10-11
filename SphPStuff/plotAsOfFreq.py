@@ -72,56 +72,6 @@ def plotDosAsOfFreq(dos1, dos2, dos3, zArr, L, omegaArr, wLO, wTO, epsInf):
 
     plt.savefig("./SPhPPlotsSaved/dosAsOfFreq.png")
 
-
-def plotDosAsOfFreqDosTotal(dos, zArr, L, omegaArr, wLO, wTO, epsInf, filename):
-    omegaArr = omegaArr * 1e-12  # convert to THz
-
-    fig = plt.figure(figsize=(3., 2.), dpi=800)
-    gs = gridspec.GridSpec(1, 1,
-                           wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.22, right=0.96)
-    ax = plt.subplot(gs[0, 0])
-
-    cmapPink = cm.get_cmap('pink')
-    cmapBone = cm.get_cmap('bone')
-
-    dos = dos[:, :] - (dos[:, 0])[:, None] * np.ones(len(zArr))[None, :]
-    zArr = zArr[ : 21 : 4]
-    dos = dos[:,  : 21 : 4]
-
-    for zInd, zVal in enumerate(zArr):
-        if(zInd == 0):
-            ax.plot(omegaArr, dos[:, zInd], color='black', lw=.6, linestyle='-', zorder = 666,  label = r'$z = $'+'{0:.1g}'.format(zVal) + '$\mathrm{m}$')
-            continue
-        color = cmapPink((zInd + 1.) / (len(zArr) + 4.))
-        ax.plot(omegaArr, dos[:, zInd] * omegaArr**3, color=color, lw=.6, linestyle='-', label = r'$z = $'+'{0:.1g}'.format(zVal) + '$\mathrm{m}$')
-        #arrow = patch.FancyArrow(0., 0.3 - 0.05 * zInd, consts.c / zVal * 1e-12, 0., color = color, width = 0.002, head_width = 0.01, head_length=0.3)
-        #ax.add_patch(arrow)
-    #ax.axvline(wLO * 1e-12, lw=0.3, color='gray')
-    #ax.axvline(wTO * 1e-12, lw=0.3, color='gray')
-#    print("eps = 1 at {}THz".format(np.sqrt((epsInf * wLO ** 2 - wTO ** 2) / (epsInf - 1)) * 1e-12))
-#    ax.axvline(np.sqrt((epsInf * wLO ** 2 - wTO ** 2) / (epsInf - 1)) * 1e-12, lw=0.5, color='gray')
-
-    ax.axhline(0., color = 'black', lw = .3, zorder = 1000)
-
-    #ax.set_xlim(np.amin(omegaArr), np.amax(omegaArr))
-    ax.set_xlim(np.amin(omegaArr), np.amax(omegaArr))
-    #ax.set_ylim(-14.2, 14.2)
-
-    ax.set_xlabel(r"$\omega[\mathrm{THz}]$")
-    ax.set_ylabel(r"$\left(\rho / \rho_0 - 0.5\right) \times \omega^3$")
-
-    legend = ax.legend(fontsize=fontsize-2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=2)
-    legend.get_frame().set_alpha(0.)
-    legend.get_frame().set_boxstyle('Square', pad=0.1)
-    legend.get_frame().set_linewidth(0.0)
-
-    for axis in ['top', 'bottom', 'left', 'right']:
-        ax.spines[axis].set_linewidth(.5)
-
-    plt.savefig("./SPhPPlotsSaved/dosTotal" + filename + ".png")
-
-
-
 def plotDosTotalWithSurfExtra(dos, dosSurf, zArr, L, omegaArr, surfFreqArr, wLO, wTO, epsInf, filename):
     omegaArr = omegaArr * 1e-12  # convert to THz
     surfFreqArr = surfFreqArr * 1e-12  # convert to THz

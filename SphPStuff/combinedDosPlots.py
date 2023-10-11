@@ -65,7 +65,7 @@ def plotDosWhole(zArr, wLO, wTO, epsInf, L):
     createDosPlotFreq(wArr, zArr, dosTMTotal + dosTETotal, filename, wLO, wTO)
 
 def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO):
-
+    wArr = wArr * 1e-12
     fig = plt.figure(figsize=(3., 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
                            wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.22, right=0.96)
@@ -75,11 +75,11 @@ def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO):
     cmapBone = cm.get_cmap('bone')
 
     indArr = np.array([0, 10, 20, 30, 40], dtype = int)
-    ax.plot(wArr * 1e-12, (dos[:, indArr[0]] - 3. / 3.) * (wArr * 1e-12)*3, color=cmapPink(0.1), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[0]]))
-    ax.plot(wArr * 1e-12, (dos[:, indArr[1]] - 3. / 3.) * (wArr * 1e-12)*3, color=cmapPink(0.3), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[1]]))
-    ax.plot(wArr * 1e-12, (dos[:, indArr[2]] - 3. / 3.) * (wArr * 1e-12)*3, color=cmapPink(0.5), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[2]]))
-    ax.plot(wArr * 1e-12, (dos[:, indArr[3]] - 3. / 3.) * (wArr * 1e-12)*3, color=cmapPink(0.6), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[3]]))
-    ax.plot(wArr * 1e-12, (dos[:, indArr[4]] - 3. / 3.) * (wArr * 1e-12)*3, color=cmapPink(0.7), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[4]]))
+    ax.plot(wArr, (dos[:, indArr[0]] - 3. / 3.) * wArr**3, color=cmapPink(0.1), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[0]]))
+    ax.plot(wArr, (dos[:, indArr[1]] - 3. / 3.) * wArr**3, color=cmapPink(0.3), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[1]]))
+    ax.plot(wArr, (dos[:, indArr[2]] - 3. / 3.) * wArr**3, color=cmapPink(0.5), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[2]]))
+    ax.plot(wArr, (dos[:, indArr[3]] - 3. / 3.) * wArr**3, color=cmapPink(0.6), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[3]]))
+    ax.plot(wArr, (dos[:, indArr[4]] - 3. / 3.) * wArr**3, color=cmapPink(0.7), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[4]]))
 
     #ax.plot(wArr * 1e-12, dos[:, indArr[0]], color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.2g}".format(zArr[indArr[0]]))
     #ax.plot(wArr * 1e-12, dos[:, indArr[1]], color=cmapPink(0.3), lw=.7, label="$z = $" + "{:1.2g}".format(zArr[indArr[1]]))
@@ -89,7 +89,8 @@ def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO):
 
     ax.axhline(2. / 3., lw = 0.5, color = 'gray', zorder = -666)
 
-    ax.set_xlim(np.amin(wArr * 1e-12), 5. * wLO * 1e-12)
+    ax.set_xlim(np.amin(wArr), 5. * wLO * 1e-12)
+    ax.set_xlim(np.amin(wArr), np.amax(wArr))
     #ax.set_ylim(-1e1, 1e1)
 
 
