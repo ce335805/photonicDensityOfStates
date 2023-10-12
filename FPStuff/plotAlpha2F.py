@@ -53,17 +53,17 @@ def plotLinesAsOfD(qArr, dArr, alpha2Trans, alpha2Long):
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
     for dInd, dVal in enumerate(dArr[:-1]):
-        colorP = cmapPink((dInd + 1.) / (len(dArr) + 2))
-        colorB = cmapBone((dInd + 1.) / (len(dArr) + 2))
-        ax.plot(qArr, qArr * np.abs(alpha2TransEff[dInd, :]), color = colorP, lw = 0.5)
-        ax.plot(qArr, qArr * np.abs(alpha2LongEff[dInd, :]), color = colorB, lw = 0.5)
+        colorP = cmapPink((dInd + 1.) / (len(dArr) + 0))
+        colorB = cmapBone((dInd + 1.) / (len(dArr) + 0))
+        #ax.plot(qArr, alpha2TransEff[dInd, :], color = colorP, lw = 0.5)
+        ax.plot(qArr, alpha2LongEff[dInd, :], color = colorB, lw = 0.5)
 
 
     #ax.plot(qArr, 2. * alpha2TransEff[-1, 0] * qArr[0] / qArr, color = 'red', lw = 0.5)
     #ax.plot(qArr, 2. * alpha2TransEff[-1, -1] * qArr[-1]**2 / qArr**2, color = 'red', lw = 0.5)
 
-    ax.set_yscale('log')
-    ax.set_xscale('log')
+    #ax.set_yscale('log')
+    #ax.set_xscale('log')
 
     #ax.set_xlim(0., 0.1 * np.amax(qArr))
     #limBot = -1 * 1e-37

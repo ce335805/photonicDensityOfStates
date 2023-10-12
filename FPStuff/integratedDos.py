@@ -21,6 +21,9 @@ def dosTMWithReg(omega, zVal, L, alpha):
 def dosParallelWithRegE(omega, zVal, L, alpha):
     return (computeDosFP.dosParallelOneFreq(omega, zVal, L) - 2. / 3.) * (omega * 1e-12)**3 * np.exp(- alpha**2 * omega**2)
 
+def dosParallelWithRegA(omega, zVal, L, alpha):
+    return (computeDosFP.dosParallelOneFreq(omega, zVal, L) - 2. / 3.) * (omega * 1e-12)**1 * np.exp(- alpha**2 * omega**2)
+
 def dosEffectiveMassReg(omega, zVal, L, alpha):
     return (computeDosFP.dosParallelOneFreq(omega, zVal, L) - 2. / 3.) * np.exp(- alpha**2 * omega**2)
 
@@ -42,10 +45,10 @@ def numericalIntegral(zVal, omegaMax, L):
         print("cutoff = {}THz".format(cutoff * 1e-12))
         numResonances = math.floor(cutoff * L / np.pi / consts.c)
         resonancePoints = (np.arange(numResonances) + 1.) * np.pi * consts.c / L
-        #res = scipy.integrate.quad(dosParallelWithRegE, 1e10, cutoff, args=(zVal, L, alphaArr[cutInd]), points=resonancePoints, limit = (numResonances * 10 + 50))
+        res = scipy.integrate.quad(dosParallelWithRegE, 0, cutoff, args=(zVal, L, alphaArr[cutInd]), points=resonancePoints, limit = (numResonances * 10 + 50))
         #res = scipy.integrate.quad(dosPerpWithRegE, 1e10, cutoff, args=(zVal, L, alphaArr[cutInd]), points=resonancePoints, limit = (numResonances * 4 + 50))
         #res = scipy.integrate.quad(dosTEWithRegE, 1e10, cutoff, args=(zVal, L, alphaArr[cutInd]), points=resonancePoints, limit = (numResonances * 4 + 50))
-        res = scipy.integrate.quad(dosTMWithRegE, 1e10, cutoff, args=(zVal, L, alphaArr[cutInd]), points=resonancePoints, limit = (numResonances * 4 + 50))
+        #res = scipy.integrate.quad(dosTMWithRegE, 1e10, cutoff, args=(zVal, L, alphaArr[cutInd]), points=resonancePoints, limit = (numResonances * 4 + 50))
         #print("Rel Int Err = {}".format(res[1] / res[0]))
         resArr[cutInd] = res[0]
 
@@ -53,22 +56,35 @@ def numericalIntegral(zVal, omegaMax, L):
     #plotDosFP.plotFieldIntegrals(cutoffArr, resArr * fieldFac)
     return (cutoffArr, resArr * fieldFac)
 
-def numericalIntegralFixedCutoff(cutoff, dArr):
+def numericalIntegralEField(cutoff, dArr):
     wMax = 4. * cutoff
     integratedDos = np.zeros(len(dArr))
     for dInd, dVal in enumerate(dArr):
         print("d = {}m".format(dVal))
         numResonances = math.floor(wMax * dVal / np.pi / consts.c)
         resonancePoints = (np.arange(numResonances) + 1.) * np.pi * consts.c / dVal
-        #res = scipy.integrate.quad(dosParallelWithRegE, 0, wMax, args=(dVal / 2., dVal, 1. / cutoff), points=resonancePoints, limit = (numResonances * 4 + 50))
-        res = scipy.integrate.quad(dosEffectiveMassReg, 0, wMax, args=(dVal / 2., dVal, 1. / cutoff), points=resonancePoints, limit = (numResonances * 4 + 50))
-        #print("Int res = {}".format(res))
+        res = scipy.integrate.quad(dosParallelWithRegE, 0, wMax, args=(dVal / 2., dVal, 1. / cutoff), points=resonancePoints, limit = (numResonances * 4 + 50))
+        #res = scipy.integrate.quad(dosEffectiveMassReg, 0, wMax, args=(dVal / 2., dVal, 1. / cutoff), points=resonancePoints, limit = (numResonances * 4 + 50))
         integratedDos[dInd] = res[0]
 
     fieldFac = consts.hbar / (2. * consts.epsilon_0 * np.pi ** 2 * consts.c ** 3) * 1e36
     #massFac = 8. / (3. * np.pi) * consts.hbar / (consts.m_e * consts.c ** 2)
-    #plotDosFP.plotFieldIntegrals(cutoffArr, resArr * fieldFac)
-    return integratedDos
+    return fieldFac * integratedDos
+
+def numericalIntegralAField(cutoff, dArr):
+    wMax = 4. * cutoff
+    integratedDos = np.zeros(len(dArr))
+    for dInd, dVal in enumerate(dArr):
+        print("d = {}m".format(dVal))
+        numResonances = math.floor(wMax * dVal / np.pi / consts.c)
+        resonancePoints = (np.arange(numResonances) + 1.) * np.pi * consts.c / dVal
+        res = scipy.integrate.quad(dosParallelWithRegA, 0, wMax, args=(dVal / 2., dVal, 1. / cutoff), points=resonancePoints, limit = (numResonances * 4 + 50))
+        #res = scipy.integrate.quad(dosEffectiveMassReg, 0, wMax, args=(dVal / 2., dVal, 1. / cutoff), points=resonancePoints, limit = (numResonances * 4 + 50))
+        integratedDos[dInd] = res[0]
+
+    fieldFac = consts.hbar / (2. * consts.epsilon_0 * np.pi ** 2 * consts.c ** 3) * 1e36
+    #massFac = 8. / (3. * np.pi) * consts.hbar / (consts.m_e * consts.c ** 2)
+    return fieldFac * integratedDos
 
 def numericalIntegralHopping(cutoff, dArr):
     wMax = 4. * cutoff

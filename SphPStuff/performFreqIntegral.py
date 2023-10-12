@@ -19,8 +19,8 @@ import produceFreqData as prod
 
 def freqIntegral(zArr, wLO, wTO, epsInf, L):
 
-    #cutoff = 241.8 * 1e12# 1eV cutoff
-    cutoff = 200 * 1e12# 1eV cutoff
+    cutoff = 3. * 241.8 * 1e12# 1eV cutoff
+    #cutoff = 500 * 1e12# 1eV cutoff
     computeEffectiveMass(zArr, cutoff, wLO, wTO, epsInf, L)
     computeFluctuations(zArr, cutoff, wLO, wTO, epsInf, L)
 
@@ -101,8 +101,8 @@ def computeFluctuations(zArr, cutoff, wLO, wTO, epsInf, L):
     flucATM = np.zeros(zArr.shape)
 
     for zInd, zVal in enumerate(zArr):
-        prefacE = consts.hbar * wArr**3 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)
         cutoffFac = np.exp(- wArr**2 / cutoff**2)
+        prefacE = consts.hbar * wArr**3 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)
         flucETEInt = prefacE * (dosTETotal[ : , zInd] - .5) * cutoffFac
         flucETE[zInd] = np.trapz(flucETEInt, x=wArr, axis = 0)
         flucETMInt = prefacE * (dosTMTotal[ : , zInd] - 1. / 6.) * cutoffFac
@@ -124,8 +124,10 @@ def computeFluctuations(zArr, cutoff, wLO, wTO, epsInf, L):
     flucA = flucATE + flucATM + flucASurf
     flucANoSurf = flucATE + flucATM
 
-    plotFreq.plotFluctuationsE(flucENoSurf, flucE, zArr, L, wLO, wTO, epsInf)
-    plotFreq.plotFluctuationsA(flucANoSurf, flucA, zArr, L, wLO, wTO, epsInf)
+    #plotFreq.plotFluctuationsE(flucENoSurf, flucE, zArr, L, wLO, wTO, epsInf)
+    #plotFreq.plotFluctuationsA(flucANoSurf, flucA, zArr, L, wLO, wTO, epsInf)
+    plotFreq.plotFluctuationsEandA(flucENoSurf, flucE, flucANoSurf, flucA, zArr, L, wLO, wTO, epsInf)
+    #plotFreq.plotFluctuationsA(flucATE, flucATM, zArr, L, wLO, wTO, epsInf)
 
 
 def computeEffectiveHopping(zArr, cutoff, wLO, wTO, epsInf, L):

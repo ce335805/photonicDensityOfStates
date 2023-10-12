@@ -175,13 +175,22 @@ def plotFluctuationsE(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf):
 
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
-    ax.plot(zArr, np.abs(dosTot) * 1e-12, color=cmapBone(.6), linestyle='', marker='x', markersize=2., label = r"$\langle E^2 \rangle_{\mathrm{tot}} - \langle E^2 \rangle_{\mathrm{vac}}$")
-    ax.plot(zArr, np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle E^2 \rangle_{\mathrm{no \, surf.}} - \langle E^2 \rangle_{\mathrm{vac}} \right)$")
+#    ax.plot(zArr, np.abs(dosTot) * 1e-12, color=cmapBone(.6), linestyle='', marker='x', markersize=2., label = r"$\langle E^2 \rangle_{\mathrm{tot}} - \langle E^2 \rangle_{\mathrm{vac}}$")
+#    ax.plot(zArr, np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle E^2 \rangle_{\mathrm{no \, surf.}} - \langle E^2 \rangle_{\mathrm{vac}} \right)$")
+
+    #ax.plot(zArr, dosTot * 1e-12, color=cmapBone(.6), linestyle='', marker='x', markersize=2.,
+    #        label=r"$\langle E^2 \rangle_{\mathrm{tot}} - \langle E^2 \rangle_{\mathrm{vac}}$")
+    ax.plot(zArr, dosNoSurf * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2.,
+            label=r"$- \left(\langle E^2 \rangle_{\mathrm{no \, surf.}} - \langle E^2 \rangle_{\mathrm{vac}} \right)$")
+
+    #ax.plot(zArr, np.abs(dosTot[-1]) * 1e-12 * zArr[-1]**3 / zArr**3, color = 'red', lw = 0.5)
+    #ax.plot(zArr, np.abs(dosNoSurf[18]) * 1e-12 * zArr[18]**2 / zArr**2, color = 'red', lw = 0.5)
+
     ax.set_xscale("log")
     ax.set_yscale("log")
-    #ax.set_xlim(np.amin(zArr), np.amax(zArr))
+    ax.set_xlim(np.amin(zArr), np.amax(zArr))
     #ax.set_xlim(np.amin(omegaArr), 30)
-    #ax.set_ylim(1e-14, 1e-12)
+    #ax.set_ylim(1e-12, 1e3)
 
     ax.set_xlabel(r"$z[\mathrm{m}]$")
     ax.set_ylabel(r"$ \langle E^2(r) \rangle \, \left[\frac{\mathrm{MV}^2}{\mathrm{m}^2}\right] $")
@@ -214,14 +223,19 @@ def plotFluctuationsA(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf):
 
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
-    ax.plot(zArr, np.abs(dosTot) * 1e-12, color=cmapBone(.6), linestyle='', marker='x', markersize=2., label = r"$\langle A^2 \rangle_{\mathrm{tot}} - \langle A^2 \rangle_{\mathrm{vac}}$")
-    ax.plot(zArr, np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle A^2 \rangle_{\mathrm{no \, surf.}} - \langle A^2 \rangle_{\mathrm{vac}} \right)$")
+#    ax.plot(zArr, np.abs(dosTot) * 1e-12, color=cmapBone(.6), linestyle='', marker='x', markersize=2., label = r"$\langle A^2 \rangle_{\mathrm{tot}} - \langle A^2 \rangle_{\mathrm{vac}}$")
+#    ax.plot(zArr, np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle A^2 \rangle_{\mathrm{no \, surf.}} - \langle A^2 \rangle_{\mathrm{vac}} \right)$")
+    ax.plot(zArr, dosTot * 1e-12, color=cmapBone(.6), linestyle='', marker='x', markersize=2.,
+            label=r"$\langle A^2 \rangle_{\mathrm{tot}} - \langle A^2 \rangle_{\mathrm{vac}}$")
+    ax.plot(zArr, dosNoSurf * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2.,
+            label=r"$- \left(\langle A^2 \rangle_{\mathrm{no \, surf.}} - \langle A^2 \rangle_{\mathrm{vac}} \right)$")
+
     #ax.plot(np.log(zArr), np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle E^2 \rangle_{\mathrm{no \, surf.}} - \langle E^2 \rangle_{\mathrm{vac}} \right)$")
     ax.set_xscale("log")
     ax.set_yscale("log")
-    #ax.set_xlim(np.amin(zArr), np.amax(zArr))
+    ax.set_xlim(np.amin(zArr), np.amax(zArr))
     #ax.set_xlim(np.amin(omegaArr), 30)
-    #ax.set_ylim(1e-14, 1e-12)
+    #ax.set_ylim(1e-15, 1e0)
 
     #ydat = np.abs(dosNoSurf) * 1e-12
     #fitInd = 22
@@ -244,6 +258,90 @@ def plotFluctuationsA(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf):
         #axRight.spines[axis].set_linewidth(.5)
 
     plt.savefig("./SPhPPlotsSaved/FluctuationsAFieldSPhP.png")
+
+
+
+def plotFluctuationsEandA(dosNoSurfE, dosTotE, dosNoSurfA, dosTotA, zArr, L, wLO, wTO, epsInf):
+
+    fig = plt.figure(figsize=(3.5, 2.), dpi=800)
+    gs = gridspec.GridSpec(2, 1, height_ratios=[1, 1],
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.18, left=0.2, right=0.95)
+    axE = plt.subplot(gs[0, 0])
+    axA = plt.subplot(gs[1, 0])
+    #axRight = ax.twinx()
+
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+    axE.plot(zArr, np.abs(dosTotE) * 1e-12, color=cmapBone(.5), linestyle='', marker='x', markersize=2., label = r"$\langle A^2 \rangle_{\mathrm{tot}} - \langle A^2 \rangle_{\mathrm{vac}}$")
+    axE.plot(zArr, np.abs(dosNoSurfE) * 1e-12, color=cmapPink(.5), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle A^2 \rangle_{\mathrm{no \, surf.}} - \langle A^2 \rangle_{\mathrm{vac}} \right)$")
+
+#    axA.plot(zArr, np.abs(dosTotA) * 1e-12, color=cmapBone(.6), linestyle='', marker='x', markersize=2., label = r"$\langle A^2 \rangle_{\mathrm{tot}} - \langle A^2 \rangle_{\mathrm{vac}}$")
+#    axA.plot(zArr, np.abs(dosNoSurfA) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle A^2 \rangle_{\mathrm{no \, surf.}} - \langle A^2 \rangle_{\mathrm{vac}} \right)$")
+    axA.plot(zArr, dosTotA, color=cmapBone(.5), linestyle='', marker='x', markersize=2., label = r"$\mathrm{Total}$")
+    axA.plot(zArr, dosNoSurfA, color=cmapPink(.5), linestyle='', marker='x', markersize=2., label = r"$\mathrm{No} \, \mathrm{SPhP}$")
+
+    #ax.plot(np.log(zArr), np.abs(dosNoSurf) * 1e-12, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$- \left(\langle E^2 \rangle_{\mathrm{no \, surf.}} - \langle E^2 \rangle_{\mathrm{vac}} \right)$")
+    axE.set_xscale("log")
+    axE.set_yscale("log")
+    axA.set_xscale("log")
+    #axA.set_yscale("log")
+    axE.set_xlim(1e-8, 1e-4)
+    axE.set_ylim(1e-12, 1e0)
+    axA.set_xlim(1e-8, 1e-4)
+    axA.set_ylim(- 11, 12)
+    #axA.set_ylim(1e-14, 1e-4)
+
+    axE.plot(zArr[20:], np.abs(dosTotE[-1]) * 1e-12 * zArr[-1]**3 / zArr[20:]**3, color = 'red', lw = 0.3)
+    axE.plot(zArr, np.abs(dosNoSurfE[17]) * 1e-12 * zArr[17]**2 / zArr**2, color = 'red', lw = 0.3)
+
+    axA.plot(zArr[:], np.abs(dosTotA[18]) * zArr[18]**3 / zArr[:]**3, color = 'red', lw = 0.3)
+
+    #axE.axvline(consts.c / (3. * 241.8 * 1e12), color = "gray", lw = .5)
+    #axA.axvline(consts.c / (3. * 241.8 * 1e12), color = "gray", lw = .5)
+
+    ydat = np.abs(dosNoSurfA)
+    fitInd = 29
+    logZArr = np.log(zArr)
+    slope = (ydat[fitInd] - ydat[fitInd - 1]) / (logZArr[fitInd] - logZArr[fitInd - 1])
+    offset = ydat[fitInd] - slope * logZArr[fitInd]
+    #axA.plot(np.exp(logZArr), - slope * logZArr + 0. * offset, color = 'red', lw = 0.5)
+    axA.plot(zArr, -(slope * logZArr + offset), color = 'red', lw = 0.3)
+
+    #axA.plot(zArr[:], np.abs(dosTotA[18]) * (np.log(zArr[18]) - np.log(zArr[:])), color = 'red', lw = 0.3)
+
+
+    axA.set_xlabel(r"$z[\mathrm{m}]$", fontsize = 8)
+    axE.set_ylabel(r"$ \langle E^2 \rangle_{\rm eff}  \left[\frac{\mathrm{MV}^2}{\mathrm{m}^2}\right] $", fontsize = 8, labelpad = 1)
+    axA.set_ylabel(r"$ \langle A^2 \rangle_{\rm eff}  \left[\frac{\mathrm{V}^2}{\mathrm{THz}^2 \, \mathrm{m}^2}\right] $", fontsize = 8, labelpad = 6)
+    #axRight.set_ylabel(r"$ \langle E^2(r) \rangle \, \left[\frac{\mathrm{V}^2}{\mathrm{m}^2}\right] $")
+
+    axE.set_xticks([])
+    axE.set_yticks([1e-10, 1e-5, 1.])
+    axE.set_yticklabels(["$10^{-10}$", "$10^{-5}$", "$1$"], fontsize = 8)
+
+    axA.set_yticks([-10, 0, 10])
+    axA.set_yticklabels(["$-10$", "$0$", "$10$"], fontsize = 8)
+
+
+    axE.text(1.5 * 1e-5, 1e-9, r"$\sim z^{-2}$", fontsize = 7, color = "red")
+    axE.text(1.5 * 1e-6, 1e-6, r"$\sim z^{-3}$", fontsize = 7, color = "red")
+
+    axA.text(1. * 1e-5, 8, r"$\sim z^{-3}$", fontsize = 7, color = "red")
+    axA.text(5. * 1e-7, -7, r"$\sim \log(z) + \mathrm{const}$", fontsize = 7, color = "red")
+
+
+    legend = axA.legend(fontsize=8, loc='upper left', bbox_to_anchor=(.0, 1.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        axE.spines[axis].set_linewidth(.5)
+        axA.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./SPhPPlotsSaved/FluctuationsEandASPhP.png")
+
 
 
 def plotFluctuationsWithFit(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename):

@@ -9,13 +9,12 @@ def modeFuncSqTEPara(kzArr, zVal, d):
 
 def modeFuncSqTMPara(kzArr, qArr, zVal, d):
     func = np.sin(kzArr * zVal)**2
-    norm = 2. / d / (( 1 + 0. * qArr[None, :]**2 / kzArr[:, None]**2) + ( 0. * qArr[None, :]**2 / kzArr[:, None]**2 - 1) * np.sin(2. * kzArr[:, None] * d) / (2. * kzArr[:, None] * d))
+    norm = 2. / d / (( 1 + qArr[None, :]**2 / kzArr[:, None]**2) + ( qArr[None, :]**2 / kzArr[:, None]**2 - 1) * np.sin(2. * kzArr[:, None] * d) / (2. * kzArr[:, None] * d))
 
     return func[:, None] * norm[:, :]
 
-
 def getKzArr(d):
-    nmax = math.ceil(2. * 240 * 1e12 / consts.c * d / np.pi)
+    nmax = math.ceil(10. * 240 * 1e12 / consts.c * d / np.pi)
     nArr = np.arange(1, nmax)
     return nArr * np.pi / d
 
@@ -25,13 +24,16 @@ def computeAlpha2FTransLong(d, zVal, qArr, OmArr):
     print("Number of kz values at d = {}m: {}".format(d, len(kzArr)))
     omegaArr = consts.c * np.sqrt(kzArr[:, None]**2 + qArr[None, :]**2)
 
-    cutoffArr = (omegaArr > 2. * 240 * 1e12).astype(float)
+    cutoffArr = (omegaArr > 5. * 240 * 1e12).astype(float)
 
     modeTE = modeFuncSqTEPara(kzArr, zVal, d)
     modeTM = modeFuncSqTMPara(kzArr, qArr, zVal, d)
 
-    alpha2FTrans = np.sum(modeTE[:, None, None] / (OmArr[None, None, :]**2 + omegaArr[:, :, None]**2) * cutoffArr[:, :, None], axis = 0)
-    alpha2FLong = np.sum(modeTM[:, :, None] / (OmArr[None, None, :] ** 2 + omegaArr[:, :, None] ** 2) * cutoffArr[:, :, None], axis = 0)
+    alpha2FTrans = np.sum(modeTE[:, None, None] / (OmArr[None, None, :]**2 + omegaArr[:, :, None]**2), axis = 0)
+    alpha2FLong = np.sum(modeTM[:, :, None] / (OmArr[None, None, :] ** 2 + omegaArr[:, :, None] ** 2), axis = 0)
+
+    #alpha2FTrans = np.sum(1. / (OmArr[None, None, :] ** 2 + omegaArr[:, :, None] ** 2) / d, axis = 0)
+    #alpha2FLong = np.sum(1. / (OmArr[None, None, :] ** 2 + omegaArr[:, :, None] ** 2) / d, axis = 0)
 
     prefac = 2. * np.pi * consts.fine_structure * consts.hbar**3 * consts.c / consts.m_e ** 2 / consts.e
 

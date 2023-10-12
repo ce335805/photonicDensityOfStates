@@ -134,15 +134,20 @@ def plotDosCompare(omArr, dosFP1, dosFP2, L1, L2):
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
 
-    ax.plot(omArr, dosFP1, color=cmapPink(.5), lw=1., label = "$d = $" + "{}".format(int(L1 * 1e6)) + r"$\mu \mathrm{m}$")
-    ax.plot(omArr, dosFP2, color=cmapBone(.5), lw=1., label = "$d = $" + "{}".format(int(L2 * 1e6)) + r"$\mu \mathrm{m}$")
+    ax.plot(omArr, dosFP1, color=cmapPink(.5), lw=.7, label = "$d = $" + "{}".format(int(L1 * 1e6)) + r"$\mu \mathrm{m}$")
+    ax.plot(omArr, dosFP2, color=cmapBone(.5), lw=.7, label = "$d = $" + "{}".format(int(L2 * 1e6)) + r"$\mu \mathrm{m}$")
     #ax.plot(omArr, (dosFP1 - 0.5) * omArr**0, color=cmapPink(.5), lw=1., label = "$d = $" + "{}".format(int(L1 * 1e6)) + r"$\mu \mathrm{m}$")
     #ax.plot(omArr, (dosFP2 - 0.5) * omArr**0, color=cmapBone(.5), lw=1., label = "$d = $" + "{}".format(int(L2 * 1e6)) + r"$\mu \mathrm{m}$")
     ax.set_xlim(np.amin(omArr), np.amax(omArr))
-    ax.axhline(.5, color = 'black', lw = .5, zorder = -666)
+    ax.axhline(2. / 3., color = 'black', lw = .5, zorder = -666)
     #ax.set_xscale("log")
 
-    ax.set_ylim(0, 1.1)
+    ax.set_ylim(0, 2.2)
+
+    ax.set_xticks([0., 100, 200])
+    ax.set_xticklabels(["$0$", "$100$", "$200$"], fontsize = 8)
+    ax.set_yticks([0., 1., 2.])
+    ax.set_yticklabels(["$0$", "$1$", "$2$"], fontsize = 8)
 
     ax.set_xlabel(r"$\omega \, \left[\mathrm{THz}\right]$")
     #ax.set_ylabel(r"$\left(\rho / \rho_0 - 0.5\right) \times \omega^3$")
@@ -156,7 +161,7 @@ def plotDosCompare(omArr, dosFP1, dosFP2, L1, L2):
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
 
-    plt.savefig("FPPlotsSaved/dosFPCompareTE.png")
+    plt.savefig("FPPlotsSaved/dosFPComparePara.png")
 
 
 def plotDosWithCutoff(omArr, dos):
@@ -288,27 +293,118 @@ def plotEffectiveMass(dArr, delMOverM, freqArr):
     plt.savefig("FPPlotsSaved/effectiveMass.png")
 
 
-def plotHoppingWithFixedCutoff(dArr, dosArr, freqArr):
+def plotFluctuationsEAsOfD(dArr, dosArr, freqArr, cutoff):
 
-    fig = plt.figure(figsize=(3.4, 2.), dpi=800)
+    fig = plt.figure(figsize=(1.7, 1.4), dpi=800)
     gs = gridspec.GridSpec(1, 1,
-                           wspace=0.35, hspace=0., top=0.9, bottom=0.22, left=0.18, right=0.85)
+                           wspace=0.35, hspace=0., top=0.8, bottom=0.22, left=0.15, right=0.85)
     ax = plt.subplot(gs[0, 0])
     axRight = ax.twinx()
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
-    ax.plot(dArr, - dosArr, color=cmapBone(.6), linestyle = '', marker = 'x', markersize = 2.)
+    ax.plot(dArr, dosArr * 1e-6, color=cmapBone(.6), linestyle = '', marker = 'x', markersize = 2.)
     axRight.plot(dArr, freqArr * 1e-12, color='red', linestyle = '-', lw = 0.5)
-    axRight.axhline(241.8, color = 'black', lw = 0.4)
-    #ax.set_ylim(- 0.01 * 1e-18, 0.)
-    ax.set_xlim(np.amin(dArr), np.amax(dArr))
+    axRight.axhline(cutoff * 1e-12, color = 'black', lw = 0.4)
+    ax.set_ylim(0., 6)
+    ax.set_xlim(1e-6, 1e-4)
+    #ax.set_xlim(np.amin(dArr), np.amax(dArr))
     ax.set_xscale('log')
 
-    ax.set_xlabel(r"$d \; \left[ \mathrm{m} \right]$")
-    ax.set_ylabel(r"$\frac{\Delta t}{t_0}$")
-    axRight.set_ylabel(r"$\omega \left[ \mathrm{THz} \right] $")
+    ax.set_xlabel(r"$d \; \left[ \mathrm{m} \right]$", fontsize = 6)
+    ax.yaxis.set_label_coords(0.05, 1.02)
+    ax.set_ylabel(r"$\langle E^2 \rangle_{\rm eff} \left[ \frac{\mathrm{MV}^2}{\mathrm{m}^2} \right]$", fontsize = 6, rotation=0, labelpad = 15)
+    axRight.yaxis.set_label_coords(1.05, 1.13)
+    axRight.set_ylabel(r"$\omega \left[ \mathrm{THz} \right] $", fontsize = 6, rotation=0, labelpad = 0)
 
-    axRight.text(1e-4, 260, r"$\mathrm{cutoff} = 1 \mathrm{eV}$")
+    axRight.text(1e-5, cutoff * 1e-12 + 20, r"$\mathrm{cutoff} = 1 \mathrm{eV}$", fontsize = 6)
+    #ax.text(1e-1, 7.5, r"$\omega_0 = 9.41 \mathrm{THz}$")
+
+    ax.set_yticks([0, 3, 6])
+    ax.set_yticklabels(["$0$", "$3$", "$6$"], fontsize = 6)
+
+    axRight.set_yticks([0, 300, 600])
+    axRight.set_yticklabels(["$0$", "$300$", "$600$"], fontsize = 6)
+
+    ax.set_xticks([1e-6, 1e-5, 1e-4])
+    ax.set_xticklabels(["$10^{-6}$", "$10^{-5}$", "$10^{-4}$"], fontsize = 6)
+
+    arrowprops = {
+        'arrowstyle': '<-',  # Arrow style
+        'mutation_scale': 8,  # Custom head size
+        'color': 'red',  # Custom arrow color
+        'linewidth': .7
+    }
+    ax.annotate("", xy=(3. * 1e-5, .5), xytext=(1e-4, 1.5), arrowprops=arrowprops)
+    arrowprops = {
+        'arrowstyle': '<-',  # Arrow style
+        'mutation_scale': 8,  # Custom head size
+        'color': cmapBone(.6),  # Custom arrow color
+        'linewidth': .7
+    }
+    ax.annotate("", xy=(3. * 1e-6, .5), xytext=(1e-6, 1.5), arrowprops=arrowprops)
+    #legend = ax.legend(fontsize=fontsize - 2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black',
+    #                   ncol=1)
+    #legend.get_frame().set_alpha(0.)
+    #legend.get_frame().set_boxstyle('Square', pad=0.1)
+    #legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+        axRight.spines[axis].set_linewidth(.5)
+
+    plt.savefig("FPPlotsSaved/FluctuationsE.png")
+
+
+def plotFluctuationsAAsOfD(dArr, dosArr, freqArr, cutoff):
+
+    fig = plt.figure(figsize=(1.7, 1.4), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.8, bottom=0.22, left=0.2, right=0.85)
+    ax = plt.subplot(gs[0, 0])
+    axRight = ax.twinx()
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+    ax.plot(dArr, dosArr, color=cmapBone(.6), linestyle = '', marker = 'x', markersize = 2.)
+    axRight.plot(dArr, freqArr * 1e-12, color='red', linestyle = '-', lw = 0.5)
+    axRight.axhline(cutoff * 1e-12, color = 'black', lw = 0.4)
+    #ax.set_ylim(0., 1e4)
+    ax.set_xlim(1e-6, 1e-4)
+    axRight.set_xlim(1e-6, 1e-4)
+    #ax.set_xlim(np.amin(dArr), np.amax(dArr))
+    ax.set_xscale('log')
+
+    ax.set_xlabel(r"$d \; \left[ \mathrm{m} \right]$", fontsize = 6)
+    ax.yaxis.set_label_coords(0.02, 1.02)
+    ax.set_ylabel(r"$\langle A^2 \rangle_{\rm eff} \left[ \frac{\mathrm{kV}^2}{\mathrm{THz}^2 \, \mathrm{m}^2} \right]$", fontsize = 6, rotation=0, labelpad = 15)
+    axRight.yaxis.set_label_coords(1.1, 1.13)
+    axRight.set_ylabel(r"$\omega \left[ \mathrm{THz} \right] $", fontsize = 6, rotation=0, labelpad = 0)
+
+    axRight.text(1e-5, cutoff * 1e-12 + 20, r"$\mathrm{cutoff} = 1 \mathrm{eV}$", fontsize = 6)
+
+    ax.set_yticks([0, -200, -400])
+    ax.set_yticklabels(["$0$", "$-200$", "$- 400$"], fontsize = 6)
+
+    axRight.set_yticks([0, 300, 600])
+    axRight.set_yticklabels(["$0$", "$300$", "$600$"], fontsize = 6)
+
+    ax.set_xticks([1e-6, 1e-5, 1e-4])
+    ax.set_xticklabels(["$10^{-6}$", "$10^{-5}$", "$10^{-4}$"], fontsize = 6)
+
+    arrowprops = {
+        'arrowstyle': '<-',  # Arrow style
+        'mutation_scale': 8,  # Custom head size
+        'color': 'red',  # Custom arrow color
+        'linewidth': .7
+    }
+    ax.annotate("", xy=(3. * 1e-5, -400), xytext=(1e-4, -350), arrowprops=arrowprops)
+    arrowprops = {
+        'arrowstyle': '<-',  # Arrow style
+        'mutation_scale': 8,  # Custom head size
+        'color': cmapBone(.6),  # Custom arrow color
+        'linewidth': .7
+    }
+    ax.annotate("", xy=(2. * 1e-6, -300), xytext=(1e-6, -200), arrowprops=arrowprops)
+
     #ax.text(1e-1, 7.5, r"$\omega_0 = 9.41 \mathrm{THz}$")
 
     #legend = ax.legend(fontsize=fontsize - 2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black',
@@ -321,5 +417,82 @@ def plotHoppingWithFixedCutoff(dArr, dosArr, freqArr):
         ax.spines[axis].set_linewidth(.5)
         axRight.spines[axis].set_linewidth(.5)
 
-    plt.savefig("FPPlotsSaved/HoppingOfD.png")
+    plt.savefig("FPPlotsSaved/FluctuationsA.png")
 
+
+
+def plotFluctuationsAandE(dArr, flucE, flucA, freqArr, cutoff):
+
+    fig = plt.figure(figsize=(3.5, 2.), dpi=800)
+    gs = gridspec.GridSpec(2, 1, height_ratios=[2, 1],
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.18, left=0.2, right=0.85)
+    axE = plt.subplot(gs[0, 0])
+    axA = plt.subplot(gs[1, 0])
+    axRightE = axE.twinx()
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+    axE.plot(dArr, flucE * 1e-6, color=cmapBone(.55), linestyle = '', marker = 'x', markersize = 2.)
+    axA.plot(dArr, flucA, color=cmapPink(.55), linestyle = '', marker = 'x', markersize = 2.)
+    axRightE.plot(dArr, freqArr * 1e-12, color='red', linestyle = '-', lw = 0.5)
+    axRightE.axhline(cutoff * 1e-12, color = 'black', lw = 0.4)
+    axE.set_ylim(-4., 85)
+    axA.set_ylim(-1800, 200)
+    #axRightE.set_xlim(1e-6, 1e-4)
+    axE.set_xlim(np.amin(dArr), np.amax(dArr))
+    axA.set_xlim(np.amin(dArr), np.amax(dArr))
+    axE.set_xscale('log')
+    axA.set_xscale('log')
+
+    axA.set_xlabel(r"$d \; \left[ \mathrm{m} \right]$", fontsize = 8)
+    axE.set_ylabel(r"$\langle E^2 \rangle_{\rm eff} \left[ \frac{\mathrm{kV}^2}{\mathrm{m}^2} \right]$", fontsize = 8, labelpad = 16)
+    axA.set_ylabel(r"$\langle A^2 \rangle_{\rm eff} \left[ \frac{\mathrm{V}^2}{\mathrm{THz}^2 \, \mathrm{m}^2} \right]$", fontsize = 8, labelpad = 0)
+    axRightE.set_ylabel(r"$\omega \left[ \mathrm{THz} \right] $", fontsize = 8, labelpad = 4)
+
+    axRightE.text(1e-5, cutoff * 1e-12 + 20, r"$\mathrm{cutoff} = 2 \mathrm{eV}$", fontsize = 8)
+
+
+    axA.set_yticks([0, 3, 6])
+    axA.set_yticklabels(["$0$", "$3$", "$6$"], fontsize = 8)
+
+    axA.set_yticks([0, -1000])
+    axA.set_yticklabels(["$0$", "$-1000$"], fontsize = 8)
+
+    axRightE.set_yticks([0, 300, 600])
+    axRightE.set_yticklabels(["$0$", "$300$", "$600$"], fontsize = 8)
+
+    axA.set_xticks([1e-6, 1e-5, 1e-4, 1e-3])
+    axA.set_xticklabels(["$10^{-6}$", "$10^{-5}$", "$10^{-4}$", "$10^{-3}$"], fontsize = 8)
+
+
+    axE.set_xticks([])
+
+
+    arrowprops = {
+        'arrowstyle': '<-',  # Arrow style
+        'mutation_scale': 8,  # Custom head size
+        'color': 'red',  # Custom arrow color
+        'linewidth': .7
+    }
+    axE.annotate("", xy=(3. * 1e-5, -400), xytext=(1e-4, -350), arrowprops=arrowprops)
+    arrowprops = {
+        'arrowstyle': '<-',  # Arrow style
+        'mutation_scale': 8,  # Custom head size
+        'color': cmapBone(.6),  # Custom arrow color
+        'linewidth': .7
+    }
+    axE.annotate("", xy=(2. * 1e-6, -300), xytext=(1e-6, -200), arrowprops=arrowprops)
+
+    #ax.text(1e-1, 7.5, r"$\omega_0 = 9.41 \mathrm{THz}$")
+
+    #legend = ax.legend(fontsize=fontsize - 2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black',
+    #                   ncol=1)
+    #legend.get_frame().set_alpha(0.)
+    #legend.get_frame().set_boxstyle('Square', pad=0.1)
+    #legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        axE.spines[axis].set_linewidth(.5)
+        axA.spines[axis].set_linewidth(.5)
+        axRightE.spines[axis].set_linewidth(.5)
+
+    plt.savefig("FPPlotsSaved/FluctuationsEandA.png")
