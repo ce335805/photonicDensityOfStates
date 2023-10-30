@@ -14,7 +14,7 @@ def modeFuncSqTMPara(kzArr, qArr, zVal, d):
     return func[:, None] * norm[:, :]
 
 def getKzArr(d):
-    nmax = math.ceil(10. * 240 * 1e12 / consts.c * d / np.pi)
+    nmax = math.ceil(100. * 240 * 1e12 / consts.c * d / np.pi)
     nArr = np.arange(1, nmax)
     return nArr * np.pi / d
 

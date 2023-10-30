@@ -35,34 +35,39 @@ def dosFPMain():
     #plotDosFP.plotDosCompare(omArr, dosFP1, dosFP2, L1, L2)
 
 
-    #compute field plots
+    ##compute field plots
     evCutoff = 241.8 * 1e12
-    cutoff = 2. * evCutoff
-    dArr = np.logspace(-6, -3, 100, endpoint=True)
-    #fluctuationsE = integratedDos.numericalIntegralEField(cutoff, dArr)
+    cutoff = 10. * evCutoff
+    dArr = np.logspace(-6, -3, 80, endpoint=True)
+    fluctuationsE = integratedDos.numericalIntegralEField(cutoff, dArr)
     filename = "fluctuationsE"
-    #handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsE, filename)
+    handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsE, filename)
     cutoff, dArr, fluctuationsE = handleIntegralData.retrieveDataFixedCutoff(filename)
-    #fluctuationsA = integratedDos.numericalIntegralAField(cutoff, dArr)
+    fluctuationsA = integratedDos.numericalIntegralAField(cutoff, dArr)
     filename = "fluctuationsA"
-    #handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsA, filename)
+    handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsA, filename)
     cutoff, dArr, fluctuationsA = handleIntegralData.retrieveDataFixedCutoff(filename)
     baseFreqArr = np.pi * consts.c / dArr
+    #plotDosFP.plotFluctuationsAandE(dArr, fluctuationsE, fluctuationsA, baseFreqArr, cutoff)
+    plotDosFP.plotFluctuationsAandENaturalUnits(dArr, fluctuationsE, fluctuationsA, baseFreqArr, cutoff)
+    exit()
 
-    #plotDosFP.plotFluctuationsEAsOfD(dArr, fluctuationsE, baseFreqArr, cutoff)
-    #plotDosFP.plotFluctuationsAAsOfD(dArr, fluctuationsA, baseFreqArr, cutoff)
-    plotDosFP.plotFluctuationsAandE(dArr, fluctuationsE, fluctuationsA, baseFreqArr, cutoff)
 
-    #exit()
+    #compute effective mass of free electrons and write it to a file
 
-    #dArr = np.logspace(-3, -6, 100)
-    #cutoff = 241.8 * 1e12
-    #filename = "hoppingFixedCutoff"
-    ##hopArr = integratedDos.numericalIntegralHopping(cutoff, dArr, )
-    ##handleIntegralData.writeDataFixedCutoff(cutoff, dArr, hopArr, filename)
-    #cutoff, dArr, hopArr = handleIntegralData.retrieveDataFixedCutoff(filename)
-    #freqArr = np.pi * consts.c / dArr
-    #plotDosFP.plotFluctuationsEAsOfD(dArr, hopArr, freqArr)
+    #dArr = np.logspace(-6, -3, 20)
+    #cutoff = 3. * 241.8 * 1e12
+    ##massArr = integratedDos.numericalIntegralEffectiveMass(cutoff, dArr)
+    ##filename = "delMassFP"
+    ##handleIntegralData.writeMassData(cutoff, dArr, massArr, filename)
+    #plotDosFP.plotEffectiveMassesComparison()
+
+    dArr = np.logspace(-6, -3, 20)
+    cutoff = 3. * 241.8 * 1e12
+    #filename = "delHoppingFP"
+    #hopArr = integratedDos.numericalIntegralHopping(cutoff, dArr)
+    #handleIntegralData.writeMassData(cutoff, dArr, hopArr, filename)
+    plotDosFP.plotEffectiveHoppingComparison()
 
 
 dosFPMain()

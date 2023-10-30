@@ -84,6 +84,8 @@ def diffIntegrand(L, omArr):
 
     return toInt
 
+
+
 def integrateDosDifference(L, omArr):
     toInt = diffIntegrand(L, omArr)
     return np.trapz(toInt, omArr)

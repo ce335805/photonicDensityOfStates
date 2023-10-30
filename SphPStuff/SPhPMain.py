@@ -34,7 +34,7 @@ def main():
 
     #produceFreqData.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
 
-    combinedDosPlots.plotDosWhole(zArr, wLO, wTO, epsInf, L)
+    #combinedDosPlots.plotDosWhole(zArr, wLO, wTO, epsInf, L)
     performFreqIntegral.freqIntegral(zArr, wLO, wTO, epsInf, L)
 
 if __name__ == "__main__":

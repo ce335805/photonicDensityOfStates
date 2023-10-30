@@ -344,6 +344,52 @@ def plotFluctuationsEandA(dosNoSurfE, dosTotE, dosNoSurfA, dosTotA, zArr, L, wLO
 
 
 
+def plotFluctuationsENaturalUnits(dosNoSurfE, dosTotE, zArr, L, wLO, wTO, epsInf):
+
+    fig = plt.figure(figsize=(7.04 / 3., 1.8), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.28, right=0.95)
+    axE = plt.subplot(gs[0, 0])
+
+    wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
+    lambda0 = consts.c / (2. * np.pi * wInf)
+    natUnitFac = consts.epsilon_0 * lambda0**3 / (consts.hbar * wInf)
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+    axE.plot(zArr / lambda0, np.abs(dosTotE) * natUnitFac, color=cmapBone(.5), linestyle='', marker='x', markersize=2., label = r"$\mathrm{Total}$")
+    axE.plot(zArr / lambda0, np.abs(dosNoSurfE) * natUnitFac, color=cmapPink(.5), linestyle='', marker='x', markersize=2., label = r"$\mathrm{Bulk}$")
+
+    axE.set_xscale("log")
+    axE.set_yscale("log")
+    axE.set_xlim(1e-2, 1e2)
+    axE.set_ylim(1e-6, 1e3)
+
+    axE.plot(zArr / lambda0, np.abs(dosTotE[-1]) * zArr[-1]**3 / zArr**3 * natUnitFac, color = 'red', lw = 0.3)
+    axE.plot(zArr / lambda0, np.abs(dosNoSurfE[20]) * zArr[20]**2 / zArr**2 * natUnitFac, color = 'red', lw = 0.3)
+
+    axE.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
+    axE.set_ylabel(r"$ \langle E^2 \rangle_{\rm eff}  \left[\frac{\hbar \omega_{\mathrm{S}}}{\varepsilon_0 \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
+
+    #axE.set_xticks([])
+    #axE.set_yticks([1e-10, 1e-5, 1.])
+    #axE.set_yticklabels(["$10^{-10}$", "$10^{-5}$", "$1$"], fontsize = 8)
+
+    axE.text(1e-1, 1e1, r"$\sim z^{-3}$", fontsize = 7, color = "red")
+    axE.text(1.5 * 1e-2, 5. * 1e0, r"$\sim z^{-2}$", fontsize = 7, color = "red")
+
+    legend = axE.legend(fontsize=8, loc='upper right', bbox_to_anchor=(1., 1.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        axE.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./SPhPPlotsSaved/FluctuationsENatUnits.png")
+
+
+
 def plotFluctuationsWithFit(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename):
 
     fig = plt.figure(figsize=(3.4, 2.), dpi=800)

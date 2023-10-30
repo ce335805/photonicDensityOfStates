@@ -46,3 +46,38 @@ def writeDataFixedCutoff(cutoff, dArr, dosInt, fileName):
     h5f.create_dataset('distance', data=dArr)
     h5f.create_dataset('dosInt', data=dosInt)
     h5f.close()
+
+
+def retrieveMassData(fileName):
+    dir = "savedData/"
+    fileName = dir + fileName + ".h5"
+    h5f = h5py.File(fileName, 'r')
+    cutoff = h5f['cutoff'][:]
+    dArr = h5f['distance'][:]
+    massArr = h5f['massArr'][:]
+    h5f.close()
+
+    return (cutoff[0], dArr, massArr)
+
+def writeMassData(cutoff, dArr, massArr, fileName):
+    dir = "savedData/"
+    fileName = dir + fileName + ".h5"
+    h5f = h5py.File(fileName, 'w')
+    h5f.create_dataset('cutoff', data=np.array([cutoff]))
+    h5f.create_dataset('distance', data=dArr)
+    h5f.create_dataset('massArr', data=massArr)
+    h5f.close()
+
+def readMassesSPhP(filename):
+
+    dir = "../SphPStuff/savedData/"
+    fileName = dir + filename + ".hdf5"
+
+    h5f = h5py.File(fileName, 'r')
+    cutoff = h5f['cutoff'][:]
+    mArr = h5f['delM'][:]
+    zArr = h5f['zArr'][:]
+    h5f.close()
+    return (cutoff, zArr, mArr)
+
+

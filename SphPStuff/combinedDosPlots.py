@@ -61,11 +61,11 @@ def plotDosWhole(zArr, wLO, wTO, epsInf, L):
         dosSurf[wInd, :] = 1. / (1. + np.abs(epsilon)) * dosAsOfFreq.getDosTMSurf(wVal, zArr, L, wLO, wTO, epsInf)
 
     filename = "Para"
-    createDosPlotFreq(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO)
+    createDosPlotFreq(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
     #createDosPlotFreq(wArr, zArr, dosTETotal, filename, wLO, wTO)
     #createDosPlotFreq(wArr, zArr, dosTMPara, filename, wLO, wTO)
 
-def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO):
+def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO, epsInf):
     wArr = wArr * 1e-12
     fig = plt.figure(figsize=(3., 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
@@ -78,25 +78,30 @@ def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO):
     cutoff = 500
     cutoffFac = np.exp(- wArr ** 2 / cutoff ** 2)
 
-    indArr = np.array([10, 15, 20, 25, 30], dtype = int)
-    ax.plot(wArr, (dos[:, indArr[0]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.1), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[0]]))
-    ax.plot(wArr, (dos[:, indArr[1]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.3), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[1]]))
-    ax.plot(wArr, (dos[:, indArr[2]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.5), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[2]]))
-    ax.plot(wArr, (dos[:, indArr[3]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.6), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[3]]))
-    ax.plot(wArr, (dos[:, indArr[4]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.7), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[4]]))
+    indArr = np.array([1, 8, 16, 24, 32], dtype = int)
+    #ax.plot(wArr, (dos[:, indArr[0]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.1), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[0]]))
+    #ax.plot(wArr, (dos[:, indArr[1]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.3), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[1]]))
+    #ax.plot(wArr, (dos[:, indArr[2]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.5), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[2]]))
+    #ax.plot(wArr, (dos[:, indArr[3]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.6), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[3]]))
+    #ax.plot(wArr, (dos[:, indArr[4]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.7), lw=.7, label = "$z = $" + "{:1.2g}".format(zArr[indArr[4]]))
 
-    #ax.plot(wArr, dos[:, indArr[0]], color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.2g}".format(zArr[indArr[0]]))
-    #ax.plot(wArr, dos[:, indArr[1]], color=cmapPink(0.3), lw=.7, label="$z = $" + "{:1.2g}".format(zArr[indArr[1]]))
-    #ax.plot(wArr, dos[:, indArr[2]], color=cmapPink(0.5), lw=.7, label="$z = $" + "{:1.2g}".format(zArr[indArr[2]]))
-    #ax.plot(wArr, dos[:, indArr[3]], color=cmapPink(0.6), lw=.7, label="$z = $" + "{:1.2g}".format(zArr[indArr[3]]))
-    #ax.plot(wArr, dos[:, indArr[4]], color=cmapPink(0.7), lw=.7, label="$z = $" + "{:1.2g}".format(zArr[indArr[4]]))
+    wInf = np.sqrt(epsInf * wLO ** 2 + wTO ** 2) / np.sqrt(epsInf + 1)
+
+#    ax.plot(wArr, dos[:, indArr[0]], color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[0]] * wInf / consts.c))
+#    ax.plot(wArr, dos[:, indArr[1]], color=cmapPink(0.3), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[1]] * wInf / consts.c))
+    ax.plot(wArr, dos[:, indArr[0]], color=cmapPink(0.1), lw=.7,
+            label="$z = 80$" + r"$\lambda_0$")
+    ax.plot(wArr, dos[:, indArr[1]], color=cmapPink(0.3), lw=.7,
+            label="$z = 10$" + r"$\lambda_0$")
+    ax.plot(wArr, dos[:, indArr[2]], color=cmapPink(0.5), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[2]] * wInf / consts.c) + r"$\lambda_0$")
+    ax.plot(wArr, dos[:, indArr[3]], color=cmapPink(0.6), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[3]] * wInf / consts.c) + r"$\lambda_0$")
+    ax.plot(wArr, dos[:, indArr[4]], color=cmapPink(0.7), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[4]] * wInf / consts.c) + r"$\lambda_0$")
 
     ax.axhline(0, lw = 0.5, color = 'gray', zorder = -666)
 
-    ax.set_xlim(np.amin(wArr), 5. * wLO * 1e-12)
-    ax.set_xlim(np.amin(wArr), np.amax(wArr) / 1.)
-    #ax.set_ylim(0., 10.)
-    ax.set_ylim(-1e6, 1e6)
+    #ax.set_xlim(np.amin(wArr), 5. * wLO * 1e-12)
+    ax.set_xlim(np.amin(wArr), np.amax(wArr) / 30.)
+    ax.set_ylim(0., 10.)
 
 
     ax.set_xlabel(r"$\omega \, [\mathrm{THz}]$")
