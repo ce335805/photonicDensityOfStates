@@ -163,7 +163,8 @@ def plotDosCompare(omArr, dosFP1, dosFP2, L1, L2):
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
 
-    plt.savefig("FPPlotsSaved/dosFPComparePara.png")
+    #plt.savefig("FPPlotsSaved/dosFPComparePara.png")
+    plt.savefig("FPPlotsSaved/dosFPTotal.png")
 
 
 def plotDosWithCutoff(omArr, dos):
@@ -567,6 +568,29 @@ def plotFluctuationsAandENaturalUnits(dArr, flucE, flucA, freqArr, cutoff):
         axA.spines[axis].set_linewidth(.5)
 
     plt.savefig("FPPlotsSaved/FluctuationsEandANatUnits.png")
+
+
+def plotSumRules(dArr, sumRules, cutoffArr):
+    fig = plt.figure(figsize=(7.04 / 3., 1.8), dpi=800)
+    gs = gridspec.GridSpec(1, 1, wspace=0.35, hspace=0., top=0.9, bottom=0.18, left=0.2, right=0.85)
+    ax = plt.subplot(gs[0, 0])
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+
+    for cutoffInd, cutoff in enumerate(cutoffArr):
+        color = cmapBone(cutoffInd / (len(cutoffArr) + 1))
+        ax.plot(dArr, np.abs(sumRules[cutoffInd, :]), color=color, linestyle='', marker='x', markersize=2.)
+
+    ax.plot(dArr, np.abs(sumRules[-1, -1]) * dArr[-1] / dArr, color = "red", lw = 0.5)
+    #ax.set_ylim(0.06, .16)
+    ax.set_xlim(np.amin(dArr), np.amax(dArr))
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+
+    plt.savefig("FPPlotsSaved/SumRule.png")
 
 
 def plotEffectiveMassesComparison():

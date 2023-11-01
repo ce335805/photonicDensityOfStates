@@ -376,7 +376,7 @@ def plotFluctuationsENaturalUnits(dosNoSurfE, dosTotE, zArr, L, wLO, wTO, epsInf
     #axE.set_yticklabels(["$10^{-10}$", "$10^{-5}$", "$1$"], fontsize = 8)
 
     axE.text(1e-1, 1e1, r"$\sim z^{-3}$", fontsize = 7, color = "red")
-    axE.text(1.5 * 1e-2, 5. * 1e0, r"$\sim z^{-2}$", fontsize = 7, color = "red")
+    axE.text(1.5 * 1e-2, .3 * 1e-1, r"$\sim z^{-2}$", fontsize = 7, color = "red")
 
     legend = axE.legend(fontsize=8, loc='upper right', bbox_to_anchor=(1., 1.), edgecolor='black', ncol=1)
     legend.get_frame().set_alpha(0.)
@@ -388,6 +388,94 @@ def plotFluctuationsENaturalUnits(dosNoSurfE, dosTotE, zArr, L, wLO, wTO, epsInf
 
     plt.savefig("./SPhPPlotsSaved/FluctuationsENatUnits.png")
 
+
+def plotFluctuationsANaturalUnits(dosNoSurfA, dosTotA, zArr, L, wLO, wTO, epsInf):
+
+    fig = plt.figure(figsize=(7.04 / 3., 1.8), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.35, right=0.95)
+    axA = plt.subplot(gs[0, 0])
+
+    wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
+    lambda0 = consts.c / (2. * np.pi * wInf)
+    natUnitFac = consts.epsilon_0 * lambda0**3 * wInf / (consts.hbar)
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+    axA.plot(zArr / lambda0, dosTotA * natUnitFac, color=cmapBone(.5), linestyle='', marker='x', markersize=2., label = r"$\mathrm{Total}$")
+    axA.plot(zArr / lambda0, dosNoSurfA * natUnitFac, color=cmapPink(.5), linestyle='', marker='x', markersize=2., label = r"$\mathrm{Bulk}$")
+
+    axA.set_xscale("log")
+    #axA.set_yscale("log")
+    axA.set_xlim(1e-2, 1e2)
+    axA.set_ylim(-0.15 * 1e-3, .15 * 1e-3)
+
+    axA.plot(zArr / lambda0, np.abs(dosTotA[17]) * zArr[17]**3 / zArr**3 * natUnitFac, color = 'red', lw = 0.3)
+
+    ydat = np.abs(dosNoSurfA)
+    fitInd = 29
+    logZArr = np.log(zArr)
+    slope = (ydat[fitInd] - ydat[fitInd - 1]) / (logZArr[fitInd] - logZArr[fitInd - 1])
+    offset = ydat[fitInd] - slope * logZArr[fitInd]
+    #axA.plot(np.exp(logZArr), - slope * logZArr + 0. * offset, color = 'red', lw = 0.5)
+    axA.plot(zArr / lambda0, -(slope * logZArr + offset) * natUnitFac, color = 'red', lw = 0.3)
+
+    axA.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
+    axA.set_ylabel(r"$ \langle A^2 \rangle_{\rm eff}  \left[\frac{\hbar }{\varepsilon_0 \omega_{\mathrm{S}} \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
+
+    #axE.set_xticks([])
+    #axE.set_yticks([1e-10, 1e-5, 1.])
+    #axE.set_yticklabels(["$10^{-10}$", "$10^{-5}$", "$1$"], fontsize = 8)
+
+    axA.text(.5 * 1e0, 1.2 * 1e-4, r"$\sim z^{-3}$", fontsize = 7, color = "red")
+    axA.text(1e-1, 1.2 * -1e-4, r"$\sim \mathrm{log}(z) + \mathrm{const}$", fontsize = 7, color = "red")
+
+    legend = axA.legend(fontsize=8, loc='upper left', bbox_to_anchor=(0., .8), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        axA.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./SPhPPlotsSaved/FluctuationsANatUnits.png")
+
+
+def plotSumRules(dosNoSurf, dosTot, zArr, cutoffArr, L, wLO, wTO, epsInf):
+
+    fig = plt.figure(figsize=(7.04 / 3., 1.8), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.28, right=0.95)
+    ax = plt.subplot(gs[0, 0])
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+
+    for cutoffInd, cutoff in enumerate(cutoffArr):
+        color1 = cmapBone(cutoffInd / (len(cutoffArr) + 1))
+        color2 = cmapPink(cutoffInd / (len(cutoffArr) + 1))
+        ax.plot(zArr, np.abs(dosTot[cutoffInd, :]), color=color1, linestyle='', marker='x', markersize=2., label =r"$\mathrm{Total}$")
+        ax.plot(zArr, np.abs(dosNoSurf[cutoffInd, :]), color=color2, linestyle='', marker='x', markersize=2., label =r"$\mathrm{Bulk}$")
+
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    #ax.set_xlim(1e-2, 1e2)
+    #ax.set_ylim(1e-6, 1e3)
+
+    #ax.plot(zArr / lambda0, np.abs(dosTot[-1]) * zArr[-1] ** 3 / zArr ** 3 * natUnitFac, color ='red', lw = 0.3)
+    #ax.plot(zArr / lambda0, np.abs(dosNoSurf[20]) * zArr[20] ** 2 / zArr ** 2 * natUnitFac, color ='red', lw = 0.3)
+
+    ax.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
+
+    #legend = ax.legend(fontsize=8, loc='upper right', bbox_to_anchor=(1., 1.), edgecolor='black', ncol=1)
+    #legend.get_frame().set_alpha(0.)
+    #legend.get_frame().set_boxstyle('Square', pad=0.1)
+    #legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./SPhPPlotsSaved/sumRules.png")
 
 
 def plotFluctuationsWithFit(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename):

@@ -52,14 +52,12 @@ def dosTMAsOfFeq(zArr, omegaArr, L):
 def dosTM(zArr, omega, L):
     nzArr = nzValsTM(omega, L)
     kzVals = np.pi / L * nzArr
-    if(len(kzVals) == 0):
-        return 0.
     normSqr = np.zeros(len(kzVals))
-    normSqr[0] = L / 2. * (omega**2 + (omega**2 - 2 * consts.c**2 * kzVals[0]**2))
+    normSqr[0] = L  * omega**2
     normSqr[1:] = L / 2. * (omega**2 + (omega**2 - 2 * consts.c**2 * kzVals[1:]**2) * np.sin(2. * kzVals[1:] * L) / (2. * kzVals[1:] * L))
     prefac = np.pi * consts.c / (2. * omega)
     dos = prefac * 1 / normSqr[None, :] * ( consts.c**2 * kzVals**2 * np.sin(kzVals[None, :] * zArr[:, None])**2 + (omega**2 - consts.c**2 * kzVals**2) * np.cos(kzVals[None, :] * zArr[:, None])**2)
-    return np.sum(dos, axis = 1)
+    return np.sum(dos[:, 0:], axis = 1)
 
 def dosTMParallel(zArr, omega, L):
     nzArr = nzValsTM(omega, L)
