@@ -63,11 +63,9 @@ def numericalIntegralEField(cutoff, dArr):
         numResonances = math.floor(wMax * dVal / np.pi / consts.c)
         resonancePoints = (np.arange(numResonances) + 1.) * np.pi * consts.c / dVal
         res = scipy.integrate.quad(dosParallelWithRegE, 0, wMax, args=(dVal / 2., dVal, 1. / cutoff), points=resonancePoints, limit = (numResonances * 4 + 50))
-        #res = scipy.integrate.quad(dosEffectiveMassReg, 0, wMax, args=(dVal / 2., dVal, 1. / cutoff), points=resonancePoints, limit = (numResonances * 4 + 50))
         integratedDos[dInd] = res[0]
 
     fieldFac = consts.hbar / (2. * consts.epsilon_0 * np.pi ** 2 * consts.c ** 3) * 1e36
-    #massFac = 8. / (3. * np.pi) * consts.hbar / (consts.m_e * consts.c ** 2)
     return fieldFac * integratedDos
 
 def numericalIntegralAField(cutoff, dArr):

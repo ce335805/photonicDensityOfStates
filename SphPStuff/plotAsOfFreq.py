@@ -389,6 +389,55 @@ def plotFluctuationsENaturalUnits(dosNoSurfE, dosTotE, zArr, L, wLO, wTO, epsInf
     plt.savefig("./SPhPPlotsSaved/FluctuationsENatUnits.png")
 
 
+
+def plotFluctuationsENaturalUnitsMultipleCutoffs(dosNoSurfE, dosTotE, zArr, cutoffArr, L, wLO, wTO, epsInf):
+
+    fig = plt.figure(figsize=(7.04 / 3., 1.8), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.28, right=0.95)
+    axE = plt.subplot(gs[0, 0])
+    evCutoff = 1519.3 * 1e12 #1eV
+
+    wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
+    lambda0 = consts.c / (2. * np.pi * wInf)
+    natUnitFac = consts.epsilon_0 * lambda0**3 / (consts.hbar * wInf)
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+
+    for cutInd, cutoff in enumerate(cutoffArr):
+        color1 = cmapBone(cutInd / (len(cutoffArr) + 1))
+        color2 = cmapPink(cutInd / (len(cutoffArr) + 1))
+        axE.plot(zArr / lambda0, np.abs(dosTotE[cutInd, :]) * natUnitFac, color=color1, linestyle='', marker='x', markersize=2.)
+        axE.plot(zArr / lambda0, np.abs(dosNoSurfE[cutInd, :]) * natUnitFac, color=color2, linestyle='', marker='x',
+                 markersize=2., label = r"$\Lambda = $" + "{:.2f}".format(cutoff / evCutoff) + "$\mathrm{eV}$")
+
+    axE.set_xscale("log")
+    axE.set_yscale("log")
+    axE.set_xlim(1e-2, 2. * 1e1)
+    axE.set_ylim(5. * 1e-6, 1e3)
+
+    #axE.plot(zArr / lambda0, np.abs(dosTotE[-1]) * zArr[-1]**3 / zArr**3 * natUnitFac, color = 'red', lw = 0.3)
+    #axE.plot(zArr / lambda0, np.abs(dosNoSurfE[20]) * zArr[20]**2 / zArr**2 * natUnitFac, color = 'red', lw = 0.3)
+
+    axE.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
+    axE.set_ylabel(r"$ \langle E^2 \rangle_{\rm eff}  \left[\frac{\hbar \omega_{\mathrm{S}}}{\varepsilon_0 \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
+
+    #axE.set_xticks([])
+    #axE.set_yticks([1e-10, 1e-5, 1.])
+    #axE.set_yticklabels(["$10^{-10}$", "$10^{-5}$", "$1$"], fontsize = 8)
+
+    legend = axE.legend(fontsize=6, loc='upper right', bbox_to_anchor=(1., 1.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        axE.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./SPhPPlotsSaved/FluctuationsENatUnitsMulticut.png")
+
+
 def plotFluctuationsANaturalUnits(dosNoSurfA, dosTotA, zArr, L, wLO, wTO, epsInf):
 
     fig = plt.figure(figsize=(7.04 / 3., 1.8), dpi=800)
@@ -441,12 +490,64 @@ def plotFluctuationsANaturalUnits(dosNoSurfA, dosTotA, zArr, L, wLO, wTO, epsInf
     plt.savefig("./SPhPPlotsSaved/FluctuationsANatUnits.png")
 
 
+
+def plotFluctuationsANaturalUnitsMultipleCutoffs(dosNoSurfA, dosTotA, zArr, cutoffArr, L, wLO, wTO, epsInf):
+
+    fig = plt.figure(figsize=(7.04 / 3., 1.8), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.35, right=0.95)
+    axA = plt.subplot(gs[0, 0])
+    evCutoff = 1519.3 * 1e12 #1eV
+
+    wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
+    lambda0 = consts.c / (2. * np.pi * wInf)
+    natUnitFac = consts.epsilon_0 * lambda0**3 * wInf / (consts.hbar)
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+
+    for cutInd, cutoff in enumerate(cutoffArr):
+        color1 = cmapBone(cutInd / (len(cutoffArr) + 1))
+        color2 = cmapPink(cutInd / (len(cutoffArr) + 1))
+        axA.plot(zArr / lambda0, dosTotA[cutInd, :] * natUnitFac, color=color1, linestyle='', marker='x', markersize=2.)
+        axA.plot(zArr / lambda0, dosNoSurfA[cutInd, :] * natUnitFac, color=color2, linestyle='', marker='x',
+                 markersize=2., label = r"$\Lambda = $" + "{:.2f}".format(cutoff / evCutoff) + "$\mathrm{eV}$")
+
+    axA.set_xscale("log")
+    #axA.set_yscale("log")
+    axA.set_xlim(1e-2, 2. * 1e1)
+    axA.set_ylim(-0.15 * 1e-3, .15 * 1e-3)
+
+    #axE.plot(zArr / lambda0, np.abs(dosTotE[-1]) * zArr[-1]**3 / zArr**3 * natUnitFac, color = 'red', lw = 0.3)
+    #axE.plot(zArr / lambda0, np.abs(dosNoSurfE[20]) * zArr[20]**2 / zArr**2 * natUnitFac, color = 'red', lw = 0.3)
+
+    axA.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
+    axA.set_ylabel(r"$ \langle A^2 \rangle_{\rm eff}  \left[\frac{\hbar }{\varepsilon_0 \omega_{\mathrm{S}} \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
+
+    #axE.set_xticks([])
+    #axE.set_yticks([1e-10, 1e-5, 1.])
+    #axE.set_yticklabels(["$10^{-10}$", "$10^{-5}$", "$1$"], fontsize = 8)
+
+    legend = axA.legend(fontsize=6, loc='upper left', bbox_to_anchor=(0., 1.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        axA.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./SPhPPlotsSaved/FluctuationsANatUnitsMulticut.png")
+
+
 def plotSumRules(dosNoSurf, dosTot, zArr, cutoffArr, L, wLO, wTO, epsInf):
 
     fig = plt.figure(figsize=(7.04 / 3., 1.8), dpi=800)
     gs = gridspec.GridSpec(1, 1,
-                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.28, right=0.95)
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.22, left=0.22, right=0.95)
     ax = plt.subplot(gs[0, 0])
+    evCutoff = 1519.3 * 1e12 #1eV
+    wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
+    lambda0 = consts.c / (2. * np.pi * wInf)
 
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
@@ -454,28 +555,31 @@ def plotSumRules(dosNoSurf, dosTot, zArr, cutoffArr, L, wLO, wTO, epsInf):
     for cutoffInd, cutoff in enumerate(cutoffArr):
         color1 = cmapBone(cutoffInd / (len(cutoffArr) + 1))
         color2 = cmapPink(cutoffInd / (len(cutoffArr) + 1))
-        ax.plot(zArr, np.abs(dosTot[cutoffInd, :]), color=color1, linestyle='', marker='x', markersize=2., label =r"$\mathrm{Total}$")
-        ax.plot(zArr, np.abs(dosNoSurf[cutoffInd, :]), color=color2, linestyle='', marker='x', markersize=2., label =r"$\mathrm{Bulk}$")
+        ax.plot(zArr / lambda0, dosTot[cutoffInd, :], color=color1, linestyle='', marker='x', markersize=2.)
+        ax.plot(zArr / lambda0, dosNoSurf[cutoffInd, :], color=color2, linestyle='', marker='x', markersize=2.,
+                label = r"$\Lambda = $" + "{:.2f}".format(cutoff / evCutoff) + "$\mathrm{eV}$")
 
     ax.set_xscale("log")
-    ax.set_yscale("log")
-    #ax.set_xlim(1e-2, 1e2)
-    #ax.set_ylim(1e-6, 1e3)
+    #ax.set_yscale("log")
+    ax.set_xlim(1e-2, 1e2)
+    #ax.set_ylim(1e11, 1e21)
+    ax.set_ylim(0., .2 * 1e14)
 
     #ax.plot(zArr / lambda0, np.abs(dosTot[-1]) * zArr[-1] ** 3 / zArr ** 3 * natUnitFac, color ='red', lw = 0.3)
     #ax.plot(zArr / lambda0, np.abs(dosNoSurf[20]) * zArr[20] ** 2 / zArr ** 2 * natUnitFac, color ='red', lw = 0.3)
 
     ax.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
+    ax.set_ylabel(r"$\int \frac{\rho(z) - \rho_0}{\rho_0} \; \mathrm{d}\omega$", fontsize = 8)
 
-    #legend = ax.legend(fontsize=8, loc='upper right', bbox_to_anchor=(1., 1.), edgecolor='black', ncol=1)
-    #legend.get_frame().set_alpha(0.)
-    #legend.get_frame().set_boxstyle('Square', pad=0.1)
-    #legend.get_frame().set_linewidth(0.0)
+    legend = ax.legend(fontsize=6, loc='lower left', bbox_to_anchor=(0., 0.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
 
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
 
-    plt.savefig("./SPhPPlotsSaved/sumRules.png")
+    plt.savefig("./SPhPPlotsSaved/sumRulesSPhPLin.png")
 
 
 def plotFluctuationsWithFit(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename):

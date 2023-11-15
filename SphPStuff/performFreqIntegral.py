@@ -88,6 +88,83 @@ def computeEffectiveMass(zArr, cutoff, wLO, wTO, epsInf, L):
     #filename = "EffectiveMass"
     #plotFreq.plotEffectiveMass(dosTot, zArr, L, wLO, wTO, epsInf, filename)
 
+def computeFluctuationsMultipleCutoffs(zArr, wLO, wTO, epsInf, L):
+    evCutoff = 1519.3 * 1e12 #1eV
+    cutoffArr = np.array([0.01 * evCutoff, 0.05 * evCutoff, 0.1 * evCutoff, 0.5 * evCutoff, 1. * evCutoff])
+    cutoffArr = np.logspace(np.log10(0.05 * evCutoff), np.log10(.5 * evCutoff), 5, endpoint=True)
+    print(cutoffArr * 1e-12)
+
+    fluctuationsTotE = np.zeros((len(cutoffArr), len(zArr)), dtype = float)
+    fluctuationsNoSurfE = np.zeros((len(cutoffArr), len(zArr)), dtype = float)
+    fluctuationsTotA = np.zeros((len(cutoffArr), len(zArr)), dtype = float)
+    fluctuationsNoSurfA = np.zeros((len(cutoffArr), len(zArr)), dtype = float)
+    for cutoffInd, cutoff in enumerate(cutoffArr):
+        fluctuationsNoSurfE[cutoffInd, :], fluctuationsTotE[cutoffInd, :]  = computeFluctuationsE(zArr, cutoff, wLO, wTO, epsInf, L)
+        fluctuationsNoSurfA[cutoffInd, :], fluctuationsTotA[cutoffInd, :]  = computeFluctuationsA(zArr, cutoff, wLO, wTO, epsInf, L)
+
+    plotFreq.plotFluctuationsENaturalUnitsMultipleCutoffs(fluctuationsNoSurfE[:, :], fluctuationsTotE[:, :], zArr, cutoffArr, L, wLO, wTO, epsInf)
+    plotFreq.plotFluctuationsANaturalUnitsMultipleCutoffs(fluctuationsNoSurfA[:, :], fluctuationsTotA[:, :], zArr, cutoffArr, L, wLO, wTO, epsInf)
+
+def computeFluctuationsE(zArr, cutoff, wLO, wTO, epsInf, L):
+
+    arrBelow, arrWithin, arrAbove, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
+    wArr = np.append(arrBelow, arrWithin)
+    wArr = np.append(wArr, arrAbove)
+
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+
+    flucETE = np.zeros(zArr.shape)
+    flucETM = np.zeros(zArr.shape)
+
+    for zInd, zVal in enumerate(zArr):
+        cutoffFac = np.exp(- wArr**2 / cutoff**2)
+        prefacE = consts.hbar * wArr**3 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)
+        flucETEInt = prefacE * (dosTETotal[ : , zInd] - .5) * cutoffFac
+        flucETE[zInd] = np.trapz(flucETEInt, x=wArr, axis = 0)
+        flucETMInt = prefacE * (dosTMTotal[ : , zInd] - 1. / 6.) * cutoffFac
+        flucETM[zInd] = np.trapz(flucETMInt, x=wArr, axis = 0)
+
+    flucESurf = np.zeros(len(zArr))
+    for zInd, zVal in enumerate(zArr):
+        flucESurf[zInd] = performSPhPIntegralEFluc(zVal, wLO, wTO, epsInf)[0]
+
+    flucE = flucETE + flucETM + flucESurf
+    flucENoSurf = flucETE + flucETM
+
+    return flucENoSurf, flucE
+
+
+def computeFluctuationsA(zArr, cutoff, wLO, wTO, epsInf, L):
+
+    arrBelow, arrWithin, arrAbove, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
+    wArr = np.append(arrBelow, arrWithin)
+    wArr = np.append(wArr, arrAbove)
+
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+
+    flucATE = np.zeros(zArr.shape)
+    flucATM = np.zeros(zArr.shape)
+
+    for zInd, zVal in enumerate(zArr):
+        cutoffFac = np.exp(- wArr**2 / cutoff**2)
+        prefacA = consts.hbar * wArr**1 / (2 * np.pi**2 * consts.epsilon_0 * consts.c**3)
+        flucATEInt = prefacA * (dosTETotal[ : , zInd] - .5) * cutoffFac
+        flucATE[zInd] = np.trapz(flucATEInt, x=wArr, axis = 0)
+        flucATMInt = prefacA * (dosTMTotal[ : , zInd] - 1. / 6.) * cutoffFac
+        flucATM[zInd] = np.trapz(flucATMInt, x=wArr, axis = 0)
+
+    flucASurf = np.zeros(len(zArr))
+    for zInd, zVal in enumerate(zArr):
+        flucASurf[zInd] = performSPhPIntegralAFluc(zVal, wLO, wTO, epsInf)[0]
+
+    flucA = flucATE + flucATM + flucASurf
+    flucANoSurf = flucATE + flucATM
+
+    return flucANoSurf, flucA
+
+
 def computeFluctuations(zArr, cutoff, wLO, wTO, epsInf, L):
 
     arrBelow, arrWithin, arrAbove, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
@@ -133,14 +210,15 @@ def computeFluctuations(zArr, cutoff, wLO, wTO, epsInf, L):
 
 
 def computeSumRuleMultipleCutoffs(zArr, wLO, wTO, epsInf, L):
-    evCutoff = 2. * np.pi * 241.8 * 1e12# 1eV cutoff
-    cutoffArr = np.array([0.01 * evCutoff, 0.05 * evCutoff, 0.1 * evCutoff, 0.5 * evCutoff])
+    evCutoff = 1519.3 * 1e12 #1eV
+    cutoffArr = np.logspace(np.log10(0.01 * evCutoff), np.log10(.5 * evCutoff), 5, endpoint=True)
 
-    sumRules = np.zeros((2, len(cutoffArr), len(zArr)), dtype = float)
+    sumRulesTot = np.zeros((len(cutoffArr), len(zArr)), dtype = float)
+    sumRulesNoSurf = np.zeros((len(cutoffArr), len(zArr)), dtype = float)
     for cutoffInd, cutoff in enumerate(cutoffArr):
-        sumRules[:, cutoffInd, :] = computeSumRule(zArr, cutoff, wLO, wTO, epsInf, L)
+        sumRulesNoSurf[cutoffInd, :], sumRulesTot[cutoffInd, :]  = computeSumRule(zArr, cutoff, wLO, wTO, epsInf, L)
 
-    plotFreq.plotSumRules(sumRules[0, :, :], sumRules[1, :, :], zArr, cutoffArr, L, wLO, wTO, epsInf)
+    plotFreq.plotSumRules(sumRulesNoSurf[:, :], sumRulesTot[:, :], zArr, cutoffArr, L, wLO, wTO, epsInf)
 
 def computeSumRule(zArr, cutoff, wLO, wTO, epsInf, L):
 
@@ -149,7 +227,7 @@ def computeSumRule(zArr, cutoff, wLO, wTO, epsInf, L):
     wArr = np.append(wArr, arrAbove)
 
     dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTMTotal(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
 
     dosTE = np.zeros(zArr.shape)
     dosTM = np.zeros(zArr.shape)
@@ -158,22 +236,17 @@ def computeSumRule(zArr, cutoff, wLO, wTO, epsInf, L):
         cutoffFac = np.exp(- wArr**2 / cutoff**2)
         dosTEInt = (dosTETotal[ : , zInd] - .5) * cutoffFac
         dosTE[zInd] = np.trapz(dosTEInt, x=wArr, axis = 0)
-        dosInt = (dosTMTotal[ : , zInd] - 5.) * cutoffFac
-        dosTM[zInd] = np.trapz(dosInt, x=wArr, axis = 0)
+        dosTMInt = (dosTMTotal[ : , zInd] - 1. / 6.) * cutoffFac
+        dosTM[zInd] = np.trapz(dosTMInt, x=wArr, axis = 0)
 
     dosSurf = np.zeros(len(zArr))
     for zInd, zVal in enumerate(zArr):
-        dosSurf[zInd] = performSPhPIntegralEFluc(zVal, wLO, wTO, epsInf)[0]
+        dosSurf[zInd] = performSPhPIntegralSumRule(zVal, wLO, wTO, epsInf)[0]
 
     dos = dosTE + dosTM + dosSurf
     dosNoSurf = dosTE + dosTM
 
     return (dosNoSurf, dos)
-
-    #plotFreq.plotFluctuationsEandA(flucENoSurf, flucE, flucANoSurf, flucA, zArr, L, wLO, wTO, epsInf)
-    #plotFreq.plotFluctuationsEandANaturalUnits(flucENoSurf, flucE, flucANoSurf, flucA, zArr, L, wLO, wTO, epsInf)
-    plotFreq.plotFluctuationsENaturalUnits(dosNoSurf, dos, zArr, L, wLO, wTO, epsInf)
-
 
 def computeEffectiveHopping(zArr, cutoff, wLO, wTO, epsInf, L):
 
@@ -305,7 +378,7 @@ def performSPhPIntegralAFluc(zVal, wLO, wTO, epsInf):
 
 def performSPhPIntegralSumRule(zVal, wLO, wTO, epsInf):
     wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
-    return scipy.integrate.quad(intFuncFieldStrengthE, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 1000)
+    return scipy.integrate.quad(intSumRule, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 1000)
 
 def performSPhPIntegralHopping(zVal, wLO, wTO, epsInf):
     wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)

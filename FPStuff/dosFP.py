@@ -36,33 +36,31 @@ def dosFPMain():
     #dosFP2 = computeDosFP.dosTEAsOfFeq(np.array([L2 / 2.]), omArr, L2) + computeDosFP.dosTMAsOfFeq(np.array([L2 / 2.]), omArr, L2)
     #plotDosFP.plotDosCompare(omArr, dosFP1, dosFP2, L1, L2)
 
-    evCutoff = 241.8 * 1e12
-    cutoffArr = np.array([0.1 * evCutoff, 0.5 * evCutoff, 1. * evCutoff, 5. * evCutoff])
-
-    dArr = np.logspace(-6, -4, 20, endpoint=True)
-
-    sumRules = np.zeros((len(cutoffArr), len(dArr)), dtype = float)
-    for cutoffInd, cutoff in enumerate(cutoffArr):
-        sumRules[cutoffInd, :] = integratedDos.numericalIntegralSumRule(cutoff, dArr)
-    #print(sumRuleRes)
-    plotDosFP.plotSumRules(dArr, sumRules, cutoffArr)
-    exit()
+    #evCutoff = 1519.3 * 1e12 #1eV
+    #cutoffArr = np.logspace(np.log10(0.01 * evCutoff), np.log10(.5 * evCutoff), 5, endpoint=True)
+    #dArr = np.logspace(-6, -4, 20, endpoint=True)
+    #sumRules = np.zeros((len(cutoffArr), len(dArr)), dtype = float)
+    #for cutoffInd, cutoff in enumerate(cutoffArr):
+    #    sumRules[cutoffInd, :] = integratedDos.numericalIntegralSumRule(cutoff, dArr)
+    ##print(sumRuleRes)
+    #plotDosFP.plotSumRules(dArr, sumRules, cutoffArr)
+    #exit()
 
     ##compute field plots
-    evCutoff = 241.8 * 1e12
-    cutoff = 10. * evCutoff
-    dArr = np.logspace(-6, -3, 80, endpoint=True)
-    fluctuationsE = integratedDos.numericalIntegralEField(cutoff, dArr)
+    evCutoff = 1519.3 * 1e12 #1eV
+    cutoff = 1. * evCutoff
+    dArr = np.logspace(-6, -4, 50, endpoint=True)
+    #fluctuationsE = integratedDos.numericalIntegralEField(cutoff, dArr)
     filename = "fluctuationsE"
-    handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsE, filename)
+    #handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsE, filename)
     cutoff, dArr, fluctuationsE = handleIntegralData.retrieveDataFixedCutoff(filename)
-    sumRuleRes = integratedDos.numericalIntegralAField(cutoff, dArr)
+    #fluctuationsA = integratedDos.numericalIntegralAField(cutoff, dArr)
     filename = "fluctuationsA"
-    handleIntegralData.writeDataFixedCutoff(cutoff, dArr, sumRuleRes, filename)
-    cutoff, dArr, sumRuleRes = handleIntegralData.retrieveDataFixedCutoff(filename)
+    #handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsA, filename)
+    cutoff, dArr, fluctuationsA = handleIntegralData.retrieveDataFixedCutoff(filename)
     baseFreqArr = np.pi * consts.c / dArr
     #plotDosFP.plotFluctuationsAandE(dArr, fluctuationsE, fluctuationsA, baseFreqArr, cutoff)
-    plotDosFP.plotFluctuationsAandENaturalUnits(dArr, fluctuationsE, sumRuleRes, baseFreqArr, cutoff)
+    plotDosFP.plotFluctuationsAandENaturalUnits(dArr, fluctuationsE, fluctuationsA, baseFreqArr, cutoff)
     exit()
 
 

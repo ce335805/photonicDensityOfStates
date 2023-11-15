@@ -504,7 +504,7 @@ def plotFluctuationsAandE(dArr, flucE, flucA, freqArr, cutoff):
 
 def plotFluctuationsAandENaturalUnits(dArr, flucE, flucA, freqArr, cutoff):
     fig = plt.figure(figsize=(7.04 / 3., 1.8), dpi=800)
-    gs = gridspec.GridSpec(1, 1, wspace=0.35, hspace=0., top=0.9, bottom=0.18, left=0.2, right=0.85)
+    gs = gridspec.GridSpec(1, 1, wspace=0.35, hspace=0., top=0.9, bottom=0.2, left=0.24, right=0.75)
     axE = plt.subplot(gs[0, 0])
     axA = axE.twinx()
     cmapPink = cm.get_cmap('pink')
@@ -514,9 +514,9 @@ def plotFluctuationsAandENaturalUnits(dArr, flucE, flucA, freqArr, cutoff):
     unitFacA = consts.epsilon_0 * freqArr * dArr**3 / consts.hbar
 
     axE.plot(dArr, flucE * unitFacE, color=cmapBone(.55), linestyle='', marker='x', markersize=2.)
-    #axA.plot(dArr, flucA * unitFacA * 1e-24, color=cmapPink(.55), linestyle='', marker='x', markersize=2.)
-    axE.set_ylim(0.06, .16)
-    #axA.set_ylim(-0.02, 0.02)
+    axA.plot(dArr, flucA * unitFacA * 1e-24, color=cmapPink(.55), linestyle='', marker='x', markersize=2.)
+    axE.set_ylim(-0.22, .22)
+    axA.set_ylim(-0.02, 0.02)
     # axRightE.set_xlim(1e-6, 1e-4)
     axE.set_xlim(np.amin(dArr), np.amax(dArr))
     axA.set_xlim(np.amin(dArr), np.amax(dArr))
@@ -524,9 +524,9 @@ def plotFluctuationsAandENaturalUnits(dArr, flucE, flucA, freqArr, cutoff):
     #axE.set_yscale('log')
     axA.set_xscale('log')
 
-    axA.set_xlabel(r"$d \; \left[ \mathrm{m} \right]$", fontsize=8)
+    axE.set_xlabel(r"$d \; \left[ \mathrm{m} \right]$", fontsize=8)
     axE.set_ylabel(r"$\langle E^2 \rangle_{\rm eff} \left[ \frac{\hbar \omega_0}{\varepsilon_0 d^3} \right]$", fontsize=8,
-                   labelpad=8)
+                   labelpad=0)
     axA.set_ylabel(
         r"$\langle A^2 \rangle_{\rm eff} \left[ \frac{\hbar}{\varepsilon_0 \omega_0 d^3} \right]$",
         fontsize=8, labelpad=0)
@@ -572,14 +572,16 @@ def plotFluctuationsAandENaturalUnits(dArr, flucE, flucA, freqArr, cutoff):
 
 def plotSumRules(dArr, sumRules, cutoffArr):
     fig = plt.figure(figsize=(7.04 / 3., 1.8), dpi=800)
-    gs = gridspec.GridSpec(1, 1, wspace=0.35, hspace=0., top=0.9, bottom=0.18, left=0.2, right=0.85)
+    gs = gridspec.GridSpec(1, 1, wspace=0.35, hspace=0., top=0.9, bottom=0.22, left=0.3, right=0.95)
     ax = plt.subplot(gs[0, 0])
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
+    evCutoff = 1519.3 * 1e12 #1eV
 
     for cutoffInd, cutoff in enumerate(cutoffArr):
         color = cmapBone(cutoffInd / (len(cutoffArr) + 1))
-        ax.plot(dArr, np.abs(sumRules[cutoffInd, :]), color=color, linestyle='', marker='x', markersize=2.)
+        ax.plot(dArr, np.abs(sumRules[cutoffInd, :]), color=color, linestyle='', marker='x', markersize=2.,
+                label = r"$\Lambda = $" + "{:.2f}".format(cutoff / evCutoff) + "$\mathrm{eV}$")
 
     ax.plot(dArr, np.abs(sumRules[-1, -1]) * dArr[-1] / dArr, color = "red", lw = 0.5)
     #ax.set_ylim(0.06, .16)
@@ -587,8 +589,16 @@ def plotSumRules(dArr, sumRules, cutoffArr):
     ax.set_xscale('log')
     ax.set_yscale('log')
 
+    ax.set_xlabel(r"$d [\mathrm{m}]$")
+    ax.set_ylabel(r"$\int \frac{\rho(L / 2) - \rho_0}{\rho_0} \; \mathrm{d}\omega$")
+
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
+
+    legend = ax.legend(fontsize=6, loc='upper right', bbox_to_anchor=(1., 1.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
 
     plt.savefig("FPPlotsSaved/SumRule.png")
 
@@ -648,6 +658,7 @@ def plotEffectiveMassesComparison():
     for axis in ['top', 'bottom', 'left', 'right']:
         axFP.spines[axis].set_linewidth(.5)
         axSPhP.spines[axis].set_linewidth(.5)
+
 
 
     plt.savefig("FPPlotsSaved/EffectiveMassesCompared.png")

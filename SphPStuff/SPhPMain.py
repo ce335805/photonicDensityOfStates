@@ -37,6 +37,7 @@ def main():
     #combinedDosPlots.plotDosWhole(zArr, wLO, wTO, epsInf, L)
     #performFreqIntegral.freqIntegral(zArr, wLO, wTO, epsInf, L)
     performFreqIntegral.computeSumRuleMultipleCutoffs(zArr, wLO, wTO, epsInf, L)
+    #performFreqIntegral.computeFluctuationsMultipleCutoffs(zArr, wLO, wTO, epsInf, L)
 
 if __name__ == "__main__":
     main()
