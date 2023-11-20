@@ -27,16 +27,25 @@ def main():
     epsInf = 1.
     wLO = 32.04 * 1e12
     wTO = 7.92 * 1e12
-    #epsInf = 6.3
-    L = 1.
+    wLO = 20. * 1e12
+    wTO = 1e6
+    L = 0.01
     zArr = np.logspace(-3, -9, 50, endpoint=True, base = 10)
     zArr = np.append(np.array([L / 4.]), zArr)
 
     #produceFreqData.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
 
+    wLOArr = np.array([2., 5., 10., 20.]) * 1e12
+    wTOArr = np.array([1., 1., 1., 1.]) * 1e6
+    #for wInd, _ in enumerate(wLOArr):
+    #    produceFreqData.produceFreqIntegralData(zArr, wLOArr[wInd], wTOArr[wInd], epsInf, L)
+
+    cutoff = 1e14
+    performFreqIntegral.produceCollapsePlot(zArr, cutoff, wLOArr, wTOArr, epsInf, L)
+
     #combinedDosPlots.plotDosWhole(zArr, wLO, wTO, epsInf, L)
     #performFreqIntegral.freqIntegral(zArr, wLO, wTO, epsInf, L)
-    performFreqIntegral.computeSumRuleMultipleCutoffs(zArr, wLO, wTO, epsInf, L)
+    #performFreqIntegral.computeSumRuleMultipleCutoffs(zArr, wLO, wTO, epsInf, L)
     #performFreqIntegral.computeFluctuationsMultipleCutoffs(zArr, wLO, wTO, epsInf, L)
 
 if __name__ == "__main__":

@@ -105,6 +105,14 @@ def computeFluctuationsMultipleCutoffs(zArr, wLO, wTO, epsInf, L):
     plotFreq.plotFluctuationsENaturalUnitsMultipleCutoffs(fluctuationsNoSurfE[:, :], fluctuationsTotE[:, :], zArr, cutoffArr, L, wLO, wTO, epsInf)
     plotFreq.plotFluctuationsANaturalUnitsMultipleCutoffs(fluctuationsNoSurfA[:, :], fluctuationsTotA[:, :], zArr, cutoffArr, L, wLO, wTO, epsInf)
 
+def produceCollapsePlot(zArr, cutoff, wLOArr, wTOArr, epsInf, L):
+
+    flucEArr = np.zeros((2, len(wLOArr), len(zArr)))
+    for wInd, _ in enumerate(wLOArr):
+        flucEArr[:, wInd, :] = computeFluctuationsE(zArr, cutoff, wLOArr[wInd], wTOArr[wInd], epsInf, L)
+
+    plotFreq.collapseFlucE(flucEArr[0, :, :], flucEArr[1, :, :], zArr, L, wLOArr, wTOArr, epsInf)
+
 def computeFluctuationsE(zArr, cutoff, wLO, wTO, epsInf, L):
 
     arrBelow, arrWithin, arrAbove, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
