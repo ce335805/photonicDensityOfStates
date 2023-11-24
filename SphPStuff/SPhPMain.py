@@ -2,9 +2,15 @@ import numpy as np
 import combinedDosPlots
 import produceFreqData
 import performFreqIntegral
+import thesisPlots
+import scipy.constants as consts
 
 def main():
     print("Compute full Dos and all modes")
+
+    #thesisPlots.plotEpsilonOmega()
+    #thesisPlots.plotDispersion()
+    #exit()
 
     #TE.createPlotTE()
     #TEEva.createPlotTEEva()
@@ -27,24 +33,27 @@ def main():
     epsInf = 1.
     wLO = 32.04 * 1e12
     wTO = 7.92 * 1e12
-    wLO = 20. * 1e12
+    #wLO = 20. * 1e12
     wTO = 1e6
-    L = 0.01
-    zArr = np.logspace(-3, -9, 50, endpoint=True, base = 10)
-    zArr = np.append(np.array([L / 4.]), zArr)
+    L = 1.
+    wInf = np.sqrt(epsInf * wLO ** 2 + wTO ** 2) / np.sqrt(epsInf + 1)
+    lambda0 = 2. * np.pi * consts.c / wInf
+    zArr = np.logspace(np.log10(1e2 * lambda0), np.log10(1e-3 * lambda0), 200, endpoint=True, base = 10)
+    zArr = np.append([L / 4.], zArr)
 
     #produceFreqData.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
 
-    wLOArr = np.array([2., 5., 10., 20.]) * 1e12
-    wTOArr = np.array([1., 1., 1., 1.]) * 1e6
+    #wLOArr = np.array([2., 5., 10., 20.]) * 1e12
+    #wTOArr = np.array([1., 1., 1., 1.]) * 1e6
     #for wInd, _ in enumerate(wLOArr):
     #    produceFreqData.produceFreqIntegralData(zArr, wLOArr[wInd], wTOArr[wInd], epsInf, L)
 
-    cutoff = 1e14
-    performFreqIntegral.produceCollapsePlot(zArr, cutoff, wLOArr, wTOArr, epsInf, L)
+    cutoff = 1e15
+    #performFreqIntegral.produceCollapsePlotE(zArr, cutoff, wLOArr, wTOArr, epsInf, L)
+    #performFreqIntegral.produceCollapsePlotA(zArr, cutoff, wLOArr, wTOArr, epsInf, L)
 
     #combinedDosPlots.plotDosWhole(zArr, wLO, wTO, epsInf, L)
-    #performFreqIntegral.freqIntegral(zArr, wLO, wTO, epsInf, L)
+    performFreqIntegral.freqIntegral(zArr, wLO, wTO, epsInf, L)
     #performFreqIntegral.computeSumRuleMultipleCutoffs(zArr, wLO, wTO, epsInf, L)
     #performFreqIntegral.computeFluctuationsMultipleCutoffs(zArr, wLO, wTO, epsInf, L)
 

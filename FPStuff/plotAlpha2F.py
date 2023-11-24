@@ -44,7 +44,7 @@ def plotLinesAsOfD(qArr, dArr, alpha2Trans, alpha2Long):
 
     fig = plt.figure(figsize=(2.5, 2.), dpi=800)
     gs = gridspec.GridSpec(2, 1, height_ratios=[1, 1],
-                           wspace=0.35, hspace=0., top=0.92, bottom=0.2, left=0.22, right=0.95)
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.2, left=0.22, right=0.95)
     axLong = plt.subplot(gs[0, 0])
     axTrans = plt.subplot(gs[1, 0])
 
@@ -59,22 +59,22 @@ def plotLinesAsOfD(qArr, dArr, alpha2Trans, alpha2Long):
         if(dInd == 0):
             colorB = cmapBone(.7)
             colorP = cmapPink(.7)
-            axLong.plot(qArr * 1e-6, alpha2Long[revInd, :] * 1e40, color=colorB, lw=linew, label="$d = 1\mathrm{cm}$")
-            axTrans.plot(qArr * 1e-6, alpha2Trans[revInd, :] * 1e40, color=colorP, lw=linew, label="$d = 1\mathrm{cm}$")
+            axLong.plot(qArr * 1e-6, alpha2Long[revInd, :], color=colorB, lw=linew, label="$d = 1\mathrm{cm}$")
+            axTrans.plot(qArr * 1e-6, alpha2Trans[revInd, :], color=colorP, lw=linew, label="$d = 1\mathrm{cm}$")
         if (dInd == 1):
             colorB = cmapBone(.5)
             colorP = cmapPink(.5)
-            axLong.plot(qArr * 1e-6, alpha2Long[revInd, :] * 1e40, color=colorB, lw=linew, label="$d = 100\mu\mathrm{m}$")
-            axTrans.plot(qArr * 1e-6, alpha2Trans[revInd, :] * 1e40, color=colorP, lw=linew, label="$d = 100\mu\mathrm{m}$")
+            axLong.plot(qArr * 1e-6, alpha2Long[revInd, :], color=colorB, lw=linew, label="$d = 100\mu\mathrm{m}$")
+            axTrans.plot(qArr * 1e-6, alpha2Trans[revInd, :], color=colorP, lw=linew, label="$d = 100\mu\mathrm{m}$")
         if (dInd == 2):
             colorB = cmapBone(.2)
             colorP = cmapPink(.2)
-            axLong.plot(qArr * 1e-6, alpha2Long[revInd, :] * 1e40, color=colorB, lw=linew, label="$d = 10\mu\mathrm{m}$")
-            axTrans.plot(qArr * 1e-6, alpha2Trans[revInd, :] * 1e40, color=colorP, lw=linew, label="$d = 10\mu\mathrm{m}$")
+            axLong.plot(qArr * 1e-6, alpha2Long[revInd, :], color=colorB, lw=linew, label="$d = 10\mu\mathrm{m}$")
+            axTrans.plot(qArr * 1e-6, alpha2Trans[revInd, :], color=colorP, lw=linew, label="$d = 10\mu\mathrm{m}$")
 
 
-    axLong.set_ylim(0., 4000)
-    axTrans.set_ylim(0., 4000)
+    axLong.set_ylim(0., 8)
+    axTrans.set_ylim(0., 8)
 
     axLong.set_xlim(0., np.amax(qArr * 1e-6))
     axTrans.set_xlim(0., np.amax(qArr * 1e-6))
@@ -96,7 +96,7 @@ def plotLinesAsOfD(qArr, dArr, alpha2Trans, alpha2Long):
     axTrans.set_ylabel(r"$\mathrm{Longitudinal}$", fontsize = 8)
     axLong.set_ylabel(r"$\mathrm{Transversal}$", fontsize = 8)
 
-    axLong.text(np.pi / 20, 4200, r"$\alpha^2F / \rho^2 \, [\mathrm{eV} \mathrm{m}^4]$", fontsize=8, ha='center')
+    axLong.text(np.pi / 20, 8.2, r"$\alpha^2F \, [E_{\mathrm{F}} \mathrm{\AA}^2]$", fontsize=8, ha='center')
 
     legend = axLong.legend(fontsize=8, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=1)
     legend.get_frame().set_alpha(0.)

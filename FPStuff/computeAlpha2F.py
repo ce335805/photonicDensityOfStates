@@ -35,9 +35,14 @@ def computeAlpha2FTransLong(d, zVal, qArr, OmArr):
     #alpha2FTrans = np.sum(1. / (OmArr[None, None, :] ** 2 + omegaArr[:, :, None] ** 2) / d, axis = 0)
     #alpha2FLong = np.sum(1. / (OmArr[None, None, :] ** 2 + omegaArr[:, :, None] ** 2) / d, axis = 0)
 
-    prefac = 2. * np.pi * consts.fine_structure * consts.hbar**3 * consts.c / consts.m_e ** 2 / consts.e
+    #prefac = 2. * np.pi * consts.fine_structure * consts.hbar**3 * consts.c / consts.m_e ** 2 / consts.e
+    prefac = consts.fine_structure * consts.hbar**3 * consts.c / (2. * np.pi * consts.m_e**2)
 
-    prefac = prefac * 2. * np.pi#for fermi wave-vector
+#   Let's set the units here
+
+    #prefac = prefac / consts.e ### eV m^2
+    #prefac = prefac * 2. * consts.m_e / consts.hbar**2 / d**2 ### Ef d^2
+    prefac = prefac * 2. * consts.m_e / consts.hbar**2 * 1e20 ### Ef Area in Angstrom^2
 
     return (prefac * alpha2FTrans, prefac * alpha2FLong)
 

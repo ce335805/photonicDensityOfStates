@@ -11,6 +11,8 @@ import matplotlib.cm as cm
 import matplotlib.colors
 import h5py
 from matplotlib import gridspec
+import matplotlib.image as mpimg
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 import handleIntegralData
 
@@ -166,6 +168,150 @@ def plotDosCompare(omArr, dosFP1, dosFP2, L1, L2):
     #plt.savefig("FPPlotsSaved/dosFPComparePara.png")
     plt.savefig("FPPlotsSaved/dosFPTotal.png")
 
+
+
+def plotRhoParaAsOfOmDimensionless(omArr, dosFP, L):
+
+    lambda1 = 2. * L
+    freq1 = 2. * np.pi * consts.c / (lambda1)
+
+    print("res1 = {}THz".format(freq1))
+
+
+    fig = plt.figure(figsize=(3., 1.8), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.2, left=0.13, right=0.96)
+    ax = plt.subplot(gs[0, 0])
+
+    arr_img = mpimg.imread('FabryPerotV3.png')
+    im = OffsetImage(arr_img, zoom = .1)
+    ab = AnnotationBbox(im, (1.0, 0.3), xycoords='axes fraction', box_alignment=(1.05, -0.05), frameon=False, pad=0, boxcoords="offset points")
+    ax.add_artist(ab)
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+
+    ax.plot(omArr, dosFP, color=cmapPink(.45), lw=.7, label ="$d = $" + "{}".format(int(L * 1e6)) + r"$\mu \mathrm{m}$")
+    ax.set_xlim(np.amin(omArr), np.amax(omArr))
+    ax.axhline(2. / 3., color = 'black', lw = .4, linestyle = "-", zorder = -666)
+
+    ax.set_ylim(0, 2.4)
+    ax.set_xlim(0, 10.3 * freq1)
+
+    ax.set_xticks([0., freq1, 3. * freq1, 5. * freq1, 7. * freq1, 9. * freq1])
+    ax.set_xticklabels(["$0$", "$1$", "$3$", "$5$", "$7$", "$9$"], fontsize = 8)
+    ax.set_yticks([0., 2. / 3., 2.])
+    ax.set_yticklabels(["$0$", r"$\frac{2}{3}$", "$2$"], fontsize = 8)
+
+    ax.set_xlabel(r"$\omega \, \left[\omega_0 \right]$")
+    #ax.set_ylabel(r"$\left(\rho / \rho_0 - 0.5\right) \times \omega^3$")
+    ax.set_ylabel(r"$\rho \,  \left[ \rho_0 \right]$")
+
+    #legend = ax.legend(fontsize=8, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=1)
+    #legend.get_frame().set_alpha(0.)
+    #legend.get_frame().set_boxstyle('Square', pad=0.1)
+    #legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+
+    plt.savefig("FPPlotsSaved/DosAsOfOmDimensionless.png")
+
+
+def plotRhoParaAsOfOmThesis(omArr, dosFP1, dosFP2, L1, L2):
+
+    omArr = omArr * 1e-12
+
+    lambda1 = 2. * L1
+    freq1 = 2. * np.pi * consts.c / (lambda1)
+    lambda2 = 2. * L2
+    freq2 = 2. * np.pi * consts.c / (lambda2)
+
+    print("res1 = {}THz".format(freq1))
+    print("res2 = {}THz".format(freq2))
+
+
+    fig = plt.figure(figsize=(2.5, 1.8), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.95 , bottom=0.22, left=0.15, right=0.96)
+    ax = plt.subplot(gs[0, 0])
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+
+    rho0 = omArr**2 * 1e24 / (np.pi**2 * consts.c**3)
+
+    ax.plot(omArr, dosFP1, color=cmapPink(.45), lw=.7, label = "$d = $" + "{}".format(int(L1 * 1e6)) + r"$\mu \mathrm{m}$")
+    ax.plot(omArr, dosFP2, color=cmapBone(.45), lw=.7, label = "$d = $" + "{}".format(int(L2 * 1e6)) + r"$\mu \mathrm{m}$")
+    #ax.plot(omArr, (dosFP1 - 2. / 3.) * rho0, color=cmapPink(.55), lw=1., label = "$d = $" + "{}".format(int(L1 * 1e6)) + r"$\mu \mathrm{m}$")
+    #ax.plot(omArr, (dosFP2 - 2. / 3.) * rho0, color=cmapBone(.55), lw=1., label = "$d = $" + "{}".format(int(L2 * 1e6)) + r"$\mu \mathrm{m}$")
+    ax.set_xlim(np.amin(omArr), np.amax(omArr))
+    ax.axhline(2. / 3., color = 'black', lw = .4, linestyle = "-", zorder = -666)
+    #ax.set_xscale("log")
+
+    ax.set_ylim(0, 2.2)
+
+    ax.set_xticks([0., 100, 200])
+    ax.set_xticklabels(["$0$", "$100$", "$200$"], fontsize = 8)
+    ax.set_yticks([0., 1., 2.])
+    ax.set_yticklabels(["$0$", "$1$", "$2$"], fontsize = 8)
+
+    ax.set_xlabel(r"$\omega \, \left[\mathrm{THz}\right]$")
+    #ax.set_ylabel(r"$\left(\rho / \rho_0 - 0.5\right) \times \omega^3$")
+    ax.set_ylabel(r"$\rho / \rho_0$")
+
+    legend = ax.legend(fontsize=8, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+
+    plt.savefig("FPPlotsSaved/ThesisDosAsOfOm.png")
+
+
+def plotRhoParaAsOfZThesis(omArr, zArr, dosFP, L):
+
+    lambda1 = 2. * L
+    freq1 = 2. * np.pi * consts.c / (lambda1)
+
+    print("res1 = {}THz".format(freq1))
+
+    fig = plt.figure(figsize=(2.5, 1.8), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.15, right=0.96)
+    ax = plt.subplot(gs[0, 0])
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+
+    ax.plot(zArr / L, dosFP[0, :], color=cmapPink(.45), lw=.7, label ="$\omega = $" + "{}".format(round(omArr[0] / freq1)) + r"$\omega_0$")
+    ax.plot(zArr / L, dosFP[1, :], color=cmapBone(.45), lw=.7, label = "$\omega = $" + "{}".format(round(omArr[1] / freq1)) + r"$\omega_0$")
+    ax.set_xlim(np.amin(zArr / L), np.amax(zArr / L))
+    ax.axhline(2. / 3., color = 'black', lw = .4, linestyle = "-", zorder = -666)
+    ax.axvline(.5, color = 'black', lw = .4, linestyle = "-", zorder = -666)
+
+    ax.set_ylim(0, 1.2)
+
+    ax.set_xticks([0., .5, 1.])
+    ax.set_xticklabels(["$0$", r"$\frac{d}{2}$", "$d$"], fontsize = 8)
+    ax.set_yticks([0., 1.])
+    ax.set_yticklabels(["$0$", "$1$"], fontsize = 8)
+
+    ax.set_xlabel(r"$z$")
+    #ax.set_ylabel(r"$\left(\rho / \rho_0 - 0.5\right) \times \omega^3$")
+    ax.set_ylabel(r"$\rho / \rho_0$")
+
+    legend = ax.legend(fontsize=8, loc='lower right', bbox_to_anchor=(.975, 0.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+
+    plt.savefig("FPPlotsSaved/ThesisDosAsOfZ.png")
 
 def plotDosWithCutoff(omArr, dos):
     omArr = omArr * 1e-12
@@ -504,7 +650,7 @@ def plotFluctuationsAandE(dArr, flucE, flucA, freqArr, cutoff):
 
 def plotFluctuationsAandENaturalUnits(dArr, flucE, flucA, freqArr, cutoff):
     fig = plt.figure(figsize=(7.04 / 3., 1.8), dpi=800)
-    gs = gridspec.GridSpec(1, 1, wspace=0.35, hspace=0., top=0.9, bottom=0.2, left=0.24, right=0.75)
+    gs = gridspec.GridSpec(1, 1, wspace=0.35, hspace=0., top=0.9, bottom=0.2, left=0.24, right=0.72)
     axE = plt.subplot(gs[0, 0])
     axA = axE.twinx()
     cmapPink = cm.get_cmap('pink')
@@ -611,31 +757,38 @@ def plotEffectiveMassesComparison():
     filenameSPhP = "massesForPlotting"
     cutoff, zArr, massSPhPArr = handleIntegralData.readMassesSPhP(filenameSPhP)
 
-    fig = plt.figure(figsize=(2., 2.), dpi=800)
-    gs = gridspec.GridSpec(2, 1, height_ratios=[1, 1],
-                           wspace=0.35, hspace=0.6, top=0.92, bottom=0.2, left=0.22, right=0.92)
-    axFP = plt.subplot(gs[0, 0])
-    axSPhP = plt.subplot(gs[1, 0])
+    print(zArr.shape)
+
+    fig = plt.figure(figsize=(7.04, 2.), dpi=800)
+    gs = gridspec.GridSpec(2, 3, height_ratios=[1, 1], width_ratios=[1, 1, 1.5],
+                           wspace=0.5, hspace=0.8, top=0.9, bottom=0.2, left=0.22, right=0.92)
+    axFP = plt.subplot(gs[0, 2])
+    axSPhP = plt.subplot(gs[1, 2])
+
+    wLO = 32.04 * 1e12
+
+    wInf = wLO / np.sqrt(2)
+    lambda0 = 2. * np.pi * consts.c / wInf
 
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
-    axFP.plot(dArr, massFPArr * 1e7, color = cmapPink(.5), lw = 0.8)
+    axFP.plot(dArr, massFPArr * 1e7, color = cmapPink(.45), lw = 0.8)
 
-    axSPhP.plot(zArr, massSPhPArr, color = cmapBone(.5), lw = 0.8)
-
+    axSPhP.plot(zArr / lambda0, massSPhPArr, color = cmapBone(.45), lw = 0.8)
+    axSPhP.axhline(0., color = "black", lw = 0.3)
     axFP.set_xscale("log")
     axSPhP.set_xscale("log")
 
     axFP.set_xlim(np.amin(dArr), np.amax(dArr))
     axFP.set_ylim(-8., 0.)
-    axSPhP.set_xlim(1e-8, 1e-3)
+    axSPhP.set_xlim(1e-3, 1e2)
     axSPhP.set_ylim(0., 1.)
 
     axFP.set_xlabel("$d [\mathrm{m}]$", fontsize = 8)
-    axSPhP.set_xlabel("$z [\mathrm{m}]$", fontsize = 8)
+    axSPhP.set_xlabel("$z [\lambda_0]$", fontsize = 8)
 
-    axFP.set_ylabel(r"$\frac{\Delta m}{m}$", labelpad = 0., fontsize = 8)
-    axSPhP.set_ylabel(r"$\frac{\Delta m}{m}$", labelpad = 6., fontsize = 8)
+    axFP.set_ylabel(r"$\Delta m \, [m_{\rm e}]$", labelpad = 0., fontsize = 8)
+    axSPhP.set_ylabel(r"$\Delta m \, [m_{\rm e}]$", labelpad = 6., fontsize = 8)
 
     axFP.set_xticks([1e-6, 1e-5, 1e-4, 1e-3])
     axFP.set_xticklabels(["$10^{-6}$", "$10^{-5}$", "$10^{-4}$", "$10^{-3}$"], fontsize = 8)
@@ -643,22 +796,53 @@ def plotEffectiveMassesComparison():
     axFP.set_yticks([0., -5.])
     axFP.set_yticklabels(["$0$", "$-5$"], fontsize = 8)
 
-    axSPhP.set_xticks([1e-8, 1e-6, 1e-4])
-    axSPhP.set_xticklabels(["$10^{-8}$", "$10^{-6}$", "$10^{-4}$"], fontsize = 8)
+    axSPhP.set_xticks([1e-2, 1, 1e2])
+    axSPhP.set_xticklabels(["$10^{-2}$", "$1$", "$10^{2}$"], fontsize = 8)
 
-    axSPhP.set_yticks([0., 1.])
-    axSPhP.set_yticklabels(["$0$", "$1$"], fontsize = 8)
+    #axSPhP.set_yticks([0., 1.])
+    #axSPhP.set_yticklabels(["$0$", "$1$"], fontsize = 8)
 
     axFP.text(1.1 * 1e-6, -1.4, r"$\times 10^{-7}$", fontsize = 8)
     axFP.text(1. * 1e-5, -5., r"$\mathrm{Fabry-Perot}$", fontsize = 8)
-    axSPhP.text(6. * 1e-7, .5, r"$\mathrm{Surface}$", fontsize = 8)
+    axSPhP.text(1. * 1e-2, .5, r"$\mathrm{Surface}$", fontsize = 8)
 
+    axFPDisp = plt.subplot(gs[0, 1])
+    axSPhPDisp = plt.subplot(gs[1, 1])
+
+    xArr = np.linspace(-1., 1., 1000)
+    yArr = xArr * xArr
+    yArrFP = 1.1 * xArr * xArr
+    yArrSPhP = 0.6 * xArr * xArr
+
+    axFPDisp.plot(xArr, yArr, color = "gray", lw = 0.5, linestyle = '--')
+    axFPDisp.plot(xArr, yArrFP, color = cmapPink(.45) , lw = 0.8)
+
+    axSPhPDisp.plot(xArr, yArr, color = "gray", lw = 0.5, linestyle = '--')
+    axSPhPDisp.plot(xArr, yArrSPhP, color = cmapBone(.45) , lw = 0.8)
+
+    axFPDisp.set_xlim(-1, 1)
+    axFPDisp.set_ylim(0, 1)
+    axSPhPDisp.set_xlim(-1, 1)
+    axSPhPDisp.set_ylim(0, 1)
+
+    axFPDisp.set_xlabel("$k \, [\mathrm{arb. \, units}]$")
+    axSPhPDisp.set_xlabel("$k \, [\mathrm{arb. \, units}]$")
+
+    axFPDisp.set_ylabel(r"$\varepsilon(k) \, [\mathrm{arb. \, units}]$")
+    axSPhPDisp.set_ylabel(r"$\varepsilon(k) \, [\mathrm{arb. \, units}]$")
+
+    axFPDisp.set_xticks([])
+    axFPDisp.set_yticks([])
+
+    axSPhPDisp.set_xticks([])
+    axSPhPDisp.set_yticks([])
 
 
     for axis in ['top', 'bottom', 'left', 'right']:
         axFP.spines[axis].set_linewidth(.5)
         axSPhP.spines[axis].set_linewidth(.5)
-
+        axFPDisp.spines[axis].set_linewidth(.5)
+        axSPhPDisp.spines[axis].set_linewidth(.5)
 
 
     plt.savefig("FPPlotsSaved/EffectiveMassesCompared.png")

@@ -19,11 +19,11 @@ import produceFreqData as prod
 
 def freqIntegral(zArr, wLO, wTO, epsInf, L):
 
-    cutoff = 3. * 241.8 * 1e12# 1eV cutoff
-    #cutoff = 500 * 1e12# 1eV cutoff
-    #computeEffectiveMass(zArr, cutoff, wLO, wTO, epsInf, L)
+    evCutoff = 1519.3 * 1e12  # 1eV
+    cutoff = .5 * evCutoff
+    computeEffectiveMass(zArr, cutoff, wLO, wTO, epsInf, L)
     #computeEffectiveHopping(zArr, cutoff, wLO, wTO, epsInf, L)
-    computeFluctuations(zArr, cutoff, wLO, wTO, epsInf, L)
+    #computeFluctuations(zArr, cutoff, wLO, wTO, epsInf, L)
 
 def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
 
@@ -31,8 +31,8 @@ def computeFreqIntegralAsOfCutoff(zArr, wLO, wTO, epsInf, L):
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAbove)
 
-    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTMTotal(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
+    dosTMTotal = prod.retrieveDosTMTotal(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
     #dosSurf = prod.retrieveDosSurf()
 
 
@@ -64,8 +64,8 @@ def computeEffectiveMass(zArr, cutoff, wLO, wTO, epsInf, L):
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAbove)
 
-    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
+    dosTMPara = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
 
     dosIntTE = np.zeros(zArr.shape)
     dosIntTM = np.zeros(zArr.shape)
@@ -73,9 +73,11 @@ def computeEffectiveMass(zArr, cutoff, wLO, wTO, epsInf, L):
     for zInd, zVal in enumerate(zArr):
         prefacMass = 16. / (3. * np.pi) * consts.hbar / (consts.c**2 * consts.m_e)
         cutoffFac = np.exp(- wArr**2 / cutoff**2)
-        intFuncTE = prefacMass * (dosTETotal[ : , zInd] - .5) * cutoffFac
+        intFuncTE = prefacMass * (dosTETotal[ : , zInd] - .5)# * cutoffFac
+        intFuncTE[:9] = 0.
         dosIntTE[zInd] = np.trapz(intFuncTE, x=wArr, axis = 0)
-        intFuncTM = prefacMass * (dosTMTotal[ : , zInd] - 1. / 6.) * cutoffFac
+        intFuncTM = prefacMass * (dosTMPara[ : , zInd] - 1. / 6.)# * cutoffFac
+        intFuncTM[:9] = 0.
         dosIntTM[zInd] = np.trapz(intFuncTM, x=wArr, axis = 0)
 
     dosSurf = np.zeros(len(zArr))
@@ -105,13 +107,24 @@ def computeFluctuationsMultipleCutoffs(zArr, wLO, wTO, epsInf, L):
     plotFreq.plotFluctuationsENaturalUnitsMultipleCutoffs(fluctuationsNoSurfE[:, :], fluctuationsTotE[:, :], zArr, cutoffArr, L, wLO, wTO, epsInf)
     plotFreq.plotFluctuationsANaturalUnitsMultipleCutoffs(fluctuationsNoSurfA[:, :], fluctuationsTotA[:, :], zArr, cutoffArr, L, wLO, wTO, epsInf)
 
-def produceCollapsePlot(zArr, cutoff, wLOArr, wTOArr, epsInf, L):
+def produceCollapsePlotE(zArr, cutoff, wLOArr, wTOArr, epsInf, L):
 
     flucEArr = np.zeros((2, len(wLOArr), len(zArr)))
     for wInd, _ in enumerate(wLOArr):
+        cutoff = 3. * wLOArr[wInd]
         flucEArr[:, wInd, :] = computeFluctuationsE(zArr, cutoff, wLOArr[wInd], wTOArr[wInd], epsInf, L)
 
     plotFreq.collapseFlucE(flucEArr[0, :, :], flucEArr[1, :, :], zArr, L, wLOArr, wTOArr, epsInf)
+
+def produceCollapsePlotA(zArr, cutoff, wLOArr, wTOArr, epsInf, L):
+
+    flucAArr = np.zeros((2, len(wLOArr), len(zArr)))
+    for wInd, _ in enumerate(wLOArr):
+        cutoff = 3. * wLOArr[wInd]
+        flucAArr[:, wInd, :] = computeFluctuationsA(zArr, cutoff, wLOArr[wInd], wTOArr[wInd], epsInf, L)
+
+    plotFreq.collapseFlucA(flucAArr[0, :, :], flucAArr[1, :, :], zArr, L, wLOArr, wTOArr, epsInf)
+
 
 def computeFluctuationsE(zArr, cutoff, wLO, wTO, epsInf, L):
 
@@ -119,8 +132,8 @@ def computeFluctuationsE(zArr, cutoff, wLO, wTO, epsInf, L):
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAbove)
 
-    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
+    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
 
     flucETE = np.zeros(zArr.shape)
     flucETM = np.zeros(zArr.shape)
@@ -149,8 +162,8 @@ def computeFluctuationsA(zArr, cutoff, wLO, wTO, epsInf, L):
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAbove)
 
-    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
+    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
 
     flucATE = np.zeros(zArr.shape)
     flucATM = np.zeros(zArr.shape)
@@ -179,8 +192,8 @@ def computeFluctuations(zArr, cutoff, wLO, wTO, epsInf, L):
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAbove)
 
-    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
+    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
 
     flucETE = np.zeros(zArr.shape)
     flucETM = np.zeros(zArr.shape)
@@ -234,8 +247,8 @@ def computeSumRule(zArr, cutoff, wLO, wTO, epsInf, L):
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAbove)
 
-    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
+    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
 
     dosTE = np.zeros(zArr.shape)
     dosTM = np.zeros(zArr.shape)
@@ -262,8 +275,8 @@ def computeEffectiveHopping(zArr, cutoff, wLO, wTO, epsInf, L):
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAbove)
 
-    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
+    dosTMTotal = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
 
     dosIntTE = np.zeros(zArr.shape)
     dosIntTM = np.zeros(zArr.shape)
@@ -298,8 +311,8 @@ def computeLocalFieldStrength(zArr, wLO, wTO, epsInf, L):
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAbove)
 
-    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
-    dosTMTotal = prod.retrieveDosTMTotal(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, epsInf)
+    dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
+    dosTMTotal = prod.retrieveDosTMTotal(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
     dosSurf = prod.retrieveDosSurf()
 
     dosIntTE = np.zeros(dosTETotal.shape)

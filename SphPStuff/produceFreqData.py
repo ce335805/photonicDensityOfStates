@@ -8,7 +8,9 @@ import h5py
 import numpy as np
 
 
-def parameterName(wmax, L, eps):
+def parameterName(wLO, wTO, wmax, L, eps):
+    wLOStr = "wLO" + str(int(wLO * 1e-12))
+    wTOStr = "wTO" + str(int(wTO * 1e-12))
     wMaxStr = "wMax" + str(int(wmax * 1e-12))
     ellStr = "L" + str(int(10 * L))
     epsStr = "Eps" + str(int(10 * eps))
@@ -36,15 +38,14 @@ def produceFreqIntegralData(zArr, wLO, wTO, epsInf, L):
     #produceFreqDataSurf(surfFreqArr, zArr, wLO, wTO, epsInf, L)
 
 def defineFreqArrays(wLO, wTO, epsInf):
-    arrBelow = np.linspace(wTO * 1e-1, wTO - 1e-3 * wTO, 100, endpoint=False)
-    arrWithin = np.linspace(wTO, wLO, 100, endpoint=False)
+    arrBelow = np.linspace(wTO * 1e-1, wTO - 1e-3 * wTO, 1, endpoint=False)
+    arrWithin = np.linspace(wTO, wLO, 200, endpoint=False)
     arrWithin = arrWithin[1:]
     #arrAbove1 = np.linspace(wLO, 50. * wLO, 5000, endpoint=False)
     #arrAbove2 = np.linspace(50. * wLO, 99. * wLO, 1000, endpoint=False)
     #arrAbove2 = arrAbove2[1:]
     #arrAbove = np.append(arrAbove1, arrAbove2)
-    #arrAbove = np.linspace(wLO, 50. * wLO, 5000, endpoint=False)
-    arrAbove = np.linspace(wLO, 40. * 1e12, 400, endpoint=False)
+    arrAbove = np.linspace(wLO, 300 * 1e12, 2000, endpoint=False)
     arrAbove = arrAbove[1:]
 
     surfFreqArr = arrWithin
@@ -53,7 +54,7 @@ def defineFreqArrays(wLO, wTO, epsInf):
 
 def produceFreqDataBelow(wArrBelow, zArr, wLO, wTO, epsInf, L):
 
-    parameterStr = parameterName(wArrBelow[-1], L, epsInf)
+    parameterStr = parameterName(wLO, wTO, wArrBelow[-1], L, epsInf)
 
     filenameTE = 'savedData/dosTE' + parameterStr + '.h5'
     produceFreqDataTE(wArrBelow, zArr, L, wLO, wTO, epsInf, filenameTE)
@@ -62,7 +63,7 @@ def produceFreqDataBelow(wArrBelow, zArr, wLO, wTO, epsInf, L):
 
 def produceFreqDataWithin(wArrWihtin, zArr, wLO, wTO, epsInf, L):
 
-    parameterStr = parameterName(wArrWihtin[-1], L, epsInf)
+    parameterStr = parameterName(wLO, wTO, wArrWihtin[-1], L, epsInf)
 
     filenameTE = 'savedData/dosTE' + parameterStr + '.h5'
     produceFreqDataTE(wArrWihtin, zArr, L, wLO, wTO, epsInf, filenameTE)
@@ -75,7 +76,7 @@ def produceFreqDataSurf(wArrWihtin, zArr, wLO, wTO, epsInf, L):
 
 def produceFreqDataAbove(wArrAbove, zArr, wLO, wTO, epsInf, L):
 
-    parameterStr = parameterName(wArrAbove[-1], L, epsInf)
+    parameterStr = parameterName(wLO, wTO, wArrAbove[-1], L, epsInf)
 
     filenameTE = 'savedData/dosTE' + parameterStr + '.h5'
     produceFreqDataTE(wArrAbove, zArr, L, wLO, wTO, epsInf, filenameTE)
@@ -150,37 +151,9 @@ def produceFreqDataTM(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
     h5f.close()
 
 
-def retrieveDosTE(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
+def retrieveDosTE(wMaxBelow, wMaxWithin, wMAxAbove, L, wLO, wTO, epsInf):
 
-    parameterStr = parameterName(wMaxBelow, L, epsInf)
-
-    #dir = "savedData/clusterFreqData/"
-    dir = "savedData/"
-
-    filenameTE = dir + 'dosTE' + parameterStr + '.h5'
-    h5f = h5py.File(filenameTE, 'r')
-    dosTETotal = h5f['dosTE'][:] + h5f['dosTEEva'][:] + h5f['dosTERes'][:]
-    h5f.close()
-
-    parameterStr = parameterName(wMaxWithin, L, epsInf)
-
-    filenameTE = dir + 'dosTE' + parameterStr + '.h5'
-    h5f = h5py.File(filenameTE, 'r')
-    dosTETotal = np.append(dosTETotal, h5f['dosTE'][:] + h5f['dosTEEva'][:] + h5f['dosTERes'][:], axis = 0)
-    h5f.close()
-
-    parameterStr = parameterName(wMAxAbove, L, epsInf)
-
-    filenameTE = dir + 'dosTE' + parameterStr + '.h5'
-    h5f = h5py.File(filenameTE, 'r')
-    dosTETotal = np.append(dosTETotal, h5f['dosTE'][:] + h5f['dosTEEva'][:] + h5f['dosTERes'][:], axis = 0)
-    h5f.close()
-
-    return dosTETotal
-
-def retrieveDosTEMultipleWMax(wMaxBelow, wMaxWithin, wMaxAboveArr, L, epsInf):
-
-    parameterStr = parameterName(wMaxBelow, L, epsInf)
+    parameterStr = parameterName(wLO, wTO, wMaxBelow, L, epsInf)
 
     dir = "savedData/clusterFreqData/"
     #dir = "savedData/"
@@ -190,7 +163,35 @@ def retrieveDosTEMultipleWMax(wMaxBelow, wMaxWithin, wMaxAboveArr, L, epsInf):
     dosTETotal = h5f['dosTE'][:] + h5f['dosTEEva'][:] + h5f['dosTERes'][:]
     h5f.close()
 
-    parameterStr = parameterName(wMaxWithin, L, epsInf)
+    parameterStr = parameterName(wLO, wTO, wMaxWithin, L, epsInf)
+
+    filenameTE = dir + 'dosTE' + parameterStr + '.h5'
+    h5f = h5py.File(filenameTE, 'r')
+    dosTETotal = np.append(dosTETotal, h5f['dosTE'][:] + h5f['dosTEEva'][:] + h5f['dosTERes'][:], axis = 0)
+    h5f.close()
+
+    parameterStr = parameterName(wLO, wTO, wMAxAbove, L, epsInf)
+
+    filenameTE = dir + 'dosTE' + parameterStr + '.h5'
+    h5f = h5py.File(filenameTE, 'r')
+    dosTETotal = np.append(dosTETotal, h5f['dosTE'][:] + h5f['dosTEEva'][:] + h5f['dosTERes'][:], axis = 0)
+    h5f.close()
+
+    return dosTETotal
+
+def retrieveDosTEMultipleWMax(wMaxBelow, wMaxWithin, wMaxAboveArr, L, wLO, wTO, epsInf):
+
+    parameterStr = parameterName(wLO, wTO, wMaxBelow, L, epsInf)
+
+    dir = "savedData/clusterFreqData/"
+    #dir = "savedData/"
+
+    filenameTE = dir + 'dosTE' + parameterStr + '.h5'
+    h5f = h5py.File(filenameTE, 'r')
+    dosTETotal = h5f['dosTE'][:] + h5f['dosTEEva'][:] + h5f['dosTERes'][:]
+    h5f.close()
+
+    parameterStr = parameterName(wLO, wTO, wMaxWithin, L, epsInf)
 
     filenameTE = dir + 'dosTE' + parameterStr + '.h5'
     h5f = h5py.File(filenameTE, 'r')
@@ -199,7 +200,7 @@ def retrieveDosTEMultipleWMax(wMaxBelow, wMaxWithin, wMaxAboveArr, L, epsInf):
 
     for wMaxAbove in wMaxAboveArr:
 
-        parameterStr = parameterName(wMaxAbove, L, epsInf)
+        parameterStr = parameterName(wLO, wTO, wMaxAbove, L, epsInf)
 
         filenameTE = dir + 'dosTE' + parameterStr + '.h5'
         h5f = h5py.File(filenameTE, 'r')
@@ -208,9 +209,9 @@ def retrieveDosTEMultipleWMax(wMaxBelow, wMaxWithin, wMaxAboveArr, L, epsInf):
 
     return dosTETotal
 
-def retrieveDosTMTotal(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
+def retrieveDosTMTotal(wMaxBelow, wMaxWithin, wMAxAbove, L, wLO, wTO, epsInf):
 
-    parameterStr = parameterName(wMaxBelow, L, epsInf)
+    parameterStr = parameterName(wLO, wTO, wMaxBelow, L, epsInf)
 
     dir = "savedData/clusterFreqData/"
     #dir = "savedData/"
@@ -220,14 +221,14 @@ def retrieveDosTMTotal(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
     dosTMTotal = h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:] + h5f['dosTMPerp'][:] + h5f['dosTMEvaPerp'][:] + h5f['dosTMResPerp'][:]
     h5f.close()
 
-    parameterStr = parameterName(wMaxWithin, L, epsInf)
+    parameterStr = parameterName(wLO, wTO, wMaxWithin, L, epsInf)
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')
     dosTMTotal = np.append(dosTMTotal, h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:] + h5f['dosTMPerp'][:] + h5f['dosTMEvaPerp'][:] + h5f['dosTMResPerp'][:], axis = 0)
     h5f.close()
 
-    parameterStr = parameterName(wMAxAbove, L, epsInf)
+    parameterStr = parameterName(wLO, wTO, wMAxAbove, L, epsInf)
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')
@@ -237,37 +238,37 @@ def retrieveDosTMTotal(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
     return dosTMTotal
 
 
-def retrieveDosTMPara(wMaxBelow, wMaxWithin, wMAxAbove, L, epsInf):
+def retrieveDosTMPara(wMaxBelow, wMaxWithin, wMAxAbove, L, wLO, wTO, epsInf):
 
-    parameterStr = parameterName(wMaxBelow, L, epsInf)
+    parameterStr = parameterName(wLO, wTO, wMaxBelow, L, epsInf)
 
-    #dir = "savedData/clusterFreqData/"
-    dir = "savedData/"
-
-    filenameTM = dir + 'dosTM' + parameterStr + '.h5'
-    h5f = h5py.File(filenameTM, 'r')
-    dosTMTotal = h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:]
-    h5f.close()
-
-    parameterStr = parameterName(wMaxWithin, L, epsInf)
+    dir = "savedData/clusterFreqData/"
+    #dir = "savedData/"
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')
-    dosTMTotal = np.append(dosTMTotal, h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:], axis = 0)
+    dosTMPara = h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:]
     h5f.close()
 
-    parameterStr = parameterName(wMAxAbove, L, epsInf)
+    parameterStr = parameterName(wLO, wTO, wMaxWithin, L, epsInf)
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')
-    dosTMTotal = np.append(dosTMTotal, h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:], axis = 0)
+    dosTMPara = np.append(dosTMPara, h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:], axis = 0)
     h5f.close()
 
-    return dosTMTotal
+    parameterStr = parameterName(wLO, wTO, wMAxAbove, L, epsInf)
 
-def retrieveDosTMParaMultipleWMax(wMaxBelow, wMaxWithin, wMaxAboveArr, L, epsInf):
+    filenameTM = dir + 'dosTM' + parameterStr + '.h5'
+    h5f = h5py.File(filenameTM, 'r')
+    dosTMPara = np.append(dosTMPara, h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:], axis = 0)
+    h5f.close()
 
-    parameterStr = parameterName(wMaxBelow, L, epsInf)
+    return dosTMPara
+
+def retrieveDosTMParaMultipleWMax(wMaxBelow, wMaxWithin, wMaxAboveArr, L, wLO, wTO, epsInf):
+
+    parameterStr = parameterName(wLO, wTO, wMaxBelow, L, epsInf)
 
     dir = "savedData/clusterFreqData/"
     #dir = "savedData/"
@@ -277,7 +278,7 @@ def retrieveDosTMParaMultipleWMax(wMaxBelow, wMaxWithin, wMaxAboveArr, L, epsInf
     dosTMTotal = h5f['dosTMPara'][:] + h5f['dosTMEvaPara'][:] + h5f['dosTMResPara'][:]
     h5f.close()
 
-    parameterStr = parameterName(wMaxWithin, L, epsInf)
+    parameterStr = parameterName(wLO, wTO, wMaxWithin, L, epsInf)
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')
@@ -286,7 +287,7 @@ def retrieveDosTMParaMultipleWMax(wMaxBelow, wMaxWithin, wMaxAboveArr, L, epsInf
 
     for wMaxAbove in wMaxAboveArr:
 
-        parameterStr = parameterName(wMaxAbove, L, epsInf)
+        parameterStr = parameterName(wLO, wTO, wMaxAbove, L, epsInf)
 
         filenameTM = dir + 'dosTM' + parameterStr + '.h5'
         h5f = h5py.File(filenameTM, 'r')

@@ -92,6 +92,13 @@ def dosParallelAsOfFeq(zArr, omegaArr, L):
         dos[wInd] += dosTMParallel(zArr, wVal, L)
     return dos
 
+def dosParallelAsOfFeqAndZ(zArr, omegaArr, L):
+    dos = np.zeros((len(omegaArr), len(zArr)))
+    for wInd, wVal in enumerate(omegaArr):
+        dos[wInd, :] = dosTE(zArr, wVal, L)
+        dos[wInd, :] += dosTMParallel(zArr, wVal, L)
+    return dos
+
 def dosParallelOneFreq(omega, zVal, L):
         return dosTE(np.array([zVal]), omega, L) + dosTMParallel(np.array([zVal]), omega, L)
 
