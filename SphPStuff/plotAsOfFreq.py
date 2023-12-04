@@ -362,23 +362,12 @@ def plotFluctuationsENaturalUnits(dosNoSurfE, dosTotE, zArr, L, wLO, wTO, epsInf
 
     axE.set_xscale("log")
     axE.set_yscale("log")
-    axE.set_xlim(1e-2, 2 * 1e0)
-    #axE.set_ylim(1e-6, 1e3)
+    axE.set_xlim(1e-3, 1e1)
+    axE.set_ylim(1e-4, 1e8)
     #axE.set_ylim(1e10, 1e20)
 
-    dosRef = 1675492130938788.2
-    dosRef20 = -80.67464973121388
-
-    wInfRef = 20. * 1e12 / np.sqrt(2.)
-    lambda0Ref = consts.c / (2. * np.pi * wInfRef)
-    natUnitFacRef = consts.epsilon_0 * lambda0Ref**3 / (consts.hbar * wInfRef)
-
-    #axE.plot(zArr / lambda0, np.abs(dosTotE[-1]) * zArr[-1]**3 / zArr**3 * natUnitFac, color = 'red', lw = 0.3)
-    #axE.plot(zArr / lambda0, np.abs(dosNoSurfE[20]) * zArr[20]**2 / zArr**2 * natUnitFac, color = 'red', lw = 0.3)
-
-    axE.plot(zArr / lambda0Ref, np.abs(dosRef) * zArr[-1]**3 / zArr**3 * natUnitFacRef, color = 'red', lw = 0.3)
-    axE.plot(zArr / lambda0Ref, np.abs(dosRef20) * zArr[20]**2 / zArr**2 * natUnitFacRef, color = 'red', lw = 0.3)
-
+    axE.plot(zArr / lambda0, np.abs(dosTotE[-1]) * zArr[-1]**3 / zArr**3 * natUnitFac, color = 'red', lw = 0.3)
+    axE.plot(zArr / lambda0, np.abs(dosNoSurfE[-50]) * zArr[-50]**2 / zArr**2 * natUnitFac, color = 'red', lw = 0.3)
 
     axE.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
     axE.set_ylabel(r"$ \langle E^2 \rangle_{\rm eff}  \left[\frac{\hbar \omega_{\mathrm{S}}}{\varepsilon_0 \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
@@ -581,10 +570,10 @@ def plotFluctuationsANaturalUnits(dosNoSurfA, dosTotA, zArr, L, wLO, wTO, epsInf
     axA.set_xlim(1e-2, 1e2)
     axA.set_ylim(-0.15 * 1e-3, .15 * 1e-3)
 
-    axA.plot(zArr / lambda0, np.abs(dosTotA[17]) * zArr[17]**3 / zArr**3 * natUnitFac, color = 'red', lw = 0.3)
+    axA.plot(zArr / lambda0, np.abs(dosTotA[110]) * zArr[110]**3 / zArr**3 * natUnitFac, color = 'red', lw = 0.3)
 
     ydat = np.abs(dosNoSurfA)
-    fitInd = 29
+    fitInd = 160
     logZArr = np.log(zArr)
     slope = (ydat[fitInd] - ydat[fitInd - 1]) / (logZArr[fitInd] - logZArr[fitInd - 1])
     offset = ydat[fitInd] - slope * logZArr[fitInd]

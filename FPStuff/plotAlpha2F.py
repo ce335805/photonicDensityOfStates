@@ -42,9 +42,9 @@ mpl.rcParams['text.latex.preamble'] = [
 
 def plotLinesAsOfD(qArr, dArr, alpha2Trans, alpha2Long):
 
-    fig = plt.figure(figsize=(2.5, 2.), dpi=800)
+    fig = plt.figure(figsize=(2.5, 1.8), dpi=800)
     gs = gridspec.GridSpec(2, 1, height_ratios=[1, 1],
-                           wspace=0.35, hspace=0., top=0.9, bottom=0.2, left=0.22, right=0.95)
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.22, left=0.15, right=0.95)
     axLong = plt.subplot(gs[0, 0])
     axTrans = plt.subplot(gs[1, 0])
 

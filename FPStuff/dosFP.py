@@ -22,16 +22,16 @@ def dosFPMain():
 
     ### Compute rho as a function of omega
 
-    #upBound = 3. * 1e14
-    #omArr = np.linspace(1e12, upBound, 10000, endpoint=True)
-    #L1 = 1e-4
-    #freq = np.pi * consts.c / L1
-    #print("base freq = {}THz".format(freq * 1e-12))
-    #print("number of Points minimum: {}".format(upBound / freq))
-    #dosFP1 = computeDosFP.dosParallelAsOfFeq(np.array([L1 / 2.]), omArr, L1)
-    ##dosFP1 = computeDosFP.dosTEAsOfFeq(np.array([L1 / 2.]), omArr, L1) + computeDosFP.dosTMAsOfFeq(np.array([L1 / 2.]), omArr, L1)
-    ##integratedDos.computeIntegral(omArr, dosParallel, L1)
-    #plotDosFP.plotRhoParaAsOfOmDimensionless(omArr, dosFP1, L1)
+    upBound = 3. * 1e14
+    omArr = np.linspace(1e12, upBound, 10000, endpoint=True)
+    L1 = 1e-4
+    freq = np.pi * consts.c / L1
+    print("base freq = {}THz".format(freq * 1e-12))
+    print("number of Points minimum: {}".format(upBound / freq))
+    dosFP1 = computeDosFP.dosParallelAsOfFeq(np.array([L1 / 2.]), omArr, L1)
+    #dosFP1 = computeDosFP.dosTEAsOfFeq(np.array([L1 / 2.]), omArr, L1) + computeDosFP.dosTMAsOfFeq(np.array([L1 / 2.]), omArr, L1)
+    #integratedDos.computeIntegral(omArr, dosParallel, L1)
+    plotDosFP.plotRhoParaAsOfOmDimensionless(omArr, dosFP1, L1)
 
 
 #    L2 = 1e-5
@@ -71,13 +71,13 @@ def dosFPMain():
     #evCutoff = 1519.3 * 1e12 #1eV
     #cutoff = 4. * evCutoff
     #dArr = np.logspace(-6, -4, 20, endpoint=True)
-    #fluctuationsE = integratedDos.numericalIntegralEField(cutoff, dArr)
+    ##fluctuationsE = integratedDos.numericalIntegralEField(cutoff, dArr)
     #filename = "fluctuationsE"
-    #handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsE, filename)
+    ##handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsE, filename)
     #cutoff, dArr, fluctuationsE = handleIntegralData.retrieveDataFixedCutoff(filename)
-    #fluctuationsA = integratedDos.numericalIntegralAField(cutoff, dArr)
+    ##fluctuationsA = integratedDos.numericalIntegralAField(cutoff, dArr)
     #filename = "fluctuationsA"
-    #handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsA, filename)
+    ##handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsA, filename)
     #cutoff, dArr, fluctuationsA = handleIntegralData.retrieveDataFixedCutoff(filename)
     #baseFreqArr = np.pi * consts.c / dArr
     ##plotDosFP.plotFluctuationsAandE(dArr, fluctuationsE, fluctuationsA, baseFreqArr, cutoff)

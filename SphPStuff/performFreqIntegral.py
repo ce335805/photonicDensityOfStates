@@ -20,7 +20,7 @@ import produceFreqData as prod
 def freqIntegral(zArr, wLO, wTO, epsInf, L):
 
     evCutoff = 1519.3 * 1e12  # 1eV
-    cutoff = .5 * evCutoff
+    cutoff = .2 * evCutoff
     computeEffectiveMass(zArr, cutoff, wLO, wTO, epsInf, L)
     #computeEffectiveHopping(zArr, cutoff, wLO, wTO, epsInf, L)
     #computeFluctuations(zArr, cutoff, wLO, wTO, epsInf, L)

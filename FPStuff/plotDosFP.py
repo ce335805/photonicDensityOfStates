@@ -650,58 +650,38 @@ def plotFluctuationsAandE(dArr, flucE, flucA, freqArr, cutoff):
 
 def plotFluctuationsAandENaturalUnits(dArr, flucE, flucA, freqArr, cutoff):
     fig = plt.figure(figsize=(7.04 / 3., 1.8), dpi=800)
-    gs = gridspec.GridSpec(1, 1, wspace=0.35, hspace=0., top=0.9, bottom=0.2, left=0.24, right=0.72)
+    gs = gridspec.GridSpec(1, 1, wspace=0.35, hspace=0., top=0.9, bottom=0.2, left=0.26, right=0.72)
     axE = plt.subplot(gs[0, 0])
     axA = axE.twinx()
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
 
-    unitFacE = consts.epsilon_0 * dArr**3 / (consts.hbar * freqArr)
-    unitFacA = consts.epsilon_0 * freqArr * dArr**3 / consts.hbar
+    unitFacE = consts.epsilon_0 / (consts.hbar * freqArr) * 1e-18
+    unitFacA = consts.epsilon_0 * freqArr / consts.hbar * 1e-18
 
-    axE.plot(dArr, flucE * unitFacE, color=cmapBone(.55), linestyle='', marker='x', markersize=2.)
-    axA.plot(dArr, flucA * unitFacA * 1e-24, color=cmapPink(.55), linestyle='', marker='x', markersize=2.)
-    axE.set_ylim(-0.22, .22)
-    axA.set_ylim(-0.02, 0.02)
+    axE.plot(dArr, flucE * unitFacE, color=cmapBone(.45), linestyle='', marker='x', markersize=2.)
+    axA.plot(dArr, flucA * unitFacA * 1e-24, color=cmapPink(.45), linestyle='', marker='x', markersize=2.)
+    #axE.set_ylim(-0.015, .15)
+    axA.set_ylim(-0.0022, .015)
     # axRightE.set_xlim(1e-6, 1e-4)
     axE.set_xlim(np.amin(dArr), np.amax(dArr))
     axA.set_xlim(np.amin(dArr), np.amax(dArr))
     axE.set_xscale('log')
-    #axE.set_yscale('log')
+    axE.set_yscale('log')
     axA.set_xscale('log')
 
     axE.set_xlabel(r"$d \; \left[ \mathrm{m} \right]$", fontsize=8)
-    axE.set_ylabel(r"$\langle E^2 \rangle_{\rm eff} \left[ \frac{\hbar \omega_0}{\varepsilon_0 d^3} \right]$", fontsize=8,
-                   labelpad=0)
+    axE.set_ylabel(r"$\langle E^2 \rangle_{\rm eff} \left[ \frac{\hbar \omega_0}{\varepsilon_0 \mu \mathrm{m}^3} \right]$", fontsize=8,
+                   labelpad=2)
     axA.set_ylabel(
-        r"$\langle A^2 \rangle_{\rm eff} \left[ \frac{\hbar}{\varepsilon_0 \omega_0 d^3} \right]$",
-        fontsize=8, labelpad=0)
+        r"$\langle A^2 \rangle_{\rm eff} \left[ \frac{\hbar}{\varepsilon_0 \mu \mathrm{m}^3} \right]$",
+        fontsize=8, labelpad=4)
 
-    #axA.set_yticks([0, 3, 6])
-    #axA.set_yticklabels(["$0$", "$3$", "$6$"], fontsize=8)
 
-    #axA.set_yticks([0, -1000])
-    #axA.set_yticklabels(["$0$", "$-1000$"], fontsize=8)
+    plt.arrow(0.78, 0.12, 0.2, 0.2, transform=axA.transAxes, length_includes_head=True, color=cmapPink(.45), head_width = 0.05, head_length = 0.05)
+    plt.arrow(0.25, 0.7, -0.23, -0.15, transform=axA.transAxes, length_includes_head=True, color=cmapBone(.45), head_width = 0.05, head_length = 0.05)
 
-    #axE.set_xticks([1e-6, 1e-5, 1e-4, 1e-3])
-    #axE.set_xticklabels(["$10^{-6}$", "$10^{-5}$", "$10^{-4}$", "$10^{-3}$"], fontsize=8)
-
-    #arrowprops = {
-    #    'arrowstyle': '<-',  # Arrow style
-    #    'mutation_scale': 8,  # Custom head size
-    #    'color': 'red',  # Custom arrow color
-    #    'linewidth': .7
-    #}
-    #axE.annotate("", xy=(3. * 1e-5, -400), xytext=(1e-4, -350), arrowprops=arrowprops)
-    #arrowprops = {
-    #    'arrowstyle': '<-',  # Arrow style
-    #    'mutation_scale': 8,  # Custom head size
-    #    'color': cmapBone(.6),  # Custom arrow color
-    #    'linewidth': .7
-    #}
-    #axE.annotate("", xy=(2. * 1e-6, -300), xytext=(1e-6, -200), arrowprops=arrowprops)
-
-    # ax.text(1e-1, 7.5, r"$\omega_0 = 9.41 \mathrm{THz}$")
+    axA.text(2. * 1e-6, -0.0015, r"$\to 0 \, (\Lambda \to \infty)$", fontsize = 6, color = cmapPink(.45))
 
     # legend = ax.legend(fontsize=fontsize - 2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black',
     #                   ncol=1)
@@ -712,6 +692,9 @@ def plotFluctuationsAandENaturalUnits(dArr, flucE, flucA, freqArr, cutoff):
     for axis in ['top', 'bottom', 'left', 'right']:
         axE.spines[axis].set_linewidth(.5)
         axA.spines[axis].set_linewidth(.5)
+
+
+    #axE.text(-0.25, 1.07, r"$(\mathrm{b})$", fontsize = 8, transform = ax.transAxes)
 
     plt.savefig("FPPlotsSaved/FluctuationsEandANatUnits.png")
 
@@ -757,11 +740,13 @@ def plotEffectiveMassesComparison():
     filenameSPhP = "massesForPlotting"
     cutoff, zArr, massSPhPArr = handleIntegralData.readMassesSPhP(filenameSPhP)
 
+    print(np.amin(zArr))
+
     print(zArr.shape)
 
     fig = plt.figure(figsize=(7.04, 2.), dpi=800)
-    gs = gridspec.GridSpec(2, 3, height_ratios=[1, 1], width_ratios=[1, 1, 1.5],
-                           wspace=0.5, hspace=0.8, top=0.9, bottom=0.2, left=0.22, right=0.92)
+    gs = gridspec.GridSpec(2, 3, height_ratios=[1, 1], width_ratios=[1, 1, 1.2],
+                           wspace=0.4, hspace=0.8, top=0.95, bottom=0.2, left=0.0, right=0.98)
     axFP = plt.subplot(gs[0, 2])
     axSPhP = plt.subplot(gs[1, 2])
 
@@ -782,7 +767,7 @@ def plotEffectiveMassesComparison():
     axFP.set_xlim(np.amin(dArr), np.amax(dArr))
     axFP.set_ylim(-8., 0.)
     axSPhP.set_xlim(1e-3, 1e2)
-    axSPhP.set_ylim(0., 1.)
+    axSPhP.set_ylim(0., .1)
 
     axFP.set_xlabel("$d [\mathrm{m}]$", fontsize = 8)
     axSPhP.set_xlabel("$z [\lambda_0]$", fontsize = 8)
@@ -837,12 +822,33 @@ def plotEffectiveMassesComparison():
     axSPhPDisp.set_xticks([])
     axSPhPDisp.set_yticks([])
 
+    axFPComic = plt.subplot(gs[0, 0])
+
+    arr_img = mpimg.imread('MassFPV1.png')
+    im = OffsetImage(arr_img, zoom = .2)
+    ab = AnnotationBbox(im, (0.2, -.75), xycoords='axes fraction', box_alignment=(0, 0), frameon=False, pad=0, boxcoords="offset points")
+    axFPComic.add_artist(ab)
+
+    axFPComic.set_xlim(0, 1)
+    axFPComic.set_ylim(0, 1)
+    axFPComic.set_xticks([])
+    axFPComic.set_yticks([])
+
+    axFPComic.text(.4625, .65, r"$\boldmath{+}$", fontsize = 12, zorder = 666, color = "white")
+    axFPComic.text(.465, .37, r"$\boldmath{-}$", fontsize = 11, zorder = 666, color = "black")
+    axFPComic.text(.4625, -.1, r"$\boldmath{+}$", fontsize = 12, zorder = 666, color = "white")
+
+    axFPComic.text(.62, 0.35, r"$k$", fontsize = 11, zorder = 666, color = "black")
+    axFPComic.arrow(0.55, 0.33, 0.2, 0., length_includes_head=True, color="black", head_width = 0.06, head_length = 0.03, zorder = 666)
+    axFPComic.arrow(0.55, 0.73, 0.2, 0., length_includes_head=True, color="white", head_width = 0.06, head_length = 0.03, zorder = 666)
+    axFPComic.arrow(0.55, -0.03, 0.2, 0., length_includes_head=True, color="white", head_width = 0.06, head_length = 0.03, zorder = 666, clip_on = False)
 
     for axis in ['top', 'bottom', 'left', 'right']:
         axFP.spines[axis].set_linewidth(.5)
         axSPhP.spines[axis].set_linewidth(.5)
         axFPDisp.spines[axis].set_linewidth(.5)
         axSPhPDisp.spines[axis].set_linewidth(.5)
+        axFPComic.spines[axis].set_linewidth(.0)
 
 
     plt.savefig("FPPlotsSaved/EffectiveMassesCompared.png")
