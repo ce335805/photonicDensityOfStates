@@ -131,7 +131,7 @@ def computeIntegral(omArr, dos, L):
         partialOmInds = np.where(omArr < cutoffArr[ind])
         resArr[ind] = integrateDosWithReg(omArr[partialOmInds], dosIntegrand[partialOmInds], alpha)
     fieldFac = consts.hbar / (2. * consts.epsilon_0 * np.pi**2 * consts.c**3) * 1e24
-    plotDosFP.plotFieldIntegrals(cutoffArr, resArr * fieldFac)
+    plotDosFP.plotFieldsAsOfCutoff(cutoffArr, resArr * fieldFac)
     return resArr
 
 def integrateDosWithReg(omArr, dos, convFac):

@@ -29,33 +29,20 @@ def dosFPMain():
     print("base freq = {}THz".format(freq * 1e-12))
     print("number of Points minimum: {}".format(upBound / freq))
     dosFP1 = computeDosFP.dosParallelAsOfFeq(np.array([L1 / 2.]), omArr, L1)
-    #dosFP1 = computeDosFP.dosTEAsOfFeq(np.array([L1 / 2.]), omArr, L1) + computeDosFP.dosTMAsOfFeq(np.array([L1 / 2.]), omArr, L1)
-    #integratedDos.computeIntegral(omArr, dosParallel, L1)
     plotDosFP.plotRhoParaAsOfOmDimensionless(omArr, dosFP1, L1)
-
-
-#    L2 = 1e-5
-#    freq = np.pi * consts.c / L2
-#    print("base freq = {}THz".format(freq * 1e-12))
-#    print("number of Points minimum: {}".format(upBound / freq))
-#    dosFP2 = computeDosFP.dosParallelAsOfFeq(np.array([L2 / 2.]), omArr, L2)
-#    #dosFP2 = computeDosFP.dosTEAsOfFeq(np.array([L2 / 2.]), omArr, L2) + computeDosFP.dosTMAsOfFeq(np.array([L2 / 2.]), omArr, L2)
-#    #plotDosFP.plotDosCompare(omArr, dosFP1, dosFP2, L1, L2)
-#    #plotDosFP.plotRhoParaAsOfOmThesis(omArr, dosFP1, dosFP2, L1, L2)
-
-    #exit()
+    plotDosFP.plotRhoParaAsOfOmThesis(omArr, dosFP1, L1)
 
     ### Compute rho as function of z
 
-    #upBound = 3. * 1e14
-    #L = 1e-4
-    #freq = np.pi * consts.c / L
-    #omArr = np.array([4. * freq, 7. * freq])
-    #zArr = np.linspace(0., L, 1000)
-    #dosFP = computeDosFP.dosParallelAsOfFeqAndZ(zArr, omArr, L)
-    #plotDosFP.plotRhoParaAsOfZThesis(omArr, zArr, dosFP, L)
+    upBound = 3. * 1e14
+    L = 1e-4
+    freq = np.pi * consts.c / L
+    omArr = np.array([4. * freq, 7. * freq])
+    zArr = np.linspace(0., L, 1000)
+    dosFP = computeDosFP.dosParallelAsOfFeqAndZ(zArr, omArr, L)
+    plotDosFP.plotRhoParaAsOfZThesis(omArr, zArr, dosFP, L)
 #
-    #exit()
+    exit()
 
     #evCutoff = 1519.3 * 1e12 #1eV
     #cutoffArr = np.logspace(np.log10(0.01 * evCutoff), np.log10(.5 * evCutoff), 5, endpoint=True)
@@ -92,16 +79,34 @@ def dosFPMain():
     #massArr = integratedDos.numericalIntegralEffectiveMass(cutoff, dArr)
     #filename = "delMassFP"
     #handleIntegralData.writeMassData(cutoff, dArr, massArr, filename)
-    plotDosFP.plotEffectiveMassesComparison()
+    #plotDosFP.plotEffectiveMassesComparison()
 
-    exit()
+    #exit()
 
-    dArr = np.logspace(-6, -3, 20)
-    cutoff = 3. * 241.8 * 1e12
+    #dArr = np.logspace(-6, -3, 20)
+    #cutoff = 3. * 241.8 * 1e12
     #filename = "delHoppingFP"
     #hopArr = integratedDos.numericalIntegralHopping(cutoff, dArr)
     #handleIntegralData.writeMassData(cutoff, dArr, hopArr, filename)
-    plotDosFP.plotEffectiveHoppingComparison()
+    #plotDosFP.plotEffectiveHoppingComparison()
+
+
+    #compute field plots
+    evCutoff = 1519.3 * 1e12 #1eV
+    cutoffArr = np.logspace(np.log10(.005 * evCutoff), np.log10(5. * evCutoff), 60)
+
+    dArr = np.array([1e-5, 1e-6])
+    flucEArr = np.zeros((len(cutoffArr), len(dArr)))
+    flucAArr = np.zeros((len(cutoffArr), len(dArr)))
+    for cutInd, cutOff in enumerate(cutoffArr):
+        print("cutoff = {}eV".format(cutOff / evCutoff))
+        flucEArr[cutInd, :] = integratedDos.numericalIntegralEField(cutOff, dArr)
+        flucAArr[cutInd, :] = integratedDos.numericalIntegralAField(cutOff, dArr)
+
+    filename = "E"
+    plotDosFP.plotFieldsAsOfCutoff(cutoffArr, dArr, flucEArr, filename)
+    filename = "A"
+    plotDosFP.plotFieldsAsOfCutoff(cutoffArr, dArr, flucAArr, filename)
 
 
 dosFPMain()

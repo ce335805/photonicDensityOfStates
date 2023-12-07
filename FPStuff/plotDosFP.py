@@ -218,22 +218,17 @@ def plotRhoParaAsOfOmDimensionless(omArr, dosFP, L):
     plt.savefig("FPPlotsSaved/DosAsOfOmDimensionless.png")
 
 
-def plotRhoParaAsOfOmThesis(omArr, dosFP1, dosFP2, L1, L2):
+def plotRhoParaAsOfOmThesis(omArr, dosFP1, L1):
 
-    omArr = omArr * 1e-12
+    omArr = omArr
 
     lambda1 = 2. * L1
     freq1 = 2. * np.pi * consts.c / (lambda1)
-    lambda2 = 2. * L2
-    freq2 = 2. * np.pi * consts.c / (lambda2)
 
     print("res1 = {}THz".format(freq1))
-    print("res2 = {}THz".format(freq2))
-
-
-    fig = plt.figure(figsize=(2.5, 1.8), dpi=800)
+    fig = plt.figure(figsize=(2., 1.8), dpi=800)
     gs = gridspec.GridSpec(1, 1,
-                           wspace=0.35, hspace=0., top=0.95 , bottom=0.22, left=0.15, right=0.96)
+                           wspace=0.35, hspace=0., top=0.95 , bottom=0.22, left=0.18, right=0.96)
     ax = plt.subplot(gs[0, 0])
 
     cmapPink = cm.get_cmap('pink')
@@ -241,29 +236,26 @@ def plotRhoParaAsOfOmThesis(omArr, dosFP1, dosFP2, L1, L2):
 
     rho0 = omArr**2 * 1e24 / (np.pi**2 * consts.c**3)
 
-    ax.plot(omArr, dosFP1, color=cmapPink(.45), lw=.7, label = "$d = $" + "{}".format(int(L1 * 1e6)) + r"$\mu \mathrm{m}$")
-    ax.plot(omArr, dosFP2, color=cmapBone(.45), lw=.7, label = "$d = $" + "{}".format(int(L2 * 1e6)) + r"$\mu \mathrm{m}$")
-    #ax.plot(omArr, (dosFP1 - 2. / 3.) * rho0, color=cmapPink(.55), lw=1., label = "$d = $" + "{}".format(int(L1 * 1e6)) + r"$\mu \mathrm{m}$")
-    #ax.plot(omArr, (dosFP2 - 2. / 3.) * rho0, color=cmapBone(.55), lw=1., label = "$d = $" + "{}".format(int(L2 * 1e6)) + r"$\mu \mathrm{m}$")
-    ax.set_xlim(np.amin(omArr), np.amax(omArr))
+    ax.plot(omArr / freq1, dosFP1, color=cmapPink(.45), lw=.7, label = "$d = $" + "{}".format(int(L1 * 1e6)) + r"$\mu \mathrm{m}$")
+    ax.set_xlim(0, 14.5)
     ax.axhline(2. / 3., color = 'black', lw = .4, linestyle = "-", zorder = -666)
     #ax.set_xscale("log")
 
     ax.set_ylim(0, 2.2)
 
-    ax.set_xticks([0., 100, 200])
-    ax.set_xticklabels(["$0$", "$100$", "$200$"], fontsize = 8)
-    ax.set_yticks([0., 1., 2.])
-    ax.set_yticklabels(["$0$", "$1$", "$2$"], fontsize = 8)
+    ax.set_xticks([0., 1., 3., 5., 9, 13.])
+    ax.set_xticklabels(["$0$", r"$\omega_0$",  r"$3\omega_0$",  r"$5\omega_0$",  r"$9\omega_0$",  r"$13\omega_0$"], fontsize = 8)
+    ax.set_yticks([0., 2. / 3., 2.])
+    ax.set_yticklabels(["$0$", r"$\frac{2}{3}$", "$2$"], fontsize = 8)
 
-    ax.set_xlabel(r"$\omega \, \left[\mathrm{THz}\right]$")
+    ax.set_xlabel(r"$\omega$")
     #ax.set_ylabel(r"$\left(\rho / \rho_0 - 0.5\right) \times \omega^3$")
     ax.set_ylabel(r"$\rho / \rho_0$")
 
-    legend = ax.legend(fontsize=8, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=1)
-    legend.get_frame().set_alpha(0.)
-    legend.get_frame().set_boxstyle('Square', pad=0.1)
-    legend.get_frame().set_linewidth(0.0)
+    #legend = ax.legend(fontsize=8, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black', ncol=1)
+    #legend.get_frame().set_alpha(0.)
+    #legend.get_frame().set_boxstyle('Square', pad=0.1)
+    #legend.get_frame().set_linewidth(0.0)
 
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
@@ -278,9 +270,9 @@ def plotRhoParaAsOfZThesis(omArr, zArr, dosFP, L):
 
     print("res1 = {}THz".format(freq1))
 
-    fig = plt.figure(figsize=(2.5, 1.8), dpi=800)
+    fig = plt.figure(figsize=(2., 1.8), dpi=800)
     gs = gridspec.GridSpec(1, 1,
-                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.15, right=0.96)
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.18, right=0.96)
     ax = plt.subplot(gs[0, 0])
 
     cmapPink = cm.get_cmap('pink')
@@ -296,8 +288,8 @@ def plotRhoParaAsOfZThesis(omArr, zArr, dosFP, L):
 
     ax.set_xticks([0., .5, 1.])
     ax.set_xticklabels(["$0$", r"$\frac{d}{2}$", "$d$"], fontsize = 8)
-    ax.set_yticks([0., 1.])
-    ax.set_yticklabels(["$0$", "$1$"], fontsize = 8)
+    ax.set_yticks([0., 2./3., 1.])
+    ax.set_yticklabels(["$0$", r"$\frac{2}{3}$", "$1$"], fontsize = 8)
 
     ax.set_xlabel(r"$z$")
     #ax.set_ylabel(r"$\left(\rho / \rho_0 - 0.5\right) \times \omega^3$")
@@ -339,7 +331,7 @@ def plotDosWithCutoff(omArr, dos):
 
     plt.savefig("FPPlotsSaved/dosFPWithCutoff.png")
 
-def plotFieldIntegrals(alphaArr, dosArr):
+def plotFieldsAsOfCutoff(cutoffArr, dArr, flucArr, filename):
 
     fig = plt.figure(figsize=(3., 2.), dpi=800)
     gs = gridspec.GridSpec(1, 1,
@@ -347,31 +339,48 @@ def plotFieldIntegrals(alphaArr, dosArr):
     ax = plt.subplot(gs[0, 0])
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
-    ax.plot(alphaArr * 1e-12, dosArr, color=cmapPink(.5), linestyle = '', marker = 'x', markersize = 2.)
-    ax.axhline(0., color = 'red', lw = 0.4)
-    #ax.set_ylim(-0.0001, 0.)
+
+    evCutoff = 1519.3 * 1e12 #1eV
+
+    freqArr = 2. * np.pi * consts.c / (2. * dArr)
+    unitFacE = consts.epsilon_0 / (consts.hbar * freqArr)  * (dArr**3)
+    unitFacA = consts.epsilon_0 * freqArr / consts.hbar * (dArr**3) * 1e-24
+
+    for dInd, dVal in enumerate(dArr):
+        color = cmapPink((dInd + 1) / (len(dArr) + 3))
+        if (filename == "E"):
+            ax.plot(cutoffArr / evCutoff, flucArr[:, dInd] * unitFacE[dInd], color=color, linestyle ='', marker ='x', markersize = 2., label ="d = {:1.0f}".format(dVal * 1e6) + r"$\mu\mathrm{m}$")
+        elif (filename == "A"):
+            ax.plot(cutoffArr / evCutoff, flucArr[:, dInd] * unitFacA[dInd], color=color, linestyle ='', marker ='x', markersize = 2., label ="d = {:1.0f}".format(dVal * 1e6) + r"$\mu\mathrm{m}$")
+
+        ax.axhline(0, color = "black", lw = .5)
+        ax.axvline(freqArr[dInd] / evCutoff, lw = .5, color = color)
+
+    #ax.axhline(0., color = 'red', lw = 0.4)
+    ax.set_xlim(np.amin(cutoffArr) / evCutoff, np.amax(cutoffArr) / evCutoff)
     ax.set_xscale('log')
 
-    ax.set_xlabel(r"$\mathrm{cutoff} \; \left[ \mathrm{THz} \right]$")
-    ax.set_ylabel(r"$\langle E^2 \rangle \left[ \frac{\mathrm{V}^2}{\mathrm{m}^2} \right] $")
+    ax.set_xlabel(r"$\mathrm{cutoff} \; \left[ \mathrm{eV} \right]$")
+    if (filename == "E"):
+        ax.set_ylabel(r"$\langle E^2 \rangle \left[ \frac{\hbar \omega_0}{\varepsilon_0 d^3} \right] $")
+    elif (filename == "A"):
+        ax.set_ylabel(r"$\langle A^2 \rangle \left[ \frac{\hbar}{ \omega_0 \varepsilon_0 d^3} \right] $")
+
 
     #ax.text(1e-1, 10, r"$d = 100 \mu \mathrm{m}$")
     #ax.text(1e-1, 7.5, r"$\omega_0 = 9.41 \mathrm{THz}$")
-
-    #legend = ax.legend(fontsize=fontsize - 2, loc='upper right', bbox_to_anchor=(.97, 1.), edgecolor='black',
-    #                   ncol=1)
-    #legend.get_frame().set_alpha(0.)
-    #legend.get_frame().set_boxstyle('Square', pad=0.1)
-    #legend.get_frame().set_linewidth(0.0)
+    if (filename == "E"):
+        legend = ax.legend(fontsize=fontsize - 2, loc='upper left', bbox_to_anchor=(.0, 1.), edgecolor='black', ncol=1)
+    elif (filename == "A"):
+        legend = ax.legend(fontsize=fontsize - 2, loc='lower left', bbox_to_anchor=(-0.05, 0.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
 
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
 
-    plt.savefig("FPPlotsSaved/fieldInt.png")
-    #plt.savefig("FPPlotsSaved/fieldIntParallelE.png")
-    #plt.savefig("FPPlotsSaved/fieldIntPerpE.png")
-    #plt.savefig("FPPlotsSaved/fieldIntTEE.png")
-    #plt.savefig("FPPlotsSaved/fieldIntTME.png")
+    plt.savefig("FPPlotsSaved/cutoffDep" + filename + ".png")
 
 def plotFieldWithFixedCutoff(dArr, dosArr, freqArr):
 
