@@ -27,6 +27,7 @@ import wfFuncs.TEWavefunctionResSPhP as TEResWF
 import wfFuncs.TMWavefunctionSPhP as TMWF
 import wfFuncs.TMWavefunctionEvaSPhP as TMEvaWF
 import wfFuncs.TMWavefunctionResSPhP as TMResWF
+import wfFuncs.TMWavefunctionSurf as TMSurf
 
 fontsize = 8
 
@@ -132,6 +133,58 @@ def plotWFs(zArr,
     plt.savefig("./ThesisPlots/combinedWFPlot.png")
 
 
+
+def plotSPhP(zArr,
+            wfPara,
+            wfPerp,
+            wLO,
+            wTO,
+            L):
+
+    fig = plt.figure(figsize=(2., 1.8), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.2, hspace=0.0, top=0.9, bottom=0.25, left=0.2, right=0.95)
+
+    ax = plt.subplot(gs[0, 0])
+
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+
+    lwVal = 1.2
+
+    ax.plot(zArr, wfPara, color = cmapBone(.3), lw = lwVal, label = r"$f_{||}$")
+    ax.plot(zArr, wfPerp, color = cmapBone(.7), lw = lwVal, label = r"$f_{\perp}$")
+
+    ax.axvline(0, color="gray", lw=0.4)
+    ax.axhline(0, color="gray", lw=0.4)
+    ax.set_xlim(-L / 4500, L / 4500)
+    ax.set_yticks([0])
+    ax.set_yticks([0])
+    ymin, ymax = ax.get_ylim()
+    ax.set_ylim(ymin, ymax)
+    ax.fill_between(zArr, y1=ymin, y2=ymax, where=(zArr <= 0), color='oldlace', alpha=1., zorder=-667)
+
+    ax.set_ylabel("$f(z)$", fontsize = 8)
+
+    ax.set_xticks([- L / 5000, 0, L / 5000])
+    ax.set_xticklabels([r"$-\frac{L}{5000}$", r"$0$", r"$\frac{L}{5000}$"], fontsize = 8)
+    ax.set_xlabel("$z$", fontsize = 8)
+
+    ax.text(0.58, .85,r"$\omega = 0.9\omega_{\infty}$",transform=ax.transAxes, fontsize = 8)
+    ax.text(0.12, 1.05,r"$\varepsilon(\omega) < 0$",transform=ax.transAxes, fontsize = 8)
+
+    legend = ax.legend(fontsize=8, loc='upper left', bbox_to_anchor=(0., 1.05), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.05)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./ThesisPlots/wfSPhP.png")
+
+
 def TEWavefunctions(zArr, L, wLO, wTO, epsInf):
     omega = 1. * 1e10
     allowedKs = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TE")
@@ -203,6 +256,17 @@ def TMResWavefunctions(zArr, L, wLO, wTO, epsInf):
 
     return (wFPara, wFPerp)
 
+def TMSurfWavefunctions(zArr, L, wLO, wTO, epsInf):
+    wInf = np.sqrt(wLO**2 + wTO**2) / np.sqrt(2.)
+    omega = .9 * wInf
+    wFPara = np.zeros((zArr.shape[0]), dtype=float)
+    wFPerp = np.zeros((zArr.shape[0]), dtype=float)
+    kVal = omega / (consts.c * np.sqrt(np.abs(epsFunc.epsilon(omega, wLO, wTO, epsInf)) - 1))
+    wFPara[:] = TMSurf.waveFunctionTMPara(zArr, kVal, L, omega, wLO, wTO, epsInf)
+    wFPerp[:] = TMSurf.waveFunctionTMPerp(zArr, kVal, L, omega, wLO, wTO, epsInf)
+
+    return (wFPara, wFPerp)
+
 def combinedWFMain():
     print("Plotting a big panel with wave-functions")
 
@@ -213,25 +277,28 @@ def combinedWFMain():
 
     zArr = np.linspace(- L / 2., L / 2., 2000)
 
-    wfTE = TEWavefunctions(zArr, L, wLO, wTO, epsInf)
-    wfTEEva = TEEvaWavefunctions(zArr, L, wLO, wTO, epsInf)
-    wfTERes = TEResWavefunctions(zArr, L, wLO, wTO, epsInf)
-    wfTMPara, wfTMPerp = TMWavefunctions(zArr, L, wLO, wTO, epsInf)
-    wfTMEvaPara, wfTMEvaPerp = TMEvaWavefunctions(zArr, L, wLO, wTO, epsInf)
-    wfTMResPara, wfTMResPerp = TMResWavefunctions(zArr, L, wLO, wTO, epsInf)
+    #wfTE = TEWavefunctions(zArr, L, wLO, wTO, epsInf)
+    #wfTEEva = TEEvaWavefunctions(zArr, L, wLO, wTO, epsInf)
+    #wfTERes = TEResWavefunctions(zArr, L, wLO, wTO, epsInf)
+    #wfTMPara, wfTMPerp = TMWavefunctions(zArr, L, wLO, wTO, epsInf)
+    #wfTMEvaPara, wfTMEvaPerp = TMEvaWavefunctions(zArr, L, wLO, wTO, epsInf)
+    #wfTMResPara, wfTMResPerp = TMResWavefunctions(zArr, L, wLO, wTO, epsInf)
+    #plotWFs(zArr,
+    #        wfTE,
+    #        wfTEEva,
+    #        wfTERes,
+    #        wfTMPara,
+    #        wfTMPerp,
+    #        wfTMEvaPara,
+    #        wfTMEvaPerp,
+    #        wfTMResPara,
+    #        wfTMResPerp,
+    #        wLO,
+    #        wTO,
+    #        L)
 
-    plotWFs(zArr,
-            wfTE,
-            wfTEEva,
-            wfTERes,
-            wfTMPara,
-            wfTMPerp,
-            wfTMEvaPara,
-            wfTMEvaPerp,
-            wfTMResPara,
-            wfTMResPerp,
-            wLO,
-            wTO,
-            L)
+    zArr = np.linspace(- L / 4500., L / 4500., 2000)
+    wfSurfPara, wfSurfPerp = TMSurfWavefunctions(zArr, L, wLO, wTO, epsInf)
+    plotSPhP(zArr, wfSurfPara, wfSurfPerp, wLO, wTO, L)
 
 combinedWFMain()

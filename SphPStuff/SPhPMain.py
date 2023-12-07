@@ -37,12 +37,13 @@ def main():
     wInf = np.sqrt(epsInf * wLO ** 2 + wTO ** 2) / np.sqrt(epsInf + 1)
     lambda0 = 2. * np.pi * consts.c / wInf
     zArr = np.logspace(np.log10(1e2 * lambda0), np.log10(1e-5 * lambda0), 200, endpoint=True, base = 10)
+    zArr = np.logspace(np.log10(1e2 * lambda0), np.log10(1e-3 * lambda0), 300, endpoint=True, base = 10)
     zArr = np.append([L / 4.], zArr)
 
-    #wLO = 32.04 * 1e12
-    #wTO = 7.92 * 1e12
-    #L = .01
-    #zArr = np.linspace(-L / 2., L / 2., 10000)
+    wLO = 32.04 * 1e12
+    wTO = 7.92 * 1e12
+    L = .01
+    zArr = np.linspace(-L / 2., L / 2., 10000)
 
     #produceFreqData.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
 
@@ -51,7 +52,7 @@ def main():
     #for wInd, _ in enumerate(wLOArr):
     #    produceFreqData.produceFreqIntegralData(zArr, wLOArr[wInd], wTOArr[wInd], epsInf, L)
 
-    cutoff = 1e15
+    #cutoff = 1e15
     #performFreqIntegral.produceCollapsePlotE(zArr, cutoff, wLOArr, wTOArr, epsInf, L)
     #performFreqIntegral.produceCollapsePlotA(zArr, cutoff, wLOArr, wTOArr, epsInf, L)
 

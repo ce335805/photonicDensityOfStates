@@ -47,9 +47,9 @@ def plotEpsilonOmega():
     wLO = 2.5
 
     eps = (wLO**2 - omegaArr**2) / (wTO**2 - omegaArr**2)
-    fig = plt.figure(figsize=(2.5, 1.8), dpi=800)
+    fig = plt.figure(figsize=(2., 1.8), dpi=800)
     gs = gridspec.GridSpec(1, 1,
-                           wspace=0.35, hspace=0., top=0.92 , bottom=0.22, left=0.15, right=0.96)
+                           wspace=0.35, hspace=0., top=0.92 , bottom=0.22, left=0.2, right=0.96)
     ax = plt.subplot(gs[0, 0])
 
     cmapPink = cm.get_cmap('pink')
@@ -77,13 +77,15 @@ def plotEpsilonOmega():
     ax.set_yticklabels(["$0$", "$1$"], fontsize = 8)
 
     #ax.text(wTO + 0.1, 3., r"$\varepsilon(\omega) < 0$", fontsize = 8)
-    ax.text(wLO + .5, 1.3, r"$\varepsilon(\omega) \to 1$", fontsize = 8)
+    ax.text(wLO + .1, 1.3, r"$\varepsilon(\omega) \to 1$", fontsize = 8)
     ax.text(wTO - 0.05, 7.2, r"$\mathrm{Restrahlenband}$", fontsize = 8)
+
+    ax.text(-0.2, 1., r"$(\mathrm{b})$", transform = ax.transAxes, fontsize = 8)
 
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
 
-    plt.savefig("SPhPPlotsSaved/thesisEps.png")
+    plt.savefig("ThesisPlots/thesisEps.png")
 
 def dispersionAsOfQ(wLO, wTO, Q):
     wLOSq = wLO ** 2
@@ -102,7 +104,7 @@ def dispersionSurface(wLO, wTO, Q):
     wTOSq = wTO ** 2
     cqSq = consts.c**2 * Q**2
 
-    return cqSq * (wLOSq + wTOSq) / (wLOSq - wTOSq + 2 * cqSq)
+    return .5 * (-np.sqrt(wLOSq**2 - 4. * wTOSq * cqSq + 4. * cqSq**2) + wLOSq + 2. * cqSq)
 
 def plotDispersion():
 
@@ -117,9 +119,9 @@ def plotDispersion():
     dispSurf = dispersionSurface(wLO, wTO, qArrSurf)
 
 
-    fig = plt.figure(figsize=(2.5, 1.8), dpi=800)
+    fig = plt.figure(figsize=(2., 1.8), dpi=800)
     gs = gridspec.GridSpec(1, 1,
-                           wspace=0.35, hspace=0., top=0.95 , bottom=0.23, left=0.22, right=0.96)
+                           wspace=0.35, hspace=0., top=0.92 , bottom=0.22, left=0.25, right=0.96)
     ax = plt.subplot(gs[0, 0])
 
     cmapPink = cm.get_cmap('pink')
@@ -148,12 +150,14 @@ def plotDispersion():
     ax.set_xticklabels(["$0$", r"$\frac{\omega_{\rm TO}}{c}$", r"$\frac{\omega_{\rm LO}}{c}$"], fontsize = 8)
 
     ax.text(.1 * wTO, 1.5 * wLO, r"$\varepsilon(\omega) > 0$", fontsize = 8)
-    ax.text(1.5 * wLO, 0.3 * wTO, r"$\varepsilon(\omega) > 0$", fontsize = 8)
-    ax.text(1.5 * wLO, 1.2 * wTO, r"$\varepsilon(\omega) < 0$", fontsize = 8)
+    ax.text(1.3 * wLO, 0.3 * wTO, r"$\varepsilon(\omega) > 0$", fontsize = 8)
+    ax.text(1.3 * wLO, 1.2 * wTO, r"$\varepsilon(\omega) < 0$", fontsize = 8)
     ax.text(1.7 * wLO, 1.5 * wLO, r"$c|k|$", fontsize = 8)
+
+    ax.text(-0.32, 1., r"$(\mathrm{c})$", transform = ax.transAxes, fontsize = 8)
 
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
 
-    plt.savefig("SPhPPlotsSaved/ThesisSurfaceDispersion.png")
+    plt.savefig("ThesisPlots/ThesisSurfaceDispersion.png")
 
