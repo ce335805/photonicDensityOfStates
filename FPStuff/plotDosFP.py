@@ -257,6 +257,8 @@ def plotRhoParaAsOfOmThesis(omArr, dosFP1, L1):
     #legend.get_frame().set_boxstyle('Square', pad=0.1)
     #legend.get_frame().set_linewidth(0.0)
 
+    ax.text(-0.2, 1., r"$\mathrm{(b)}$", fontsize = 8, transform=ax.transAxes)
+
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
 
@@ -299,6 +301,8 @@ def plotRhoParaAsOfZThesis(omArr, zArr, dosFP, L):
     legend.get_frame().set_alpha(0.)
     legend.get_frame().set_boxstyle('Square', pad=0.1)
     legend.get_frame().set_linewidth(0.0)
+
+    ax.text(-0.2, 1., r"$\mathrm{(c)}$", fontsize = 8, transform=ax.transAxes)
 
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
@@ -766,17 +770,27 @@ def plotEffectiveMassesComparison():
 
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
-    axFP.plot(dArr, massFPArr * 1e7, color = cmapPink(.45), lw = 0.8)
+    axFP.plot(dArr, np.abs(massFPArr) * 1e7, color = cmapPink(.45), lw = 0.8)
+
+    print(dArr[-1])
+    print([massFPArr[-1]])
+    dArrRef = 0.001
+    massFPArrRef = -7.137742047012218e-10
+
+    axFP.plot(dArr, dArr[-1]/dArr * np.abs(massFPArr[-1]) * 1e7, color = 'red', linestyle = '--', lw = .5)
+    axFP.plot(dArr, dArrRef/dArr * np.abs(massFPArrRef) * 1e7, color = 'blue', linestyle = '--', lw = .5)
 
     axSPhP.plot(zArr / lambda0, massSPhPArr, color = cmapBone(.45), lw = 0.8)
     axSPhP.axhline(0., color = "black", lw = 0.3)
     axFP.set_xscale("log")
+    axFP.set_yscale("log")
     axSPhP.set_xscale("log")
+    #axSPhP.set_yscale("log")
 
     axFP.set_xlim(np.amin(dArr), np.amax(dArr))
-    axFP.set_ylim(-8., 0.)
+    #axFP.set_ylim(-8., 0.)
     axSPhP.set_xlim(1e-3, 1e2)
-    axSPhP.set_ylim(0., .1)
+    #axSPhP.set_ylim(0., .1)
 
     axFP.set_xlabel("$d [\mathrm{m}]$", fontsize = 8)
     axSPhP.set_xlabel("$z [\lambda_0]$", fontsize = 8)
@@ -787,8 +801,8 @@ def plotEffectiveMassesComparison():
     axFP.set_xticks([1e-6, 1e-5, 1e-4, 1e-3])
     axFP.set_xticklabels(["$10^{-6}$", "$10^{-5}$", "$10^{-4}$", "$10^{-3}$"], fontsize = 8)
 
-    axFP.set_yticks([0., -5.])
-    axFP.set_yticklabels(["$0$", "$-5$"], fontsize = 8)
+    #axFP.set_yticks([0., -5.])
+    #axFP.set_yticklabels(["$0$", "$-5$"], fontsize = 8)
 
     axSPhP.set_xticks([1e-2, 1, 1e2])
     axSPhP.set_xticklabels(["$10^{-2}$", "$1$", "$10^{2}$"], fontsize = 8)

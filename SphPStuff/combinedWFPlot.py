@@ -121,6 +121,10 @@ def plotWFs(zArr,
     axTEEva.text(0.12, 1.05,r"$\varepsilon(\omega) > 1$",transform=axTEEva.transAxes, fontsize = 8)
     axTERes.text(0.12, 1.05,r"$\varepsilon(\omega) < 1$",transform=axTERes.transAxes, fontsize = 8)
 
+    axTE.text(0., 1.05,r"$\mathrm{(a)}$",transform=axTE.transAxes, fontsize = 8)
+    axTEEva.text(0., 1.05,r"$\mathrm{(b)}$",transform=axTEEva.transAxes, fontsize = 8)
+    axTERes.text(0., 1.05,r"$\mathrm{(c)}$",transform=axTERes.transAxes, fontsize = 8)
+
     legend = axTMRes.legend(fontsize=8, loc='upper left', bbox_to_anchor=(0., 1.05), edgecolor='black', ncol=1)
     legend.get_frame().set_alpha(0.)
     legend.get_frame().set_boxstyle('Square', pad=0.05)
@@ -167,8 +171,10 @@ def plotSPhP(zArr,
 
     ax.set_ylabel("$f(z)$", fontsize = 8)
 
-    ax.set_xticks([- L / 5000, 0, L / 5000])
-    ax.set_xticklabels([r"$-\frac{L}{5000}$", r"$0$", r"$\frac{L}{5000}$"], fontsize = 8)
+
+    wInf = np.sqrt(wLO**2 + wTO**2) / np.sqrt(2.)
+    ax.set_xticks([- 10. * consts.c / wInf, 0, 10. * consts.c / wInf])
+    ax.set_xticklabels([r"$-\frac{10 \, c}{\omega_{\infty}}$", r"$0$", r"$\frac{10 \, c}{\omega_{\infty}}$"], fontsize = 8)
     ax.set_xlabel("$z$", fontsize = 8)
 
     ax.text(0.58, .85,r"$\omega = 0.9\omega_{\infty}$",transform=ax.transAxes, fontsize = 8)
@@ -178,6 +184,8 @@ def plotSPhP(zArr,
     legend.get_frame().set_alpha(0.)
     legend.get_frame().set_boxstyle('Square', pad=0.05)
     legend.get_frame().set_linewidth(0.0)
+
+    ax.text(-0.22, 1.05,r"$\mathrm{(a)}$",transform=ax.transAxes, fontsize = 8)
 
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(.5)
@@ -189,6 +197,7 @@ def TEWavefunctions(zArr, L, wLO, wTO, epsInf):
     omega = 1. * 1e10
     allowedKs = findAllowedKsSPhP.computeAllowedKs(L, omega, wLO, wTO, epsInf, "TE")
     kArr = allowedKs[0 : 5]
+    print(kArr)
     wF = np.zeros((kArr.shape[0], zArr.shape[0]), dtype=float)
     for kInd, kVal in enumerate(kArr):
         wF[kInd, :] = TEWF.waveFunctionTE(zArr, kVal, L, omega, wLO, wTO, epsInf)
@@ -278,6 +287,7 @@ def combinedWFMain():
     zArr = np.linspace(- L / 2., L / 2., 2000)
 
     #wfTE = TEWavefunctions(zArr, L, wLO, wTO, epsInf)
+    #print(wfTE.size)
     #wfTEEva = TEEvaWavefunctions(zArr, L, wLO, wTO, epsInf)
     #wfTERes = TEResWavefunctions(zArr, L, wLO, wTO, epsInf)
     #wfTMPara, wfTMPerp = TMWavefunctions(zArr, L, wLO, wTO, epsInf)

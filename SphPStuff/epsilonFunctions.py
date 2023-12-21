@@ -33,12 +33,18 @@ mpl.rcParams['text.latex.preamble'] = [
 ]
 
 def normFac(omega, wLO, wTO, epsInf):
-    frac = (wLO**2 - wTO**2) / (wTO**2 - omega**2)**2
+    wTO = 0.
+    tau = 1e8
+    frac = (wLO**2 - wTO**2) / (wTO**2 - omega**2 - tau**2)**2
+    #frac = (wLO**2 - wTO**2) / (wTO**2 - omega**2)**2
     return epsInf * (1 + wTO**2 * frac)
     #return epsInf
 
 def epsilon(omega, wLO, wTO, epsInf):
-    return epsInf * (wLO ** 2 - omega ** 2) / (wTO ** 2 - omega ** 2)
+    wTO = 0
+    tau = 1e8
+    return epsInf * (wLO ** 2 - omega ** 2) / (wTO ** 2 - omega ** 2 - tau**2)
+    #return epsInf * (wLO ** 2 - omega ** 2) / (wTO ** 2 - omega ** 2)
     #return epsInf
 
 def kDFromK(kVal, omega, wLO, wTO, epsInf):

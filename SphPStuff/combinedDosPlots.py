@@ -67,9 +67,9 @@ def plotDosWhole(zArr, wLO, wTO, epsInf, L):
     filename = "Para"
     #createDosPlotFreq(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
     #createDosPlotNatUnits(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
-    #createDosPlotFreqThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
+    createDosPlotFreqThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
     #createDosPlotFreqThesiswTO(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
-    createDosRealSpaceThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf, L)
+    #createDosRealSpaceThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf, L)
 
 def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO, epsInf):
     fig = plt.figure(figsize=(3., 1.8), dpi=800)
@@ -77,15 +77,15 @@ def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO, epsInf):
                            wspace=0.35, hspace=0., top=0.9, bottom=0.2, left=0.13, right=0.96)
     ax = plt.subplot(gs[0, 0])
 
-    arr_img = mpimg.imread('SPhPV3.png')
-    im = OffsetImage(arr_img, zoom = .1)
-    ab = AnnotationBbox(im, (1.0, 0.15), xycoords='axes fraction', box_alignment=(1.05, -0.05), frameon=False, pad=0, boxcoords="offset points")
-    ax.add_artist(ab)
+    #arr_img = mpimg.imread('SPhPV3.png')
+    #im = OffsetImage(arr_img, zoom = .1)
+    #ab = AnnotationBbox(im, (1.0, 0.15), xycoords='axes fraction', box_alignment=(1.05, -0.05), frameon=False, pad=0, boxcoords="offset points")
+    #ax.add_artist(ab)
 
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
 
-    cutoff = 3000
+    cutoff = 3000 * 1e12
     cutoffFac = np.exp(- wArr ** 2 / cutoff ** 2)
 
     wInf = np.sqrt(epsInf * wLO ** 2 + wTO ** 2) / np.sqrt(epsInf + 1)
@@ -93,26 +93,26 @@ def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO, epsInf):
     lambda0 = 2. * np.pi * consts.c / wInf
 
     indArr = np.array([1, 40, 80, 120, 181], dtype = int)
-    #ax.plot(wArr, (dos[:, indArr[0]] - 3. / 6.) * wArr**2 * cutoffFac, color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[0]] * wInf / consts.c))
-    #ax.plot(wArr, (dos[:, indArr[1]] - 3. / 6.) * wArr**2 * cutoffFac, color=cmapPink(0.3), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[1]] * wInf / consts.c))
-    #ax.plot(wArr, (dos[:, indArr[2]] - 3. / 6.) * wArr**2 * cutoffFac, color=cmapPink(0.5), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[2]] * wInf / consts.c))
-    #ax.plot(wArr, (dos[:, indArr[3]] - 3. / 6.) * wArr**2 * cutoffFac, color=cmapPink(0.6), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[3]] * wInf / consts.c))
-    #ax.plot(wArr, (dos[:, indArr[4]] - 3. / 6.) * wArr**2 * cutoffFac, color=cmapPink(0.7), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[4]] * wInf / consts.c))
+    ax.plot(wArr, (dos[:, indArr[0]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[0]] * wInf / consts.c))
+    ax.plot(wArr, (dos[:, indArr[1]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.3), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[1]] * wInf / consts.c))
+    ax.plot(wArr, (dos[:, indArr[2]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.5), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[2]] * wInf / consts.c))
+    ax.plot(wArr, (dos[:, indArr[3]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.6), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[3]] * wInf / consts.c))
+    ax.plot(wArr, (dos[:, indArr[4]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.7), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[4]] * wInf / consts.c))
 
 
-    ax.plot(wArr, dos[:, indArr[0]], color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[0]] / lambda0) + r"$\lambda_0$")
-    ax.plot(wArr, dos[:, indArr[1]], color=cmapPink(0.3), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[1]] / lambda0) + r"$\lambda_0$")
-    ax.plot(wArr, dos[:, indArr[2]], color=cmapPink(0.5), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[2]] / lambda0) + r"$\lambda_0$")
-    ax.plot(wArr, dos[:, indArr[3]], color=cmapPink(0.6), lw=.7, label="$z = $" + "{:1.1f}".format(zArr[indArr[3]] / lambda0) + r"$\lambda_0$")
+    #ax.plot(wArr, dos[:, indArr[0]], color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[0]] / lambda0) + r"$\lambda_0$")
+    #ax.plot(wArr, dos[:, indArr[1]], color=cmapPink(0.3), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[1]] / lambda0) + r"$\lambda_0$")
+    #ax.plot(wArr, dos[:, indArr[2]], color=cmapPink(0.5), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[2]] / lambda0) + r"$\lambda_0$")
+    #ax.plot(wArr, dos[:, indArr[3]], color=cmapPink(0.6), lw=.7, label="$z = $" + "{:1.1f}".format(zArr[indArr[3]] / lambda0) + r"$\lambda_0$")
     #ax.plot(wArr, dos[:, indArr[4]], color=cmapPink(0.7), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[4]] * wInf / consts.c) + r"$\lambda_0$")
 #
     #ax.axhline(0, lw = 0.5, color = 'gray', zorder = -666)
 
-    ax.set_xlim(0, 2. * wLO)
-    ax.set_ylim(0, 5)
+    ax.set_xlim(500 * 1e12, 1000 * 1e12)
+    ax.set_ylim(-1e40, 1e40)
 
-    ax.set_xticks([0., wLO, 2. * wLO])
-    ax.set_xticklabels([r"$0$", r"$\omega_{\rm LO}$", r"$2 \omega_{\rm LO}$"])
+    #ax.set_xticks([0., wLO, 2. * wLO])
+    #ax.set_xticklabels([r"$0$", r"$\omega_{\rm LO}$", r"$2 \omega_{\rm LO}$"])
 
 
     ax.set_xlabel(r"$\omega \, [\mathrm{THz}]$")
@@ -337,8 +337,8 @@ def createDosRealSpaceThesis(wArr, zArr, dos, filename, wLO, wTO, epsInf, L):
     ax.set_xlim(- L / 38., L / 28)
     ax.set_ylim(0, 5)
 
-    ax.set_xticks([- L / 40., 0., L / 40.])
-    ax.set_xticklabels([r"$-\frac{L}{40}$", r"$0$", r"$\frac{L}{40}$"], fontsize = 8)
+    ax.set_xticks([- 20. * consts.c / wLO, - 10. * consts.c / wLO, 0., 10. * consts.c / wLO, 20. * consts.c / wLO])
+    ax.set_xticklabels([r"$-\frac{20 \, c}{\omega_{\rm LO}}$", r"$-\frac{10 \, c}{\omega_{\rm LO}}$", r"$0$", r"$\frac{10 \, c}{\omega_{\rm LO}}$", r"$\frac{20 \, c}{\omega_{\rm LO}}$"], fontsize = 8)
     ax.set_yticks([0.])
     ax.set_yticklabels([r"$0$"], fontsize = 8)
 
@@ -363,7 +363,7 @@ def createDosRealSpaceThesis(wArr, zArr, dos, filename, wLO, wTO, epsInf, L):
 
 
     #ax.text(- 0.00095, 5.2, r"$(\mathrm{b})$", fontsize = 8)
-    ax.text(-0.25, 1.07, r"$(\mathrm{b})$", fontsize = 8, transform = ax.transAxes)
+    ax.text(-0.18, 1.05, r"$(\mathrm{b})$", fontsize = 8, transform = ax.transAxes)
 
     #legend = ax.legend(fontsize=8, loc='upper right', bbox_to_anchor=(1.0, 1.0), edgecolor='black', ncol=1)
     #legend.get_frame().set_alpha(0.)

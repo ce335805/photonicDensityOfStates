@@ -14,7 +14,7 @@ def parameterName(wLO, wTO, wmax, L, eps):
     wMaxStr = "wMax" + str(int(wmax * 1e-12))
     ellStr = "L" + str(int(10 * L))
     epsStr = "Eps" + str(int(10 * eps))
-    return wMaxStr + ellStr + epsStr
+    return wMaxStr + ellStr + epsStr + wLOStr + wTOStr
 
 def produceFreqIntegralData(zArr, wLO, wTO, epsInf, L):
 
@@ -46,14 +46,15 @@ def defineFreqArrays(wLO, wTO, epsInf):
     #arrAbove2 = arrAbove2[1:]
     #arrAbove = np.append(arrAbove1, arrAbove2)
     #arrAbove = np.linspace(wLO, 300 * 1e12, 2000, endpoint=False)
-    arrAbove = np.linspace(wLO, 1500 * 1e12, 10000, endpoint=False)
+    arrAbove = np.linspace(wLO, 100 * 1e12, 400, endpoint=False)
     arrAbove = arrAbove[1:]
 
-    arrBelow = np.linspace(wTO * 1e-1, wTO - 1e-3 * wTO, 5, endpoint=False)
-    arrWithin = np.linspace(wTO, wLO, 5, endpoint=False)
-    arrWithin = arrWithin[1:]
-    arrAbove = np.linspace(wLO, 2. * wLO, 5, endpoint=False)
-    arrAbove = arrAbove[1:]
+    #parameters for real-space plot
+    #arrBelow = np.linspace(wTO * 1e-1, wTO - 1e-3 * wTO, 5, endpoint=False)
+    #arrWithin = np.linspace(wTO, wLO, 5, endpoint=False)
+    #arrWithin = arrWithin[1:]
+    #arrAbove = np.linspace(wLO, 2. * wLO, 5, endpoint=False)
+    #arrAbove = arrAbove[1:]
 
 
     surfFreqArr = arrWithin
@@ -163,8 +164,8 @@ def retrieveDosTE(wMaxBelow, wMaxWithin, wMAxAbove, L, wLO, wTO, epsInf):
 
     parameterStr = parameterName(wLO, wTO, wMaxBelow, L, epsInf)
 
-    #dir = "savedData/clusterFreqData/"
-    dir = "savedData/"
+    dir = "savedData/clusterFreqData/"
+    #dir = "savedData/"
 
     filenameTE = dir + 'dosTE' + parameterStr + '.h5'
     h5f = h5py.File(filenameTE, 'r')
@@ -250,8 +251,8 @@ def retrieveDosTMPara(wMaxBelow, wMaxWithin, wMAxAbove, L, wLO, wTO, epsInf):
 
     parameterStr = parameterName(wLO, wTO, wMaxBelow, L, epsInf)
 
-    #dir = "savedData/clusterFreqData/"
-    dir = "savedData/"
+    dir = "savedData/clusterFreqData/"
+    #dir = "savedData/"
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')
