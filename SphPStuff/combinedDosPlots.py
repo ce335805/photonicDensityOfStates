@@ -67,8 +67,8 @@ def plotDosWhole(zArr, wLO, wTO, epsInf, L):
     filename = "Para"
     #createDosPlotFreq(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
     #createDosPlotNatUnits(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
-    createDosPlotFreqThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
-    #createDosPlotFreqThesiswTO(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
+    #createDosPlotFreqThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
+    createDosPlotFreqThesiswTO(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
     #createDosRealSpaceThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf, L)
 
 def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO, epsInf):
@@ -177,7 +177,7 @@ def createDosPlotNatUnits(wArr, zArr, dos, filename, wLO, wTO, epsInf):
 def createDosPlotFreqThesis(wArr, zArr, dos, filename, wLO, wTO, epsInf):
     fig = plt.figure(figsize=(3., 1.8), dpi=800)
     gs = gridspec.GridSpec(1, 1,
-                           wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.1, right=0.95)
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.12, right=0.95)
     ax = plt.subplot(gs[0, 0])
 
     cmapPink = cm.get_cmap('pink')
@@ -186,7 +186,7 @@ def createDosPlotFreqThesis(wArr, zArr, dos, filename, wLO, wTO, epsInf):
     wInf = np.sqrt(epsInf * wLO ** 2 + wTO ** 2) / np.sqrt(epsInf + 1)
     lambda0 = 2. * np.pi * consts.c / wInf
 
-    indArr = np.array([1, 40, 80, 110, 120], dtype = int)
+    indArr = np.array([1, 30, 60, 80, 90], dtype = int)
 
     #ax.plot(wArr, dos[:, indArr[0]], color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[0]] / lambda0) + r"$\lambda_0$")
     ax.plot(wArr, dos[:, indArr[1]], color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[1]] / lambda0) + r"$\lambda_0$")
@@ -223,7 +223,7 @@ def createDosPlotFreqThesis(wArr, zArr, dos, filename, wLO, wTO, epsInf):
 def createDosPlotFreqThesiswTO(wArr, zArr, dos, filename, wLO, wTO, epsInf):
     fig = plt.figure(figsize=(3., 1.8), dpi=800)
     gs = gridspec.GridSpec(1, 1,
-                           wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.1, right=0.95)
+                           wspace=0.35, hspace=0., top=0.9, bottom=0.25, left=0.12, right=0.95)
     ax = plt.subplot(gs[0, 0])
 
     cmapPink = cm.get_cmap('pink')
@@ -232,7 +232,7 @@ def createDosPlotFreqThesiswTO(wArr, zArr, dos, filename, wLO, wTO, epsInf):
     wInf = np.sqrt(epsInf * wLO ** 2 + wTO ** 2) / np.sqrt(epsInf + 1)
     lambda0 = 2. * np.pi * consts.c / wInf
 
-    indArr = np.array([1, 40, 80, 110, 120], dtype = int)
+    indArr = np.array([1, 30, 60, 80, 90], dtype = int)
 
     #ax.plot(wArr, dos[:, indArr[0]], color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[0]] / lambda0) + r"$\lambda_0$")
     ax.plot(wArr, dos[:, indArr[1]], color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[1]] / lambda0) + r"$\lambda_0$")

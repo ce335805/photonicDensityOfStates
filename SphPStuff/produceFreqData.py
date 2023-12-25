@@ -38,7 +38,7 @@ def produceFreqIntegralData(zArr, wLO, wTO, epsInf, L):
     #produceFreqDataSurf(surfFreqArr, zArr, wLO, wTO, epsInf, L)
 
 def defineFreqArrays(wLO, wTO, epsInf):
-    arrBelow = np.linspace(wTO * 1e-1, wTO - 1e-3 * wTO, 1, endpoint=False)
+    arrBelow = np.linspace(wTO * 1e-6, wTO, 100, endpoint=False)
     arrWithin = np.linspace(wTO, wLO, 200, endpoint=False)
     arrWithin = arrWithin[1:]
     #arrAbove1 = np.linspace(wLO, 50. * wLO, 5000, endpoint=False)
