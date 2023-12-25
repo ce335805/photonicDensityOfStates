@@ -47,14 +47,35 @@ mpl.rcParams['text.latex.preamble'] = [
 
 import epsilonFunctions as epsFunc
 import produceFreqData as prod
+import produceFreqDataV2 as prodV2
 import dosFuncs.dosTMSurfModes as surfModes
 import dosAsOfFreq
 
 def plotDosWhole(zArr, wLO, wTO, epsInf, L):
 
+    wArr = prodV2.defineFreqArray()
+
+    dosTETotal = prodV2.retrieveDosTE(wArr, L, wLO, wTO, epsInf)
+    dosTMPara = prodV2.retrieveDosTMPara(wArr, L, wLO, wTO, epsInf)
+
+    dosSurf = np.zeros((len(wArr), len(zArr)))
+    for wInd, wVal in enumerate(wArr):
+        epsilon = epsFunc.epsilon(wVal, wLO, wTO, epsInf)
+        dosSurf[wInd, :] = 1. / (1. + np.abs(epsilon)) * dosAsOfFreq.getDosTMSurf(wVal, zArr, L, wLO, wTO, epsInf)
+
+    filename = "Para"
+    createDosPlotFreq(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
+    #createDosPlotNatUnits(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
+    #createDosPlotFreqThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
+    #createDosPlotFreqThesiswTO(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
+    #createDosRealSpaceThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf, L)
+
+def plotDosWholeOld(zArr, wLO, wTO, epsInf, L):
+
     arrBelow, arrWithin, arrAbove, surfFreqArr = prod.defineFreqArrays(wLO, wTO, epsInf)
     wArr = np.append(arrBelow, arrWithin)
     wArr = np.append(wArr, arrAbove)
+    wArr = prodV2.defineFreqArray()
 
     dosTETotal = prod.retrieveDosTE(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
     dosTMPara = prod.retrieveDosTMPara(arrBelow[-1], arrWithin[-1], arrAbove[-1], L, wLO, wTO, epsInf)
@@ -70,6 +91,7 @@ def plotDosWhole(zArr, wLO, wTO, epsInf, L):
     #createDosPlotFreqThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
     createDosPlotFreqThesiswTO(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
     #createDosRealSpaceThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf, L)
+
 
 def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO, epsInf):
     fig = plt.figure(figsize=(3., 1.8), dpi=800)
@@ -93,23 +115,23 @@ def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO, epsInf):
     lambda0 = 2. * np.pi * consts.c / wInf
 
     indArr = np.array([1, 40, 80, 120, 181], dtype = int)
-    ax.plot(wArr, (dos[:, indArr[0]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[0]] * wInf / consts.c))
-    ax.plot(wArr, (dos[:, indArr[1]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.3), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[1]] * wInf / consts.c))
-    ax.plot(wArr, (dos[:, indArr[2]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.5), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[2]] * wInf / consts.c))
-    ax.plot(wArr, (dos[:, indArr[3]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.6), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[3]] * wInf / consts.c))
-    ax.plot(wArr, (dos[:, indArr[4]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.7), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[4]] * wInf / consts.c))
+    #ax.plot(wArr, (dos[:, indArr[0]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[0]] * wInf / consts.c))
+    #ax.plot(wArr, (dos[:, indArr[1]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.3), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[1]] * wInf / consts.c))
+    #ax.plot(wArr, (dos[:, indArr[2]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.5), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[2]] * wInf / consts.c))
+    #ax.plot(wArr, (dos[:, indArr[3]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.6), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[3]] * wInf / consts.c))
+    #ax.plot(wArr, (dos[:, indArr[4]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.7), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[4]] * wInf / consts.c))
 
 
-    #ax.plot(wArr, dos[:, indArr[0]], color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[0]] / lambda0) + r"$\lambda_0$")
-    #ax.plot(wArr, dos[:, indArr[1]], color=cmapPink(0.3), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[1]] / lambda0) + r"$\lambda_0$")
-    #ax.plot(wArr, dos[:, indArr[2]], color=cmapPink(0.5), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[2]] / lambda0) + r"$\lambda_0$")
-    #ax.plot(wArr, dos[:, indArr[3]], color=cmapPink(0.6), lw=.7, label="$z = $" + "{:1.1f}".format(zArr[indArr[3]] / lambda0) + r"$\lambda_0$")
-    #ax.plot(wArr, dos[:, indArr[4]], color=cmapPink(0.7), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[4]] * wInf / consts.c) + r"$\lambda_0$")
+    ax.plot(wArr, dos[:, indArr[0]], color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[0]] / lambda0) + r"$\lambda_0$")
+    ax.plot(wArr, dos[:, indArr[1]], color=cmapPink(0.3), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[1]] / lambda0) + r"$\lambda_0$")
+    ax.plot(wArr, dos[:, indArr[2]], color=cmapPink(0.5), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[2]] / lambda0) + r"$\lambda_0$")
+    ax.plot(wArr, dos[:, indArr[3]], color=cmapPink(0.6), lw=.7, label="$z = $" + "{:1.1f}".format(zArr[indArr[3]] / lambda0) + r"$\lambda_0$")
+    ax.plot(wArr, dos[:, indArr[4]], color=cmapPink(0.7), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[4]] * wInf / consts.c) + r"$\lambda_0$")
 #
     #ax.axhline(0, lw = 0.5, color = 'gray', zorder = -666)
 
-    ax.set_xlim(500 * 1e12, 1000 * 1e12)
-    ax.set_ylim(-1e40, 1e40)
+    #ax.set_xlim(500 * 1e12, 1000 * 1e12)
+    ax.set_ylim(0, 5)
 
     #ax.set_xticks([0., wLO, 2. * wLO])
     #ax.set_xticklabels([r"$0$", r"$\omega_{\rm LO}$", r"$2 \omega_{\rm LO}$"])

@@ -1,6 +1,7 @@
 import numpy as np
 import combinedDosPlots
 import produceFreqData
+import produceFreqDataV2
 import performFreqIntegral
 import thesisPlots
 import scipy.constants as consts
@@ -35,7 +36,7 @@ def main():
     wTO = 7.92 * 1e12
     #wLO = 20. * 1e12
     #wTO = 1e6
-    L = 1.
+    L = 0.01
     wInf = np.sqrt(epsInf * wLO ** 2 + wTO ** 2) / np.sqrt(epsInf + 1)
     lambda0 = 2. * np.pi * consts.c / wInf
     zArr = np.logspace(np.log10(1e2 * lambda0), np.log10(1e-5 * lambda0), 200, endpoint=True, base = 10)
@@ -48,7 +49,10 @@ def main():
     #L = .01
     #zArr = np.linspace(-L / 2., L / 2., 10000)
 
-    produceFreqData.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
+    #produceFreqData.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
+
+    ###new version of freq-int handling
+    #produceFreqDataV2.produceFreqData(zArr, wLO, wTO, epsInf, L)
 
     #wLOArr = np.array([2., 5., 10., 20.]) * 1e12
     #wTOArr = np.array([1., 1., 1., 1.]) * 1e6

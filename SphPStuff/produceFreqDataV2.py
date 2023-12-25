@@ -7,21 +7,27 @@ import dosAsOfFreq as dosAsOfFreq
 import h5py
 import numpy as np
 
+def defineFreqArray():
+    wBot = 0.
+    wTop = 50. * 1e12
+    nW = 200
+    return np.linspace(wBot, wTop, nW)[1:]
 
 def parameterName(wLO, wTO, wBot, wTop, nW, L, eps):
     wLOStr = "wLO" + str(int(wLO * 1e-12))
     wTOStr = "wTO" + str(int(wTO * 1e-12))
     wBotStr = "wBot" + str(int(wBot * 1e-12))
     wTopStr = "wTop" + str(int(wTop * 1e-12))
-    nWStr = "nW" + str(int(nW * 1e-12))
+    nWStr = "nW" + str(int(nW))
     ellStr = "L" + str(int(10 * L))
     epsStr = "Eps" + str(int(10 * eps))
     return ellStr + epsStr + wLOStr + wTOStr + wBotStr + wTopStr + nWStr
 
-def defineFreqArrays(wBot, wTop, nW):
-    return np.linspace(wBot, wTop, nW)
+def produceFreqData(zArr, wLO, wTO, epsInf, L):
+    wArr = defineFreqArray()
+    computeFreqData(wArr, zArr, wLO, wTO, epsInf, L)
 
-def produceFreqData(wArr, zArr, wLO, wTO, epsInf, L):
+def computeFreqData(wArr, zArr, wLO, wTO, epsInf, L):
     wBot = wArr[0]
     wTop = wArr[-1]
     nW = len(wArr)
@@ -140,7 +146,7 @@ def retrieveDosTMPara(wArr, L, wLO, wTO, epsInf):
     parameterStr = parameterName(wLO, wTO, wBot, wTop, nW, L, epsInf)
 
     #dir = "savedData/clusterFreqData/"
-    #dir = "savedData/"
+    dir = "savedData/"
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')
