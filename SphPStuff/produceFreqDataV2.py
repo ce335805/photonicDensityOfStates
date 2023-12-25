@@ -7,11 +7,29 @@ import dosAsOfFreq as dosAsOfFreq
 import h5py
 import numpy as np
 
-def defineFreqArray():
+def defineFreqArray(wArrSubdivisons):
     wBot = 0.
     wTop = 50. * 1e12
-    nW = 200
-    return np.linspace(wBot, wTop, nW)[1:]
+    nW = 101
+    fullArr = np.linspace(wBot, wTop, nW)[1:]
+
+    part_sizes = [len(fullArr) // wArrSubdivisons] * wArrSubdivisons
+    remaining = len(fullArr) - sum(part_sizes)
+    part_sizes[0] += remaining
+    split_arrays = [fullArr[sum(part_sizes[:i]):sum(part_sizes[:i+1])] for i in range(wArrSubdivisons)]
+
+    # Print lengths of split arrays
+    #for i, arr in enumerate(split_arrays):
+    #    print(f"Part {i + 1} length:", len(arr))
+
+    return np.array(split_arrays)
+
+def defineFreqArrayOne(wArrSubdivisions):
+    wArrs = defineFreqArray(wArrSubdivisions)
+    wArrOne = np.zeros(0, dtype=float)
+    for wArrInd, wArr in enumerate(wArrs):
+        wArrOne = np.append(wArrOne, wArr)
+    return wArrOne
 
 def parameterName(wLO, wTO, wBot, wTop, nW, L, eps):
     wLOStr = "wLO" + str(int(wLO * 1e-12))
@@ -23,9 +41,12 @@ def parameterName(wLO, wTO, wBot, wTop, nW, L, eps):
     epsStr = "Eps" + str(int(10 * eps))
     return ellStr + epsStr + wLOStr + wTOStr + wBotStr + wTopStr + nWStr
 
-def produceFreqData(zArr, wLO, wTO, epsInf, L):
-    wArr = defineFreqArray()
-    computeFreqData(wArr, zArr, wLO, wTO, epsInf, L)
+def produceFreqData(wSubArrInd, wArrSubdivisions, zArr, wLO, wTO, epsInf, L):
+    wArrs = defineFreqArray(wArrSubdivisions)
+    t_start = perf_counter()
+    computeFreqData(wArrs[wSubArrInd], zArr, wLO, wTO, epsInf, L)
+    t_stop = perf_counter()
+    print("Time to produce frequency data: {}".format(t_stop - t_start))
 
 def computeFreqData(wArr, zArr, wLO, wTO, epsInf, L):
     wBot = wArr[0]
@@ -105,6 +126,17 @@ def produceFreqDataTM(omegaArr, zArr, L, wLO, wTO, epsInf, filename):
     h5f.create_dataset('dosTMEvaPerp', data=dosTMEvaValsPerp)
     h5f.create_dataset('dosTMResPerp', data=dosTMResValsPerp)
     h5f.close()
+
+def retrieveDosPara(wArrSubdivisions, zArr, wLO, wTO, epsInf, L):
+    wArrs = defineFreqArray(wArrSubdivisions)
+
+    dosTETotal = np.zeros((0, len(zArr)), dtype=float)
+    dosTMPara = np.zeros((0, len(zArr)), dtype=float)
+    for wArrInd, wArr in enumerate(wArrs):
+        dosTETotal = np.append(dosTETotal, retrieveDosTE(wArr, L, wLO, wTO, epsInf), axis = 0)
+        dosTMPara = np.append(dosTMPara, retrieveDosTMPara(wArr, L, wLO, wTO, epsInf), axis = 0)
+
+    return (dosTETotal, dosTMPara)
 
 def retrieveDosTE(wArr, L, wLO, wTO, epsInf):
     wBot = wArr[0]

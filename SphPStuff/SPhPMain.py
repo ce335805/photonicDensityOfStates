@@ -1,8 +1,10 @@
 import numpy as np
+import sys
 import combinedDosPlots
 import produceFreqData
 import produceFreqDataV2
 import performFreqIntegral
+import performFreqIntegralV2
 import thesisPlots
 import scipy.constants as consts
 import massScalingPlots
@@ -10,25 +12,21 @@ import massScalingPlots
 def main():
     print("Compute full Dos and all modes")
 
+
     #thesisPlots.plotEpsilonOmega()
     #thesisPlots.plotDispersion()
     #exit()
 
-    #TE.createPlotTE()
-    #TEEva.createPlotTEEva()
-    #TERes.createPlotTERes()
-    #TM.createPlotTM()
-    #TMEva.createPlotTMEva()
-    #TMRes.createPlotTMRes()
-    #Surf.createPlotSurf()
+    wSubArrInd = 0
+    if len(sys.argv) > 1:
+        try:
+            wSubArrInd = int(sys.argv[1])
+            print("Integer value passed:", wSubArrInd)
+        except ValueError:
+            print("Error -- no valid integer was passed.")
 
-    #dosTE.createPlotDosTE()
-    #dosTEEva.createPlotDosTEEva()
-    #dosTERes.createPlotDosTERes()
-    #dosTM.createPlotDosTM()
-    #dosTMEva.createPlotDosTMEva()
-    #dosTMRes.createPlotDosTMRes()
-    #dosTMSurf.createPlotDosTMSurf()
+
+    wArrSubdivisions = 1
 
     epsInf = 1.
     #numbers for sto
@@ -52,7 +50,8 @@ def main():
     #produceFreqData.produceFreqIntegralData(zArr, wLO, wTO, epsInf, L)
 
     ###new version of freq-int handling
-    #produceFreqDataV2.produceFreqData(zArr, wLO, wTO, epsInf, L)
+    #for wSubArrIndTemp in np.arange(wArrSubdivisions):
+    #    produceFreqDataV2.produceFreqData(wSubArrIndTemp, wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
 
     #wLOArr = np.array([2., 5., 10., 20.]) * 1e12
     #wTOArr = np.array([1., 1., 1., 1.]) * 1e6
@@ -63,8 +62,8 @@ def main():
     #performFreqIntegral.produceCollapsePlotE(zArr, cutoff, wLOArr, wTOArr, epsInf, L)
     #performFreqIntegral.produceCollapsePlotA(zArr, cutoff, wLOArr, wTOArr, epsInf, L)
 
-    combinedDosPlots.plotDosWhole(zArr, wLO, wTO, epsInf, L)
-    #performFreqIntegral.freqIntegral(zArr, wLO, wTO, epsInf, L)
+    combinedDosPlots.plotDosWhole(wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
+    performFreqIntegralV2.freqIntegral(wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
     #performFreqIntegral.computeSumRuleMultipleCutoffs(zArr, wLO, wTO, epsInf, L)
     #performFreqIntegral.computeFluctuationsMultipleCutoffs(zArr, wLO, wTO, epsInf, L)
 

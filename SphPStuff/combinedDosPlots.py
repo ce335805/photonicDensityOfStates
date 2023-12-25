@@ -51,20 +51,25 @@ import produceFreqDataV2 as prodV2
 import dosFuncs.dosTMSurfModes as surfModes
 import dosAsOfFreq
 
-def plotDosWhole(zArr, wLO, wTO, epsInf, L):
+def plotDosWhole(wArrSubdivisions, zArr, wLO, wTO, epsInf, L):
 
-    wArr = prodV2.defineFreqArray()
+    dosTETotal, dosTMPara = prodV2.retrieveDosPara(
+        wArrSubdivisions,
+        zArr,
+        wLO,
+        wTO,
+        epsInf,
+        L)
 
-    dosTETotal = prodV2.retrieveDosTE(wArr, L, wLO, wTO, epsInf)
-    dosTMPara = prodV2.retrieveDosTMPara(wArr, L, wLO, wTO, epsInf)
+    wArrOne = prodV2.defineFreqArrayOne(wArrSubdivisions)
 
-    dosSurf = np.zeros((len(wArr), len(zArr)))
-    for wInd, wVal in enumerate(wArr):
+    dosSurf = np.zeros((len(wArrOne), len(zArr)))
+    for wInd, wVal in enumerate(wArrOne):
         epsilon = epsFunc.epsilon(wVal, wLO, wTO, epsInf)
         dosSurf[wInd, :] = 1. / (1. + np.abs(epsilon)) * dosAsOfFreq.getDosTMSurf(wVal, zArr, L, wLO, wTO, epsInf)
 
     filename = "Para"
-    createDosPlotFreq(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
+    createDosPlotFreq(wArrOne, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
     #createDosPlotNatUnits(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
     #createDosPlotFreqThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
     #createDosPlotFreqThesiswTO(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
@@ -107,6 +112,7 @@ def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO, epsInf):
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
 
+
     cutoff = 3000 * 1e12
     cutoffFac = np.exp(- wArr ** 2 / cutoff ** 2)
 
@@ -121,6 +127,7 @@ def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO, epsInf):
     #ax.plot(wArr, (dos[:, indArr[3]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.6), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[3]] * wInf / consts.c))
     #ax.plot(wArr, (dos[:, indArr[4]] - 4. / 6.) * wArr**3 * cutoffFac, color=cmapPink(0.7), lw=.7, label="$z = $" + "{:1.1g}".format(zArr[indArr[4]] * wInf / consts.c))
 
+    print(dos[9, 120])
 
     ax.plot(wArr, dos[:, indArr[0]], color=cmapPink(0.1), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[0]] / lambda0) + r"$\lambda_0$")
     ax.plot(wArr, dos[:, indArr[1]], color=cmapPink(0.3), lw=.7, label="$z = $" + "{:1.0f}".format(zArr[indArr[1]] / lambda0) + r"$\lambda_0$")
@@ -130,7 +137,7 @@ def createDosPlotFreq(wArr, zArr, dos, filename, wLO, wTO, epsInf):
 #
     #ax.axhline(0, lw = 0.5, color = 'gray', zorder = -666)
 
-    #ax.set_xlim(500 * 1e12, 1000 * 1e12)
+    ax.set_xlim(0, 50 * 1e12)
     ax.set_ylim(0, 5)
 
     #ax.set_xticks([0., wLO, 2. * wLO])

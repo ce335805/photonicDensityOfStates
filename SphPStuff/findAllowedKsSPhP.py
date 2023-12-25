@@ -175,7 +175,7 @@ def getRoots(L, omega, wLO, wTO, epsInf, mode):
     lowerBound = getLowerBound(mode, omega, wLO, wTO, epsInf)
 
     eps = epsFunc.epsilon(omega, wLO, wTO, epsInf)
-    NCoarse = 2
+    NCoarse = 100
     coarseDisvision = np.linspace(lowerBound, upperBound, NCoarse, endpoint=True)
     iteration = 0
     maxIters = 20
@@ -269,7 +269,7 @@ def computeAllowedKs(L, omega, wLO, wTO, epsInf, mode):
     return roots
 
 def findKsDerivativeW(roots, L, omega, wLO, wTO, epsInf, mode):
-    delOm = omega * 1e-8
+    delOm = omega * 1e-12
     rootsPlus = getRoots(L, omega + delOm, wLO, wTO, epsInf, mode)
     rootsPlus = rootsPlus[:len(roots)]
     return (rootsPlus - roots) / (delOm)
@@ -282,7 +282,7 @@ def findKsSurf(L, omega, wLO, wTO, epsInf):
         return kVals[0]
 
 def findKsDerivativeWSurf(L, omega, wLO, wTO, epsInf):
-    delOm = omega * 1e-4
+    delOm = omega * 1e-8
     rootPlus = allowedKSurf(L, omega + delOm, wLO, wTO, epsInf)[0]
     rootMinus = allowedKSurf(L, omega - delOm, wLO, wTO, epsInf)[0]
 
