@@ -52,6 +52,7 @@ def main():
     ###new version of freq-int handling
     #for wSubArrIndTemp in np.arange(wArrSubdivisions):
     #    produceFreqDataV2.produceFreqData(wSubArrIndTemp, wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
+    produceFreqDataV2.produceFreqData(wSubArrInd, wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
 
     #wLOArr = np.array([2., 5., 10., 20.]) * 1e12
     #wTOArr = np.array([1., 1., 1., 1.]) * 1e6
