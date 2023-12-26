@@ -21,9 +21,9 @@ import produceFreqDataV2 as prodV2
 def freqIntegral(wArrSubdevisions, zArr, wLO, wTO, epsInf, L):
 
     evCutoff = 1519.3 * 1e12  # 1eV
-    cutoff = .2 * evCutoff
-    #computeEffectiveMass(wArr, zArr, cutoff, wLO, wTO, epsInf, L)
-    #computeEffectiveHopping(wArr, zArr, cutoff, wLO, wTO, epsInf, L)
+    cutoff = .1 * evCutoff
+    #computeEffectiveMass(wArrSubdevisions, zArr, cutoff, wLO, wTO, epsInf, L)
+    #computeEffectiveHopping(wArrSubdevisions, zArr, cutoff, wLO, wTO, epsInf, L)
     computeFluctuations(wArrSubdevisions, zArr, cutoff, wLO, wTO, epsInf, L)
 
 def computeFreqIntegralAsOfCutoff(wArr, zArr, wLO, wTO, epsInf, L):
@@ -52,10 +52,10 @@ def computeFreqIntegralAsOfCutoff(wArr, zArr, wLO, wTO, epsInf, L):
     filename = "TMField"
     plotFreq.plotDosIntegratedAsOfCutoff(dosIntTM, zArr, L, wArr, wLO, wTO, epsInf, filename)
 
-def computeEffectiveMass(wArr, zArr, cutoff, wLO, wTO, epsInf, L):
+def computeEffectiveMass(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L):
 
-    dosTETotal = prodV2.retrieveDosTE(wArr, L, wLO, wTO, epsInf)
-    dosTMPara = prodV2.retrieveDosTMPara(wArr, L, wLO, wTO, epsInf)
+    dosTETotal, dosTMPara = prodV2.retrieveDosPara(wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
+    wArr = prodV2.defineFreqArrayOne(wArrSubdivisions)
 
     dosIntTE = np.zeros(zArr.shape)
     dosIntTM = np.zeros(zArr.shape)
@@ -76,7 +76,12 @@ def computeEffectiveMass(wArr, zArr, cutoff, wLO, wTO, epsInf, L):
 
     dosTot = dosIntTE + dosIntTM + dosSurf
 
-    prod.writeMasses(cutoff, zArr, dosTot, "savedData/massesForPlotting.hdf5")
+    wLOStr = "wLO" + str(int(wLO * 1e-12))
+    wTOStr = "wTO" + str(int(wTO * 1e-12))
+    filename = "./savedData/massThesis1ForPlotting" + wLOStr + wTOStr + ".hdf5"
+    print("Writing masses to file: " + filename)
+    prod.writeMasses(cutoff, zArr, dosTot, filename)
+
     #filename = "EffectiveMass"
     #plotFreq.plotEffectiveMass(dosTot, zArr, L, wLO, wTO, epsInf, filename)
 
@@ -179,10 +184,11 @@ def computeFluctuations(wArrSubdivision, zArr, cutoff, wLO, wTO, epsInf, L):
     plotFreq.plotFluctuationsENaturalUnits(flucENoSurf, flucE, zArr, L, wLO, wTO, epsInf)
     plotFreq.plotFluctuationsANaturalUnits(flucANoSurf, flucA, zArr, L, wLO, wTO, epsInf)
 
-def computeEffectiveHopping(wArr, zArr, cutoff, wLO, wTO, epsInf, L):
+def computeEffectiveHopping(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L):
 
-    dosTETotal = prodV2.retrieveDosTE(wArr, L, wLO, wTO, epsInf)
-    dosTMTotal = prodV2.retrieveDosTMPara(wArr, L, wLO, wTO, epsInf)
+
+    dosTETotal, dosTMTotal = prodV2.retrieveDosPara(wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
+    wArr = prodV2.defineFreqArrayOne(wArrSubdivisions)
 
     dosIntTE = np.zeros(zArr.shape)
     dosIntTM = np.zeros(zArr.shape)
@@ -203,7 +209,7 @@ def computeEffectiveHopping(wArr, zArr, cutoff, wLO, wTO, epsInf, L):
 
     dosTot = dosIntTE + dosIntTM + dosSurf
 
-    prod.writeMasses(cutoff, zArr, dosTot, "savedData/hoppingForPlotting.hdf5")
+    prod.writeMasses(cutoff, zArr, dosTot, "savedData/hoppingThesis1ForPlotting.hdf5")
 
     #filename = "HoppingCutoff"
     #plotFreq.plotDosIntegratedHopping(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename)

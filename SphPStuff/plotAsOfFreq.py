@@ -389,6 +389,53 @@ def plotFluctuationsENaturalUnits(dosNoSurfE, dosTotE, zArr, L, wLO, wTO, epsInf
 
     plt.savefig("./SPhPPlotsSaved/FluctuationsENatUnits.png")
 
+
+def plotFluctuationsENaturalUnits(dosNoSurfE, dosTotE, zArr, L, wLO, wTO, epsInf):
+
+    fig = plt.figure(figsize=(7.04 / 3., 1.8), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.28, right=0.95)
+    axE = plt.subplot(gs[0, 0])
+
+    wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
+    lambda0 = 2. * np.pi * consts.c / wInf
+    natUnitFac = consts.epsilon_0 * lambda0**3 / (consts.hbar * wInf)
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+    axE.plot(zArr / lambda0, np.abs(dosTotE) * natUnitFac, color=cmapBone(.5), linestyle='', marker='x', markersize=2., label = r"$\mathrm{Total}$")
+    axE.plot(zArr / lambda0, np.abs(dosNoSurfE) * natUnitFac, color=cmapPink(.5), linestyle='', marker='x', markersize=2., label = r"$\mathrm{Bulk}$")
+
+    axE.set_xscale("log")
+    axE.set_yscale("log")
+    axE.set_xlim(1e-3, 1e1)
+    axE.set_ylim(1e-4, 1e8)
+    #axE.set_ylim(1e10, 1e20)
+
+    axE.plot(zArr / lambda0, np.abs(dosTotE[-1]) * zArr[-1]**3 / zArr**3 * natUnitFac, color = 'red', lw = 0.3)
+    axE.plot(zArr / lambda0, np.abs(dosNoSurfE[-50]) * zArr[-50]**2 / zArr**2 * natUnitFac, color = 'red', lw = 0.3)
+
+    axE.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
+    axE.set_ylabel(r"$ \langle E^2 \rangle_{\rm eff}  \left[\frac{\hbar \omega_{\mathrm{S}}}{\varepsilon_0 \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
+
+    #axE.set_xticks([])
+    #axE.set_yticks([1e-10, 1e-5, 1.])
+    #axE.set_yticklabels(["$10^{-10}$", "$10^{-5}$", "$1$"], fontsize = 8)
+
+    #axE.text(1e-1, 1e1, r"$\sim z^{-3}$", fontsize = 7, color = "red")
+    #axE.text(1.5 * 1e-2, .3 * 1e-1, r"$\sim z^{-2}$", fontsize = 7, color = "red")
+
+    legend = axE.legend(fontsize=8, loc='upper right', bbox_to_anchor=(1., 1.), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        axE.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./SPhPPlotsSaved/FluctuationsENatUnits.png")
+
+
 def collapseFlucE(dosENoSurf, dosE, zArr, L, wLOArr, wTOArr, epsInf):
     fig = plt.figure(figsize=(2. * 7.04 / 3., 1.8), dpi=800)
     gs = gridspec.GridSpec(1, 2,
@@ -749,15 +796,17 @@ def plotEffectiveMass(delMOverM, zArr, L, wLO, wTO, epsInf, filename):
     ax = plt.subplot(gs[0, 0])
     #axRight = ax.twinx()
 
+    wInf = np.sqrt(epsInf * wLO ** 2 + wTO ** 2) / np.sqrt(epsInf + 1)
+    lambda0 = 2. * np.pi * consts.c / wInf
 
     cmapPink = cm.get_cmap('pink')
     cmapBone = cm.get_cmap('bone')
-    ax.plot(zArr, delMOverM, color=cmapPink(.6), linestyle='', marker='x', markersize=2., label = r"$\mathrm{all}$")
-    #ax.axhline(1., lw = 0.3, color = 'red')
-    ax.set_xscale("log")
-    ax.set_yscale("log")
-    ax.set_xlim(1e-8, 1e-5)
-    ax.set_ylim(1e-8, 1.)
+    ax.plot(zArr/lambda0, delMOverM, color=cmapPink(.6), label = r"$\mathrm{all}$")
+    ax.axhline(0., lw = 0.3, color = 'black')
+    #ax.set_xscale("log")
+    #ax.set_yscale("log")
+    ax.set_xlim(1e-3, 2. * 1e1)
+    ax.set_ylim(-1e-10, .5 * 1e-9)
     #ax.set_xlim(np.amin(omegaArr), 30)
     #ax.set_ylim(1e-14, 1e-12)
 

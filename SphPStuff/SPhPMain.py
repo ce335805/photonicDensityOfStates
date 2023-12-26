@@ -8,6 +8,7 @@ import performFreqIntegralV2
 import thesisPlots
 import scipy.constants as consts
 import massScalingPlots
+import plotMassesThesis
 
 def main():
     print("Compute full Dos and all modes")
@@ -15,6 +16,8 @@ def main():
 
     #thesisPlots.plotEpsilonOmega()
     #thesisPlots.plotDispersion()
+
+    #plotMassesThesis.plotEffectiveMassesComparison()
     #exit()
 
     wSubArrInd = 0
@@ -26,15 +29,15 @@ def main():
             print("Error -- no valid integer was passed.")
 
 
-    wArrSubdivisions = 1
+    wArrSubdivisions = 100
 
     epsInf = 1.
     #numbers for sto
     wLO = 32.04 * 1e12
     wTO = 7.92 * 1e12
     #wLO = 20. * 1e12
-    #wTO = 1e6
-    L = 0.01
+    wTO = 1e6
+    L = 1.
     wInf = np.sqrt(epsInf * wLO ** 2 + wTO ** 2) / np.sqrt(epsInf + 1)
     lambda0 = 2. * np.pi * consts.c / wInf
     zArr = np.logspace(np.log10(1e2 * lambda0), np.log10(1e-5 * lambda0), 200, endpoint=True, base = 10)
@@ -52,7 +55,7 @@ def main():
     ###new version of freq-int handling
     #for wSubArrIndTemp in np.arange(wArrSubdivisions):
     #    produceFreqDataV2.produceFreqData(wSubArrIndTemp, wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
-    produceFreqDataV2.produceFreqData(wSubArrInd, wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
+    #produceFreqDataV2.produceFreqData(wSubArrInd, wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
 
     #wLOArr = np.array([2., 5., 10., 20.]) * 1e12
     #wTOArr = np.array([1., 1., 1., 1.]) * 1e6
@@ -63,7 +66,7 @@ def main():
     #performFreqIntegral.produceCollapsePlotE(zArr, cutoff, wLOArr, wTOArr, epsInf, L)
     #performFreqIntegral.produceCollapsePlotA(zArr, cutoff, wLOArr, wTOArr, epsInf, L)
 
-    combinedDosPlots.plotDosWhole(wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
+    #combinedDosPlots.plotDosWhole(wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
     performFreqIntegralV2.freqIntegral(wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
     #performFreqIntegral.computeSumRuleMultipleCutoffs(zArr, wLO, wTO, epsInf, L)
     #performFreqIntegral.computeFluctuationsMultipleCutoffs(zArr, wLO, wTO, epsInf, L)

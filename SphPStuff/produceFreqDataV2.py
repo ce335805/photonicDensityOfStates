@@ -9,8 +9,8 @@ import numpy as np
 
 def defineFreqArray(wArrSubdivisons):
     wBot = 0.
-    wTop = 50. * 1e12
-    nW = 101
+    wTop = 1000. * 1e12
+    nW = 5001
     fullArr = np.linspace(wBot, wTop, nW)[1:]
 
     part_sizes = [len(fullArr) // wArrSubdivisons] * wArrSubdivisons
@@ -144,8 +144,8 @@ def retrieveDosTE(wArr, L, wLO, wTO, epsInf):
     nW = len(wArr)
     parameterStr = parameterName(wLO, wTO, wBot, wTop, nW, L, epsInf)
 
-    #dir = "savedData/clusterFreqData/"
-    dir = "savedData/"
+    dir = "savedData/clusterFreqData/"
+    #dir = "savedData/"
 
     filenameTE = dir + 'dosTE' + parameterStr + '.h5'
     h5f = h5py.File(filenameTE, 'r')
@@ -160,8 +160,8 @@ def retrieveDosTMTotal(wArr, L, wLO, wTO, epsInf):
     nW = len(wArr)
     parameterStr = parameterName(wLO, wTO, wBot, wTop, nW, L, epsInf)
 
-    #dir = "savedData/clusterFreqData/"
-    dir = "savedData/"
+    dir = "savedData/clusterFreqData/"
+    #dir = "savedData/"
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')
@@ -177,8 +177,8 @@ def retrieveDosTMPara(wArr, L, wLO, wTO, epsInf):
     nW = len(wArr)
     parameterStr = parameterName(wLO, wTO, wBot, wTop, nW, L, epsInf)
 
-    #dir = "savedData/clusterFreqData/"
-    dir = "savedData/"
+    dir = "savedData/clusterFreqData/"
+    #dir = "savedData/"
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'
     h5f = h5py.File(filenameTM, 'r')
