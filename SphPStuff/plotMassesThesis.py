@@ -75,11 +75,16 @@ def plotEffectiveMassesComparison():
     axZoom.plot(zArr, massSPhPArr, color = cmapPink(.45), lw = 0.8)
     axZoom.plot(zArrSPP, massSPPArr, color = cmapBone(.45), lw = 0.8)
 
-    #axSPhP.set_xscale("log")
-    #axSPhP.set_yscale("log")
+    axCollapse.plot(zArr / lambda0, np.abs(massSPPArr), color = cmapBone(.45), lw = 0.8)
+
+    axCollapse.set_xscale("log")
+    axCollapse.set_yscale("log")
 
     axZoom.set_xlim(1e-6, 2. * 1e-3)
     axZoom.set_ylim(- 1e-9, 1e-9)
+
+    axCollapse.set_xlim(1e-3, 1e1)
+    axCollapse.set_ylim(1e-12, 1e-4)
 
     axZoom.set_xlabel("$z [\lambda_0]$", fontsize = 8)
 

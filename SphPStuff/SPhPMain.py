@@ -37,7 +37,7 @@ def main():
     wTO = 7.92 * 1e12
     #wLO = 20. * 1e12
     wTO = 1e6
-    L = 1.
+    L = 2.
     wInf = np.sqrt(epsInf * wLO ** 2 + wTO ** 2) / np.sqrt(epsInf + 1)
     lambda0 = 2. * np.pi * consts.c / wInf
     zArr = np.logspace(np.log10(1e2 * lambda0), np.log10(1e-5 * lambda0), 200, endpoint=True, base = 10)
