@@ -10,7 +10,7 @@ import numpy as np
 def defineFreqArray(wArrSubdivisons):
     wBot = 0.
     wTop = 1000. * 1e12
-    nW = 10001
+    nW = 20001
     fullArr = np.linspace(wBot, wTop, nW)[1:]
 
     part_sizes = [len(fullArr) // wArrSubdivisons] * wArrSubdivisons

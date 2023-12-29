@@ -56,23 +56,23 @@ def dosFPMain():
     #exit()
 
     #compute field plots
-    evCutoff = 1519.3 * 1e12 #1eV
-    cutoff = 4. * evCutoff
-    dArr = np.logspace(-6, -4, 20, endpoint=True)
-    #fluctuationsE = integratedDos.numericalIntegralEField(cutoff, dArr)
-    filename = "fluctuationsE"
-    #handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsE, filename)
-    cutoff, dArr, fluctuationsE = handleIntegralData.retrieveDataFixedCutoff(filename)
-    #fluctuationsA = integratedDos.numericalIntegralAField(cutoff, dArr)
-    filename = "fluctuationsA"
-    #handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsA, filename)
-    cutoff, dArr, fluctuationsA = handleIntegralData.retrieveDataFixedCutoff(filename)
-    baseFreqArr = np.pi * consts.c / dArr
-    #plotDosFP.plotFluctuationsAandE(dArr, fluctuationsE, fluctuationsA, baseFreqArr, cutoff)
-    #plotDosFP.plotFluctuationsAandENaturalUnits(dArr, fluctuationsE, fluctuationsA, baseFreqArr, cutoff)
-    plotFlucThesis.plotFluctuationsAandENaturalUnits(dArr, fluctuationsE, fluctuationsA, baseFreqArr, cutoff)
-    plotFlucThesis.plotFluctuationsEExpUnits(dArr, fluctuationsE, baseFreqArr, cutoff)
-    exit()
+    #evCutoff = 1519.3 * 1e12 #1eV
+    #cutoff = 4. * evCutoff
+    #dArr = np.logspace(-6, -4, 20, endpoint=True)
+    ##fluctuationsE = integratedDos.numericalIntegralEField(cutoff, dArr)
+    #filename = "fluctuationsE"
+    ##handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsE, filename)
+    #cutoff, dArr, fluctuationsE = handleIntegralData.retrieveDataFixedCutoff(filename)
+    ##fluctuationsA = integratedDos.numericalIntegralAField(cutoff, dArr)
+    #filename = "fluctuationsA"
+    ##handleIntegralData.writeDataFixedCutoff(cutoff, dArr, fluctuationsA, filename)
+    #cutoff, dArr, fluctuationsA = handleIntegralData.retrieveDataFixedCutoff(filename)
+    #baseFreqArr = np.pi * consts.c / dArr
+    ##plotDosFP.plotFluctuationsAandE(dArr, fluctuationsE, fluctuationsA, baseFreqArr, cutoff)
+    ##plotDosFP.plotFluctuationsAandENaturalUnits(dArr, fluctuationsE, fluctuationsA, baseFreqArr, cutoff)
+    #plotFlucThesis.plotFluctuationsAandENaturalUnits(dArr, fluctuationsE, fluctuationsA, baseFreqArr, cutoff)
+    #plotFlucThesis.plotFluctuationsEExpUnits(dArr, fluctuationsE, baseFreqArr, cutoff)
+    #exit()
 
 
     #compute effective mass of free electrons and write it to a file
@@ -96,6 +96,7 @@ def dosFPMain():
     #handleIntegralData.writeMassData(cutoff, dArr, hopArr, filename)
     #plotDosFP.plotEffectiveHoppingComparison()
     #massPlotsThesis.plotEffectiveHoppingComparison()
+    #massPlotsThesis.plotHoppingComparisonZoom()
 
     exit()
 

@@ -19,13 +19,14 @@ import produceFreqData as prod
 import produceFreqDataV2 as prodV2
 import fluctuationPlotsThesis as plotFlucThesis
 
-def freqIntegral(wArrSubdevisions, zArr, wLO, wTO, epsInf, L):
+def freqIntegral(wArrSubdivisions, zArr, wLO, wTO, epsInf, L):
 
     evCutoff = 1519.3 * 1e12  # 1eV
     cutoff = .2 * evCutoff
-    #computeEffectiveMass(wArrSubdevisions, zArr, cutoff, wLO, wTO, epsInf, L)
-    #computeEffectiveHopping(wArrSubdevisions, zArr, cutoff, wLO, wTO, epsInf, L)
-    computeFluctuations(wArrSubdevisions, zArr, cutoff, wLO, wTO, epsInf, L)
+    #computeEffectiveMass(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
+    #computeEffectiveHopping(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
+    computeFluctuations(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
+    computeFluctuationsMultipleCutoffs(wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
 
 def computeFreqIntegralAsOfCutoff(wArr, zArr, wLO, wTO, epsInf, L):
     dosTETotal = prodV2.retrieveDosTE(wArr, L, wLO, wTO, epsInf)
@@ -174,7 +175,7 @@ def computeFluctuations(wArrSubdivision, zArr, cutoff, wLO, wTO, epsInf, L):
 
     #plotFlucThesis.plotFluctuationsEExpUnits(flucENoSurf, flucE, zArr, L, wLO, wTO, epsInf)
 
-def computeFluctuationsMultipleCutoffs(wArrSubdivision, zArr, wLO, wTO, epsInf, L):
+def computeFluctuationsMultipleCutoffs(wArrSubdivisions, zArr, wLO, wTO, epsInf, L):
     evCutoff = 1519.3 * 1e12 #1eV
     cutoffArr = np.logspace(np.log10(0.033 * evCutoff), np.log10(.33 * evCutoff), 5, endpoint=True)
     print(cutoffArr * 1e-12)
@@ -184,11 +185,11 @@ def computeFluctuationsMultipleCutoffs(wArrSubdivision, zArr, wLO, wTO, epsInf, 
     fluctuationsTotA = np.zeros((len(cutoffArr), len(zArr)), dtype = float)
     fluctuationsNoSurfA = np.zeros((len(cutoffArr), len(zArr)), dtype = float)
     for cutoffInd, cutoff in enumerate(cutoffArr):
-        fluctuationsNoSurfE[cutoffInd, :], fluctuationsTotE[cutoffInd, :]  = computeFluctuationsE(wArrSubdivision, zArr, cutoff, wLO, wTO, epsInf, L)
-        fluctuationsNoSurfA[cutoffInd, :], fluctuationsTotA[cutoffInd, :]  = computeFluctuationsA(wArrSubdivision, zArr, cutoff, wLO, wTO, epsInf, L)
+        fluctuationsNoSurfE[cutoffInd, :], fluctuationsTotE[cutoffInd, :]  = computeFluctuationsE(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
+        fluctuationsNoSurfA[cutoffInd, :], fluctuationsTotA[cutoffInd, :]  = computeFluctuationsA(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
 
-    plotFreq.plotFluctuationsENaturalUnitsMultipleCutoffs(fluctuationsNoSurfE[:, :], fluctuationsTotE[:, :], zArr, cutoffArr, L, wLO, wTO, epsInf)
-    plotFreq.plotFluctuationsANaturalUnitsMultipleCutoffs(fluctuationsNoSurfA[:, :], fluctuationsTotA[:, :], zArr, cutoffArr, L, wLO, wTO, epsInf)
+    plotFlucThesis.plotFluctuationsECutoffConv(fluctuationsNoSurfE[:, :], fluctuationsTotE[:, :], cutoffArr, zArr, L, wLO, wTO, epsInf)
+    plotFlucThesis.plotFluctuationsACutoffConv(fluctuationsNoSurfA[:, :], fluctuationsTotA[:, :], cutoffArr, zArr, L, wLO, wTO, epsInf)
 
 
 def computeEffectiveHopping(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L):

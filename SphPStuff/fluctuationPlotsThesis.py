@@ -174,3 +174,106 @@ def plotFluctuationsEExpUnits(dosNoSurfE, dosTotE, zArr, L, wLO, wTO, epsInf):
 
     plt.savefig("./ThesisPlots/FluctuationsEExpUnits.png")
 
+
+def plotFluctuationsECutoffConv(dosNoSurfEArr, dosTotEArr, cutoffArr, zArr, L, wLO, wTO, epsInf):
+
+    fig = plt.figure(figsize=(3., 1.8), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.24, right=0.95)
+    axE = plt.subplot(gs[0, 0])
+
+    evCutoff = 1519.3 * 1e12
+
+    wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
+    lambda0 = 2. * np.pi * consts.c / wInf
+    natUnitFac = consts.epsilon_0 * lambda0**3 / (consts.hbar * wInf)
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+
+    for cutoffInd, cutoff in enumerate(cutoffArr):
+        color1 = cmapBone((cutoffInd + 1.) / (len(cutoffArr) + 2.))
+        color2 = cmapPink((cutoffInd + 1.) / (len(cutoffArr) + 2.))
+        axE.plot(zArr / lambda0, np.abs(dosTotEArr[cutoffInd, :]) * natUnitFac, color=color1, linestyle='', marker='x', markersize=2.)
+        axE.plot(zArr / lambda0, np.abs(dosNoSurfEArr[cutoffInd, :]) * natUnitFac, color=color2, linestyle='', marker='x', markersize=2.
+                 , label = r"$\Lambda = $" + "{:.3f}".format(cutoff / evCutoff) + "$\mathrm{eV}$")
+
+    axE.set_xscale("log")
+    axE.set_yscale("log")
+    axE.set_xlim(1e-3, 1e1)
+    axE.set_ylim(1e-4, 1e8)
+    #axE.set_ylim(1e10, 1e20)
+
+    axE.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
+    axE.set_ylabel(r"$ \langle \widehat{E \,}^{\! 2} \rangle_{\rm eff}  \left[\frac{h \hspace{-1mm} \rule[1.05ex]{0.25em}{0.3pt} \, \omega_{\mathrm{S}}}{\varepsilon_0 \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
+
+    #axE.set_xticks([])
+    #axE.set_yticks([1e-10, 1e-5, 1.])
+    #axE.set_yticklabels(["$10^{-10}$", "$10^{-5}$", "$1$"], fontsize = 8)
+
+    #axE.text(1e-1, 1e1, r"$\sim z^{-3}$", fontsize = 7, color = "red")
+    #axE.text(1.5 * 1e-2, .3 * 1e-1, r"$\sim z^{-2}$", fontsize = 7, color = "red")
+
+    legend = axE.legend(fontsize=8, loc='upper right', bbox_to_anchor=(1., 1.05), edgecolor='black', ncol=1)
+    legend.get_frame().set_alpha(0.)
+    legend.get_frame().set_boxstyle('Square', pad=0.1)
+    legend.get_frame().set_linewidth(0.0)
+
+    axE.text(-0.45, 0.98, r"$\mathrm{(b)}$", fontsize = 8, transform = axE.transAxes)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        axE.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./ThesisPlots/FluctuationsECutoffConv.png")
+
+
+def plotFluctuationsACutoffConv(dosNoSurfAArr, dosTotAArr, cutoffArr, zArr, L, wLO, wTO, epsInf):
+
+    fig = plt.figure(figsize=(3., 1.8), dpi=800)
+    gs = gridspec.GridSpec(1, 1,
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.24, right=0.95)
+    axA = plt.subplot(gs[0, 0])
+
+    evCutoff = 1519.3 * 1e12
+
+    wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
+    lambda0 = consts.c / (2. * np.pi * wInf)
+    natUnitFac = consts.epsilon_0 * lambda0**3 * wInf / (consts.hbar)
+
+    cmapPink = cm.get_cmap('pink')
+    cmapBone = cm.get_cmap('bone')
+
+    for cutoffInd, cutoff in enumerate(cutoffArr):
+        color1 = cmapBone((cutoffInd + 1.) / (len(cutoffArr) + 2.))
+        color2 = cmapPink((cutoffInd + 1.) / (len(cutoffArr) + 2.))
+        axA.plot(zArr / lambda0, dosTotAArr[cutoffInd, :] * natUnitFac, color=color1, linestyle='', marker='x', markersize=2.)
+        axA.plot(zArr / lambda0, dosNoSurfAArr[cutoffInd, :] * natUnitFac, color=color2, linestyle='', marker='x', markersize=2.
+                 , label = r"$\Lambda = $" + "{:.3f}".format(cutoff / evCutoff) + "$\mathrm{eV}$")
+
+    axA.set_xscale("log")
+    #axA.set_yscale("log")
+    axA.set_xlim(1e-2, 1e2)
+    axA.set_ylim(-0.15 * 1e-3, 0.15 * 1e-3)
+
+    axA.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
+    axA.set_ylabel(r"$ \langle \widehat{A \,}^{\! 2} \rangle_{\rm eff}  \left[\frac{h \hspace{-1mm} \rule[1.05ex]{0.25em}{0.3pt}}{\varepsilon_0 \omega_{\mathrm{S}} \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
+
+    #axE.set_xticks([])
+    #axE.set_yticks([1e-10, 1e-5, 1.])
+    #axE.set_yticklabels(["$10^{-10}$", "$10^{-5}$", "$1$"], fontsize = 8)
+
+    #axE.text(1e-1, 1e1, r"$\sim z^{-3}$", fontsize = 7, color = "red")
+    #axE.text(1.5 * 1e-2, .3 * 1e-1, r"$\sim z^{-2}$", fontsize = 7, color = "red")
+
+    #legend = axA.legend(fontsize=8, loc='upper right', bbox_to_anchor=(1., 1.05), edgecolor='black', ncol=1)
+    #legend.get_frame().set_alpha(0.)
+    #legend.get_frame().set_boxstyle('Square', pad=0.1)
+    #legend.get_frame().set_linewidth(0.0)
+
+    axA.text(-0.45, 0.98, r"$\mathrm{(b)}$", fontsize = 8, transform = axA.transAxes)
+
+    for axis in ['top', 'bottom', 'left', 'right']:
+        axA.spines[axis].set_linewidth(.5)
+
+    plt.savefig("./ThesisPlots/FluctuationsACutoffConv.png")
+
