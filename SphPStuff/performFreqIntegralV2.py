@@ -21,12 +21,14 @@ import fluctuationPlotsThesis as plotFlucThesis
 
 def freqIntegral(wArrSubdivisions, zArr, wLO, wTO, epsInf, L):
 
-    evCutoff = 1519.3 * 1e12  # 1eV
-    cutoff = .2 * evCutoff
-    #computeEffectiveMass(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
+    evCutoff = 1519.3 * 1e12 # 1eV
+    #cutoff = .1 * evCutoff
+    #For scaling plot
+    cutoff = .075 * evCutoff
+    computeEffectiveMass(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
     #computeEffectiveHopping(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
-    computeFluctuations(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
-    computeFluctuationsMultipleCutoffs(wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
+    #computeFluctuations(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
+    #computeFluctuationsMultipleCutoffs(wArrSubdivisions, zArr, wLO, wTO, epsInf, L)
 
 def computeFreqIntegralAsOfCutoff(wArr, zArr, wLO, wTO, epsInf, L):
     dosTETotal = prodV2.retrieveDosTE(wArr, L, wLO, wTO, epsInf)
@@ -77,12 +79,13 @@ def computeEffectiveMass(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L):
         dosSurf[zInd] = performSPhPIntegralMass(zVal, wLO, wTO, epsInf)[0]
 
     dosTot = dosIntTE + dosIntTM + dosSurf
+    dosBulk = dosIntTE + dosIntTM
 
     wLOStr = "wLO" + str(int(wLO * 1e-12))
     wTOStr = "wTO" + str(int(wTO * 1e-12))
-    filename = "./savedData/massThesis1ForPlotting" + wLOStr + wTOStr + ".hdf5"
+    filename = "./savedData/massForPaper" + wLOStr + wTOStr + ".hdf5"
     print("Writing masses to file: " + filename)
-    prod.writeMasses(cutoff, zArr, dosTot, filename)
+    prod.writeMasses(cutoff, zArr, dosTot, dosBulk, filename)
 
     #filename = "EffectiveMass"
     #plotFreq.plotEffectiveMass(dosTot, zArr, L, wLO, wTO, epsInf, filename)
@@ -177,7 +180,7 @@ def computeFluctuations(wArrSubdivision, zArr, cutoff, wLO, wTO, epsInf, L):
 
 def computeFluctuationsMultipleCutoffs(wArrSubdivisions, zArr, wLO, wTO, epsInf, L):
     evCutoff = 1519.3 * 1e12 #1eV
-    cutoffArr = np.logspace(np.log10(0.033 * evCutoff), np.log10(.33 * evCutoff), 5, endpoint=True)
+    cutoffArr = np.logspace(np.log10(0.02 * evCutoff), np.log10(.2 * evCutoff), 5, endpoint=True)
     print(cutoffArr * 1e-12)
 
     fluctuationsTotE = np.zeros((len(cutoffArr), len(zArr)), dtype = float)
@@ -217,7 +220,7 @@ def computeEffectiveHopping(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
 
     dosTot = dosIntTE + dosIntTM + dosSurf
 
-    prod.writeMasses(cutoff, zArr, dosTot, "savedData/hoppingThesis1ForPlotting.hdf5")
+    prod.writeMasses(cutoff, zArr, dosTot, "savedData/hoppingThesis1ForPlottingThesis.hdf5")
 
     #filename = "HoppingCutoff"
     #plotFreq.plotDosIntegratedHopping(dosNoSurf, dosTot, zArr, L, wLO, wTO, epsInf, filename)
@@ -259,7 +262,7 @@ def intFuncHopping(omega, zVal, wLO, wTO, epsInf):
 def performSPhPIntegralMass(zVal, wLO, wTO, epsInf):
     wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
     #return scipy.integrate.quad(intFuncFieldStrength, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 1000)
-    return scipy.integrate.quad(intFuncMass, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 1000)
+    return scipy.integrate.quad(intFuncMass, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 10000)
     #return scipy.integrate.quad(intFuncEffectiveHopping, wTO, wInf, args=(zVal, wLO, wTO, epsInf), points=[wInf, wInf - wInf * 1e-5, wInf - wInf * 1e-4, wInf - wInf * 1e-3], limit = 500)
 
 def performSPhPIntegralEFluc(zVal, wLO, wTO, epsInf):

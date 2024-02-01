@@ -77,7 +77,7 @@ def plotFluctuationsAandENaturalUnits(dArr, flucE, flucA, freqArr, cutoff):
     plt.rcParams['font.family'] = 'serif'
 
     axE.set_xlabel(r"$d \; \left[ \mathrm{m} \right]$", fontsize=8, labelpad = 2)
-    axE.set_ylabel(r"$\langle \widehat{E\,}^{\! 2} \rangle_{\rm eff} \left[ \frac{h \hspace{-1mm} \rule[1.05ex]{0.25em}{0.3pt} \, \omega_0}{\varepsilon_0 \mu \mathrm{m}^3} \right]$", fontsize=8,
+    axE.set_ylabel(r"$\langle \widehat{E\,}_{\! ||}^{\! 2} \rangle_{\rm eff} \left[ \frac{h \hspace{-1mm} \rule[1.05ex]{0.25em}{0.3pt} \, \omega_0}{\varepsilon_0 \mu \mathrm{m}^3} \right]$", fontsize=8,
                    labelpad=2)
     axA.set_ylabel(
         r"$\langle \widehat{A\,}^{\! 2} \rangle_{\rm eff} \left[ \frac{h \hspace{-1mm} \rule[1.05ex]{0.25em}{0.3pt}}{\varepsilon_0 \mu \mathrm{m}^3} \right]$",
@@ -136,7 +136,7 @@ def plotFluctuationsEExpUnits(dArr, flucE, freqArr, cutoff):
     plt.rcParams['font.family'] = 'serif'
 
     axE.set_xlabel(r"$d \; \left[ \mathrm{m} \right]$", fontsize=8, labelpad = 2)
-    axE.set_ylabel(r"$\sqrt{\langle \widehat{E\,}^{\! 2} \rangle_{\rm eff}} \left[ \frac{\mathrm{MV}}{\mathrm{m}} \right]$", fontsize=8,
+    axE.set_ylabel(r"$\sqrt{\langle \widehat{E\,}_{\! ||}^{\! 2} \rangle_{\rm eff}} \left[ \frac{\mathrm{MV}}{\mathrm{m}} \right]$", fontsize=8,
                    labelpad=4)
 
     axFreq.set_ylabel(r"$h \hspace{-1.3mm} \rule[1.4ex]{0.3em}{0.4pt} \, \omega_0 \, \left[ \mathrm{eV} \right]$", fontsize=8,

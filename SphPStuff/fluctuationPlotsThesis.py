@@ -38,7 +38,7 @@ mpl.rcParams['text.latex.preamble'] = [
 
 def plotFluctuationsENaturalUnits(dosNoSurfE, dosTotE, zArr, L, wLO, wTO, epsInf):
 
-    fig = plt.figure(figsize=(6.5 / 3., 1.8), dpi=800)
+    fig = plt.figure(figsize=(6.5 / 3., 1.8), dpi=300)
     gs = gridspec.GridSpec(1, 1,
                            wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.3, right=0.95)
     axE = plt.subplot(gs[0, 0])
@@ -54,15 +54,17 @@ def plotFluctuationsENaturalUnits(dosNoSurfE, dosTotE, zArr, L, wLO, wTO, epsInf
 
     axE.set_xscale("log")
     axE.set_yscale("log")
-    axE.set_xlim(1e-3, 1e1)
-    axE.set_ylim(1e-4, 1e8)
+    axE.set_xlim(3. * 1e-2, 5. * 1e0)
+    axE.set_ylim(7. * 1e-4, 2. * 1e2)
     #axE.set_ylim(1e10, 1e20)
 
-    axE.plot(zArr / lambda0, np.abs(dosTotE[-1]) * zArr[-1]**3 / zArr**3 * natUnitFac, color = 'red', lw = 0.3)
-    axE.plot(zArr / lambda0, np.abs(dosNoSurfE[-50]) * zArr[-50]**2 / zArr**2 * natUnitFac, color = 'red', lw = 0.3)
+    fitInd = 70
+    axE.plot(zArr / lambda0, np.abs(dosTotE[fitInd]) * zArr[fitInd]**3 / zArr**3 * natUnitFac, color = 'red', lw = 0.3)
+    fitInd = 60
+    axE.plot(zArr / lambda0, np.abs(dosNoSurfE[fitInd]) * zArr[fitInd]**2 / zArr**2 * natUnitFac, color = 'red', lw = 0.3)
 
     axE.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
-    axE.set_ylabel(r"$ \langle \widehat{E \,}^{\! 2} \rangle_{\rm eff}  \left[\frac{h \hspace{-1mm} \rule[1.05ex]{0.25em}{0.3pt} \, \omega_{\mathrm{S}}}{\varepsilon_0 \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
+    axE.set_ylabel(r"$ \big | \langle \widehat{E \,}_{\! ||}^{\! 2} \rangle_{\rm eff} \big | \left[\frac{h \hspace{-1mm} \rule[1.05ex]{0.25em}{0.3pt} \, \omega_{\infty}}{\varepsilon_0 \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
 
     #axE.set_xticks([])
     #axE.set_yticks([1e-10, 1e-5, 1.])
@@ -70,6 +72,9 @@ def plotFluctuationsENaturalUnits(dosNoSurfE, dosTotE, zArr, L, wLO, wTO, epsInf
 
     #axE.text(1e-1, 1e1, r"$\sim z^{-3}$", fontsize = 7, color = "red")
     #axE.text(1.5 * 1e-2, .3 * 1e-1, r"$\sim z^{-2}$", fontsize = 7, color = "red")
+
+    axE.text(0.3, .8, r"$\sim z^{-3}$", fontsize = 7, color = "red", transform = axE.transAxes)
+    axE.text(0.08, .3, r"$\sim z^{-2}$", fontsize = 7, color = "red", transform = axE.transAxes)
 
     legend = axE.legend(fontsize=8, loc='upper right', bbox_to_anchor=(1., 1.), edgecolor='black', ncol=1)
     legend.get_frame().set_alpha(0.)
@@ -86,13 +91,13 @@ def plotFluctuationsENaturalUnits(dosNoSurfE, dosTotE, zArr, L, wLO, wTO, epsInf
 
 def plotFluctuationsANaturalUnits(dosNoSurfA, dosTotA, zArr, L, wLO, wTO, epsInf):
 
-    fig = plt.figure(figsize=(6.5 / 3., 1.8), dpi=800)
+    fig = plt.figure(figsize=(6.5 / 3., 1.8), dpi=300)
     gs = gridspec.GridSpec(1, 1,
-                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.38, right=0.95)
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.3, right=0.95)
     axA = plt.subplot(gs[0, 0])
 
     wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
-    lambda0 = consts.c / (2. * np.pi * wInf)
+    lambda0 = 2. * np.pi * consts.c / (wInf)
     natUnitFac = consts.epsilon_0 * lambda0**3 * wInf / (consts.hbar)
 
     cmapPink = cm.get_cmap('pink')
@@ -102,13 +107,14 @@ def plotFluctuationsANaturalUnits(dosNoSurfA, dosTotA, zArr, L, wLO, wTO, epsInf
 
     axA.set_xscale("log")
     #axA.set_yscale("log")
-    axA.set_xlim(1e-2, 1e2)
-    axA.set_ylim(-0.15 * 1e-3, .15 * 1e-3)
+    axA.set_xlim(1e-2, 1e1)
+    axA.set_ylim(-0.15 * 1e1, .15 * 1e1)
 
-    axA.plot(zArr / lambda0, np.abs(dosTotA[110]) * zArr[110]**3 / zArr**3 * natUnitFac, color = 'red', lw = 0.3)
+    fitInd = 40
+    axA.plot(zArr / lambda0, np.abs(dosTotA[fitInd]) * zArr[fitInd]**3 / zArr**3 * natUnitFac, color = 'red', lw = 0.3)
 
     ydat = np.abs(dosNoSurfA)
-    fitInd = 160
+    fitInd = 70
     logZArr = np.log(zArr)
     slope = (ydat[fitInd] - ydat[fitInd - 1]) / (logZArr[fitInd] - logZArr[fitInd - 1])
     offset = ydat[fitInd] - slope * logZArr[fitInd]
@@ -116,21 +122,21 @@ def plotFluctuationsANaturalUnits(dosNoSurfA, dosTotA, zArr, L, wLO, wTO, epsInf
     axA.plot(zArr / lambda0, -(slope * logZArr + offset) * natUnitFac, color = 'red', lw = 0.3)
 
     axA.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
-    axA.set_ylabel(r"$ \langle \widehat{A \,}^{\! 2} \rangle_{\rm eff}  \left[\frac{h \hspace{-1mm} \rule[1.05ex]{0.25em}{0.3pt}}{\varepsilon_0 \omega_{\mathrm{S}} \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
+    axA.set_ylabel(r"$ \langle \widehat{A \,}_{\! ||}^{\! 2} \rangle_{\rm eff}  \left[\frac{h \hspace{-1mm} \rule[1.05ex]{0.25em}{0.3pt}}{\varepsilon_0 \omega_{\infty} \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
 
     #axE.set_xticks([])
     #axE.set_yticks([1e-10, 1e-5, 1.])
     #axE.set_yticklabels(["$10^{-10}$", "$10^{-5}$", "$1$"], fontsize = 8)
 
-    axA.text(.5 * 1e0, 1.2 * 1e-4, r"$\sim z^{-3}$", fontsize = 7, color = "red")
-    axA.text(1e-1, 1.2 * -1e-4, r"$\sim \mathrm{log}(z) + \mathrm{const}$", fontsize = 7, color = "red")
+    axA.text(.5 * 1e0, 0.6 * 1e-0, r"$\sim z^{-3}$", fontsize = 7, color = "red")
+    axA.text(2. * 1e-2, 1.2 * -1e-0, r"$\sim \mathrm{log}(z) + \mathrm{const}$", fontsize = 7, color = "red")
 
-    legend = axA.legend(fontsize=8, loc='upper left', bbox_to_anchor=(0., .8), edgecolor='black', ncol=1)
+    legend = axA.legend(fontsize=8, loc='upper left', bbox_to_anchor=(-0.1, 1.), edgecolor='black', ncol=1)
     legend.get_frame().set_alpha(0.)
     legend.get_frame().set_boxstyle('Square', pad=0.1)
     legend.get_frame().set_linewidth(0.0)
 
-    axA.text(-0.65, 0.98, r"$\mathrm{(c)}$", fontsize = 8, transform = axA.transAxes)
+    axA.text(-0.38, 0.98, r"$\mathrm{(c)}$", fontsize = 8, transform = axA.transAxes)
 
     for axis in ['top', 'bottom', 'left', 'right']:
         axA.spines[axis].set_linewidth(.5)
@@ -159,7 +165,7 @@ def plotFluctuationsEExpUnits(dosNoSurfE, dosTotE, zArr, L, wLO, wTO, epsInf):
     axE.set_ylim(0., 50)
 
     axE.set_xlabel(r"$z \, [\mathrm{m}]$", fontsize = 8)
-    axE.set_ylabel(r"$ \sqrt{\langle \widehat{E \,}^{\! 2} \rangle_{\rm eff}}  \left[\frac{\mathrm{MV}}{\mathrm{m}}\right] $", fontsize = 8, labelpad = 4)
+    axE.set_ylabel(r"$ \sqrt{\langle \widehat{E \,}_{\! ||}^{\! 2} \rangle_{\rm eff}}  \left[\frac{\mathrm{MV}}{\mathrm{m}}\right] $", fontsize = 8, labelpad = 4)
 
     axE.set_xticks([1e-9, 1e-8, 1e-7, 1e-6])
     axE.set_xticklabels(["$10^{-9}$", "$10^{-8}$", "$10^{-7}$", "$10^{-6}$"], fontsize = 8)
@@ -196,7 +202,7 @@ def plotFluctuationsECutoffConv(dosNoSurfEArr, dosTotEArr, cutoffArr, zArr, L, w
         color2 = cmapPink((cutoffInd + 1.) / (len(cutoffArr) + 2.))
         axE.plot(zArr / lambda0, np.abs(dosTotEArr[cutoffInd, :]) * natUnitFac, color=color1, linestyle='', marker='x', markersize=2.)
         axE.plot(zArr / lambda0, np.abs(dosNoSurfEArr[cutoffInd, :]) * natUnitFac, color=color2, linestyle='', marker='x', markersize=2.
-                 , label = r"$\Lambda = $" + "{:.3f}".format(cutoff / evCutoff) + "$\mathrm{eV}$")
+                 , label = r"$\Lambda = $" + "{:.2f}".format(cutoff / evCutoff) + "$\mathrm{eV}$")
 
     axE.set_xscale("log")
     axE.set_yscale("log")
@@ -205,7 +211,7 @@ def plotFluctuationsECutoffConv(dosNoSurfEArr, dosTotEArr, cutoffArr, zArr, L, w
     #axE.set_ylim(1e10, 1e20)
 
     axE.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
-    axE.set_ylabel(r"$ \langle \widehat{E \,}^{\! 2} \rangle_{\rm eff}  \left[\frac{h \hspace{-1mm} \rule[1.05ex]{0.25em}{0.3pt} \, \omega_{\mathrm{S}}}{\varepsilon_0 \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
+    axE.set_ylabel(r"$ \big| \langle \widehat{E \,}_{\! ||}^{\! 2} \rangle_{\rm eff} \big | \left[\frac{h \hspace{-1mm} \rule[1.05ex]{0.25em}{0.3pt} \, \omega_{\infty}}{\varepsilon_0 \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
 
     #axE.set_xticks([])
     #axE.set_yticks([1e-10, 1e-5, 1.])
@@ -219,7 +225,7 @@ def plotFluctuationsECutoffConv(dosNoSurfEArr, dosTotEArr, cutoffArr, zArr, L, w
     legend.get_frame().set_boxstyle('Square', pad=0.1)
     legend.get_frame().set_linewidth(0.0)
 
-    axE.text(-0.45, 0.98, r"$\mathrm{(b)}$", fontsize = 8, transform = axE.transAxes)
+    axE.text(-0.3, 0.98, r"$\mathrm{(a)}$", fontsize = 8, transform = axE.transAxes)
 
     for axis in ['top', 'bottom', 'left', 'right']:
         axE.spines[axis].set_linewidth(.5)
@@ -229,15 +235,15 @@ def plotFluctuationsECutoffConv(dosNoSurfEArr, dosTotEArr, cutoffArr, zArr, L, w
 
 def plotFluctuationsACutoffConv(dosNoSurfAArr, dosTotAArr, cutoffArr, zArr, L, wLO, wTO, epsInf):
 
-    fig = plt.figure(figsize=(3., 1.8), dpi=800)
+    fig = plt.figure(figsize=(3., 1.8), dpi=300)
     gs = gridspec.GridSpec(1, 1,
-                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.24, right=0.95)
+                           wspace=0.35, hspace=0., top=0.95, bottom=0.22, left=0.2, right=0.95)
     axA = plt.subplot(gs[0, 0])
 
     evCutoff = 1519.3 * 1e12
 
     wInf = np.sqrt(epsInf * wLO**2 + wTO**2) / np.sqrt(epsInf + 1)
-    lambda0 = consts.c / (2. * np.pi * wInf)
+    lambda0 = 2. * np.pi * consts.c / (wInf)
     natUnitFac = consts.epsilon_0 * lambda0**3 * wInf / (consts.hbar)
 
     cmapPink = cm.get_cmap('pink')
@@ -252,11 +258,11 @@ def plotFluctuationsACutoffConv(dosNoSurfAArr, dosTotAArr, cutoffArr, zArr, L, w
 
     axA.set_xscale("log")
     #axA.set_yscale("log")
-    axA.set_xlim(1e-2, 1e2)
-    axA.set_ylim(-0.15 * 1e-3, 0.15 * 1e-3)
+    axA.set_xlim(1e-3, 1e1)
+    axA.set_ylim(-0.4 * 1e1, 0.4 * 1e1)
 
     axA.set_xlabel(r"$z[\lambda_0]$", fontsize = 8)
-    axA.set_ylabel(r"$ \langle \widehat{A \,}^{\! 2} \rangle_{\rm eff}  \left[\frac{h \hspace{-1mm} \rule[1.05ex]{0.25em}{0.3pt}}{\varepsilon_0 \omega_{\mathrm{S}} \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
+    axA.set_ylabel(r"$ \langle \widehat{A \,}_{\! ||}^{\! 2} \rangle_{\rm eff} \left[\frac{h \hspace{-1mm} \rule[1.05ex]{0.25em}{0.3pt}}{\varepsilon_0 \omega_{\infty} \lambda_0^3}\right] $", fontsize = 8, labelpad = 1)
 
     #axE.set_xticks([])
     #axE.set_yticks([1e-10, 1e-5, 1.])
@@ -270,7 +276,7 @@ def plotFluctuationsACutoffConv(dosNoSurfAArr, dosTotAArr, cutoffArr, zArr, L, w
     #legend.get_frame().set_boxstyle('Square', pad=0.1)
     #legend.get_frame().set_linewidth(0.0)
 
-    axA.text(-0.45, 0.98, r"$\mathrm{(b)}$", fontsize = 8, transform = axA.transAxes)
+    axA.text(-0.24, 0.98, r"$\mathrm{(b)}$", fontsize = 8, transform = axA.transAxes)
 
     for axis in ['top', 'bottom', 'left', 'right']:
         axA.spines[axis].set_linewidth(.5)

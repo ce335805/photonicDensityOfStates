@@ -69,7 +69,7 @@ def plotEpsilonOmega():
     ax.set_xlim(0., 4.)
 
     ax.set_ylabel(r"$\varepsilon(\omega)$", fontsize = 8)
-    ax.set_xlabel(r"$\omega \, [\mathrm{arb.\,units}]$", fontsize = 8)
+    ax.set_xlabel(r"$\omega$", fontsize = 8)
 
     ax.set_xticks([0., wTO, wLO])
     ax.set_xticklabels(["$0$", r"$\omega_{\rm TO}$", r"$\omega_{\rm LO}$"], fontsize = 8)
@@ -137,8 +137,8 @@ def plotDispersion():
 
     ax.fill_between(consts.c * qArr, y1 = wTO, y2 = wLO, color='oldlace', alpha=1.)
 
-    ax.set_ylabel(r"$\omega(|k|)\,[\mathrm{arb.\,units}]$", fontsize = 8)
-    ax.set_xlabel(r"$|k|\,[\mathrm{arb.\,units}]$", fontsize = 8)
+    ax.set_ylabel(r"$\omega(|k|)$", fontsize = 8)
+    ax.set_xlabel(r"$|k|$", fontsize = 8)
 
     #ax.set_ylim(ymin, ymax)
     ax.set_xlim(consts.c * np.amin(qArr), consts.c * np.amax(qArr))

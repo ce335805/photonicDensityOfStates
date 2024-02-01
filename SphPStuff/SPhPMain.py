@@ -30,18 +30,23 @@ def main():
 
 
     wArrSubdivisions = 100
+    ### for scaling plots
+    #wArrSubdivisions = 200
 
     epsInf = 1.
     #numbers for sto
     wLO = 32.04 * 1e12
     wTO = 7.92 * 1e12
     #wLO = 20. * 1e12
-    wTO = 1e6
-    L = 2.
+    #wTO = 1e6
+    L = 1.
     wInf = np.sqrt(epsInf * wLO ** 2 + wTO ** 2) / np.sqrt(epsInf + 1)
     lambda0 = 2. * np.pi * consts.c / wInf
+    #zArr = np.logspace(np.log10(1e1 * lambda0), np.log10(1e-3 * lambda0), 100, endpoint=True, base = 10)
+    ### For fluctuations in experimental units
     zArr = np.logspace(np.log10(1e2 * lambda0), np.log10(1e-5 * lambda0), 200, endpoint=True, base = 10)
-    #zArr = np.logspace(np.log10(1e2 * lambda0), np.log10(1e-3 * lambda0), 300, endpoint=True, base = 10)
+    ### For scaling of fluctuations
+    #zArr = np.logspace(np.log10(1e1 * lambda0), np.log10(1e-3 * lambda0), 100, endpoint=True, base = 10)
     zArr = np.append([L / 4.], zArr)
 
     #parameters for real-space plot

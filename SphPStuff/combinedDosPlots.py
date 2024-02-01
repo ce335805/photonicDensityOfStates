@@ -69,10 +69,10 @@ def plotDosWhole(wArrSubdivisions, zArr, wLO, wTO, epsInf, L):
         dosSurf[wInd, :] = 1. / (1. + np.abs(epsilon)) * dosAsOfFreq.getDosTMSurf(wVal, zArr, L, wLO, wTO, epsInf)
 
     filename = "Para"
-    createDosPlotFreq(wArrOne, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
+    #createDosPlotFreq(wArrOne, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
     #createDosPlotNatUnits(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
     #createDosPlotFreqThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
-    #createDosPlotFreqThesiswTO(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
+    createDosPlotFreqThesiswTO(wArrOne, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf)
     #createDosRealSpaceThesis(wArr, zArr, dosTMPara + dosTETotal + dosSurf, filename, wLO, wTO, epsInf, L)
 
 def plotDosWholeOld(zArr, wLO, wTO, epsInf, L):

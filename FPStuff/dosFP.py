@@ -7,7 +7,9 @@ import effectiveMassFP
 import integratedDos
 import handleIntegralData
 import massPlotsThesis
+import massPlotsPaper
 import plotFluctuationsThesis as plotFlucThesis
+
 
 def dosForSeveralOmAsOfZ(zArr, omegaArr, L):
     dosOms = np.zeros((len(zArr), len(omegaArr)))
@@ -30,9 +32,12 @@ def dosFPMain():
     #print("base freq = {}THz".format(freq * 1e-12))
     #print("number of Points minimum: {}".format(upBound / freq))
     #dosFP1 = computeDosFP.dosParallelAsOfFeq(np.array([L1 / 2.]), omArr, L1)
+    #handleIntegralData.writeDosPaper(L1, omArr, dosFP1)
     ##plotDosFP.plotRhoParaAsOfOmDimensionless(omArr, dosFP1, L1)
     #plotDosFP.plotRhoParaAsOfOmThesis(omArr, dosFP1, L1)
-#
+
+    #exit()
+
     #### Compute rho as function of z
 #
     #upBound = 3. * 1e14
@@ -55,7 +60,7 @@ def dosFPMain():
     #plotDosFP.plotSumRules(dArr, sumRules, cutoffArr)
     #exit()
 
-    #compute field plots
+    ####compute field plots
     #evCutoff = 1519.3 * 1e12 #1eV
     #cutoff = 4. * evCutoff
     #dArr = np.logspace(-6, -4, 20, endpoint=True)
@@ -85,8 +90,9 @@ def dosFPMain():
     #handleIntegralData.writeMassData(cutoff, dArr, massArr, filename)
     #plotDosFP.plotEffectiveMassesComparison()
     massPlotsThesis.plotEffectiveMassesComparison()
+    #massPlotsPaper.plotEffectiveMassesComparison()
 
-    #exit()
+    exit()
 
     dArr = np.logspace(-6, -3, 100)
     evCutoff = 1519.3 * 1e12 #1eV
@@ -98,7 +104,7 @@ def dosFPMain():
     #massPlotsThesis.plotEffectiveHoppingComparison()
     #massPlotsThesis.plotHoppingComparisonZoom()
 
-    exit()
+    #exit()
 
     #compute field plots
     evCutoff = 1519.3 * 1e12 #1eV

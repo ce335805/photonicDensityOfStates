@@ -313,11 +313,12 @@ def retrieveDosSurf():
 
     return dosSurf
 
-def writeMasses(cutoff, zArr, mArr, filename):
+def writeMasses(cutoff, zArr, mArr, mArrBulk, filename):
     h5f = h5py.File(filename, 'w')
     h5f.create_dataset('cutoff', data=np.array([cutoff]))
     h5f.create_dataset('zArr', data=zArr)
     h5f.create_dataset('delM', data=mArr)
+    h5f.create_dataset('delMBulk', data=mArrBulk)
     h5f.close()
 
 def readMasses(filename):

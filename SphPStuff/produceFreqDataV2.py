@@ -9,8 +9,14 @@ import numpy as np
 
 def defineFreqArray(wArrSubdivisons):
     wBot = 0.
-    wTop = 1000. * 1e12
+    wTop = 500. * 1e12
     nW = 20001
+    #For exp data plot
+    #wTop = 500. * 1e12
+    #nW = 20001
+    ### For scaling plots
+    #wTop = 500. * 1e12
+    #nW = 20001
     fullArr = np.linspace(wBot, wTop, nW)[1:]
 
     part_sizes = [len(fullArr) // wArrSubdivisons] * wArrSubdivisons
