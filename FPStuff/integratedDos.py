@@ -25,7 +25,7 @@ def dosParallelWithRegA(omega, zVal, L, alpha):
     return (computeDosFP.dosParallelOneFreq(omega, zVal, L) - 2. / 3.) * (omega * 1e-12)**1 * np.exp(- alpha**2 * omega**2)
 
 def dosEffectiveMassReg(omega, zVal, L, alpha):
-    return (computeDosFP.dosParallelOneFreq(omega, zVal, L) - 2. / 3.) * np.exp(- alpha**2 * omega**2)
+    return (computeDosFP.dosParallelOneFreq(omega, zVal, L) - 2. / 3.)# * np.exp(- alpha**2 * omega**2)
 
 def dosPerpWithRegE(omega, zVal, L, alpha):
     return (computeDosFP.dosPerpOneFreq(omega, zVal, L) - 1. / 3.) * (omega * 1e-12)**3 * np.exp(- alpha**2 * omega**2)
@@ -95,15 +95,17 @@ def numericalIntegralSumRule(cutoff, dArr):
     return integratedDos
 
 def numericalIntegralEffectiveMass(cutoff, dArr):
-    wMax = 4. * cutoff
+    wMax = 1. * cutoff
     massArr = np.zeros(len(dArr))
     for dInd, dVal in enumerate(dArr):
         print("d = {}m".format(dVal))
         numResonances = math.floor(wMax * dVal / np.pi / consts.c)
         resonancePoints = (np.arange(numResonances) + 1.) * np.pi * consts.c / dVal
-        res = scipy.integrate.quad(dosEffectiveMassReg, 0, wMax, args=(dVal / 2., dVal, 1. / cutoff), points=resonancePoints, limit = (numResonances * 4 + 50))
+        res = scipy.integrate.quad(dosEffectiveMassReg, 50. * 1e9, wMax, args=(dVal / 2., dVal, 1. / cutoff), points=resonancePoints, limit = (numResonances * 4 + 50))
         massArr[dInd] = res[0]
-    prefacMass = 16. / (3. * np.pi) * consts.hbar / (consts.c**2 * consts.m_e)
+    #prefacMass = 16. / (3. * np.pi) * consts.hbar / (consts.c**2 * consts.m_e)
+    prefacMass = 3. / 2. * 4. / (3. * np.pi) * consts.fine_structure * consts.hbar / (consts.c ** 2 * consts.m_e)
+
 
     return prefacMass * massArr
 

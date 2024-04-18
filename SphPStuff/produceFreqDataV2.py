@@ -9,15 +9,20 @@ import numpy as np
 
 def defineFreqArray(wArrSubdivisons):
     wBot = 0.
+    #for Far-Field / Near-Field Crossover
+    #wTop = 500. * 1e12
+    #nW = 100001
+    #For exp data plot and plotting dos
     wTop = 500. * 1e12
     nW = 20001
-    #For exp data plot
-    #wTop = 500. * 1e12
-    #nW = 20001
     ### For scaling plots
     #wTop = 500. * 1e12
     #nW = 20001
-    fullArr = np.linspace(wBot, wTop, nW)[1:]
+
+    #For SPhP mass change
+    #wTop = 500. * 1e12
+    #nW = 20001
+    fullArr = np.linspace(wBot, wTop, nW)[1:] #lower cutoff is 0.5 GHz
 
     part_sizes = [len(fullArr) // wArrSubdivisons] * wArrSubdivisons
     remaining = len(fullArr) - sum(part_sizes)
@@ -150,10 +155,12 @@ def retrieveDosTE(wArr, L, wLO, wTO, epsInf):
     nW = len(wArr)
     parameterStr = parameterName(wLO, wTO, wBot, wTop, nW, L, epsInf)
 
-    dir = "savedData/clusterFreqData/"
+    #dir = "savedData/clusterFreqData/"
+    dir = "savedData/PaperData/"
     #dir = "savedData/"
 
     filenameTE = dir + 'dosTE' + parameterStr + '.h5'
+    print("Read file: " + filenameTE)
     h5f = h5py.File(filenameTE, 'r')
     dosTETotal = h5f['dosTE'][:] + h5f['dosTEEva'][:] + h5f['dosTERes'][:]
     h5f.close()
@@ -183,7 +190,8 @@ def retrieveDosTMPara(wArr, L, wLO, wTO, epsInf):
     nW = len(wArr)
     parameterStr = parameterName(wLO, wTO, wBot, wTop, nW, L, epsInf)
 
-    dir = "savedData/clusterFreqData/"
+    #dir = "savedData/clusterFreqData/"
+    dir = "savedData/PaperData/"
     #dir = "savedData/"
 
     filenameTM = dir + 'dosTM' + parameterStr + '.h5'

@@ -22,9 +22,9 @@ import fluctuationPlotsThesis as plotFlucThesis
 def freqIntegral(wArrSubdivisions, zArr, wLO, wTO, epsInf, L):
 
     evCutoff = 1519.3 * 1e12 # 1eV
-    #cutoff = .1 * evCutoff
+    cutoff = 1. * evCutoff
     #For scaling plot
-    cutoff = .075 * evCutoff
+    #cutoff = .075 * evCutoff
     computeEffectiveMass(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
     #computeEffectiveHopping(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
     #computeFluctuations(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L)
@@ -64,14 +64,22 @@ def computeEffectiveMass(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L):
     dosIntTE = np.zeros(zArr.shape)
     dosIntTM = np.zeros(zArr.shape)
 
+    print("Lambda Low = {} THz".format(wArr[1] * 1e-9))
+
     for zInd, zVal in enumerate(zArr):
-        prefacMass = 16. / (3. * np.pi) * consts.hbar / (consts.c**2 * consts.m_e)
+        #prefacMass = 16. / (3. * np.pi) * consts.hbar / (consts.c**2 * consts.m_e)
+        #3. / 2. prefactor: 1. / 2. since only x-component, 3. since data divided by rho_0 rather than rho_0x
+        prefacMass = 3. / 2. * 4. / (3. * np.pi) * consts.fine_structure * consts.hbar / (consts.c**2 * consts.m_e)
         cutoffFac = np.exp(- wArr**2 / cutoff**2)
-        intFuncTE = prefacMass * (dosTETotal[ : , zInd] - .5)# * cutoffFac
-        intFuncTE[:9] = 0.
+        #intFuncTE = prefacMass * (dosTETotal[ : , zInd] - .5) #* cutoffFac
+        intFuncTE = prefacMass * (dosTETotal[ : , zInd] - dosTETotal[ : , 0]) #* cutoffFac
+        intFuncTE[:2] = 0.
+        #intFuncTE[:9] = 0.
         dosIntTE[zInd] = np.trapz(intFuncTE, x=wArr, axis = 0)
-        intFuncTM = prefacMass * (dosTMPara[ : , zInd] - 1. / 6.)# * cutoffFac
-        intFuncTM[:9] = 0.
+        #intFuncTM = prefacMass * (dosTMPara[ : , zInd] - 1. / 6.) #* cutoffFac
+        intFuncTM = prefacMass * (dosTMPara[ : , zInd] - dosTMPara[ : , 0]) #* cutoffFac
+        intFuncTE[:2] = 0.
+        #intFuncTE[:9] = 0.
         dosIntTM[zInd] = np.trapz(intFuncTM, x=wArr, axis = 0)
 
     dosSurf = np.zeros(len(zArr))
@@ -83,7 +91,7 @@ def computeEffectiveMass(wArrSubdivisions, zArr, cutoff, wLO, wTO, epsInf, L):
 
     wLOStr = "wLO" + str(int(wLO * 1e-12))
     wTOStr = "wTO" + str(int(wTO * 1e-12))
-    filename = "./savedData/massForPaper" + wLOStr + wTOStr + ".hdf5"
+    filename = "./savedData/massForPaperLowerCutoff50GHzSPhP" + wLOStr + wTOStr + ".hdf5"
     print("Writing masses to file: " + filename)
     prod.writeMasses(cutoff, zArr, dosTot, dosBulk, filename)
 
@@ -249,7 +257,8 @@ def intSumRule(omega, zVal, wLO, wTO, epsInf):
 def intFuncMass(omega, zVal, wLO, wTO, epsInf):
     epsilon = epsFunc.epsilon(omega, wLO, wTO, epsInf)
     prefacPara = 1. / (1. + np.abs(epsilon))
-    prefacMass = 16. / (3. * np.pi) * consts.hbar / (consts.m_e * consts.c**2)
+    #prefacMass = 16. / (3. * np.pi) * consts.hbar / (consts.m_e * consts.c**2)
+    prefacMass = 3. / 2. * 4. / (3. * np.pi) * consts.fine_structure * consts.hbar / (consts.c ** 2 * consts.m_e)
     return prefacPara * prefacMass * dosTMSurf.dosAnalyticalForInt(omega, zVal, wLO, wTO, epsInf)
 
 def intFuncHopping(omega, zVal, wLO, wTO, epsInf):

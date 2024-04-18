@@ -82,14 +82,14 @@ def dosFPMain():
 
     #compute effective mass of free electrons and write it to a file
 
-    dArr = np.logspace(-6, -3, 20)
+    dArr = np.logspace(-6, -3, 50)
     evCutoff = 1519.3 * 1e12 #1eV
-    cutoff = 1. * evCutoff
-    #massArr = integratedDos.numericalIntegralEffectiveMass(cutoff, dArr)
-    #filename = "delMassFP"
-    #handleIntegralData.writeMassData(cutoff, dArr, massArr, filename)
+    cutoff = 10. * evCutoff
+    massArr = integratedDos.numericalIntegralEffectiveMass(cutoff, dArr)
+    filename = "delMassFP50GHzCutoff"
+    handleIntegralData.writeMassData(cutoff, dArr, massArr, filename)
     #plotDosFP.plotEffectiveMassesComparison()
-    massPlotsThesis.plotEffectiveMassesComparison()
+    #massPlotsThesis.plotEffectiveMassesComparison()
     #massPlotsPaper.plotEffectiveMassesComparison()
 
     exit()
