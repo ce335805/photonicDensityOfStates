@@ -22,6 +22,18 @@ def dosFPMain():
 
     print("Computing stuff for the FP")
 
+    ### Full DOS for Purcell slide in defense
+
+    upBound = 3. * 1e14
+    omArr = np.linspace(1e12, upBound, 10000, endpoint=True)
+    L1 = 1e-4
+    freq = np.pi * consts.c / L1
+    print("base freq = {}THz".format(freq * 1e-12))
+    print("number of Points minimum: {}".format(upBound / freq))
+    dosFP1 = computeDosFP.dosTotAsOfFeq(np.array([L1 / 2.]), omArr, L1)
+    handleIntegralData.writeDosDefence(L1, omArr, dosFP1)
+
+    exit()
 
     ### Compute rho as a function of omega
 

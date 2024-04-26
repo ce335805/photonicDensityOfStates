@@ -402,12 +402,23 @@ def NewFig3(zArrSPP, wArr, dosTot, massSPPArr, wLO, wTO):
     indArr = np.array([1, 1, 167, 333], dtype=int)
     #indArr = np.array([1, 30, 60, 80, 180], dtype=int)
 
+    print(np.where(dosTot[0:, indArr[3]] < 1e-10))
+    #dosTot[6407, indArr[3]] = dosTot[6406, indArr[3]]
+    zeroInds = [0, 6407]
+
+
+    wArrPlot = np.delete(wArr, zeroInds)
+    dosPlotArr1 = np.delete(dosTot[:, indArr[1]], zeroInds)
+    dosPlotArr2 = np.delete(dosTot[:, indArr[2]], zeroInds)
+    dosPlotArr3 = np.delete(dosTot[:, indArr[3]], zeroInds)
+
+
     # axSPhP.plot(wArr, dos[:, indArr[0]], color=cmapBone(0.1), lw=.7, label="$z = $" + "{:1.0f}".format(zArrSPP[indArr[0]] / lambda0) + r"$\lambda_0$")
-    axDos.plot(wArr[0:], dosTot[0:, indArr[1]], color=cmapPink(0.1), lw=1.2,
+    axDos.plot(wArrPlot, dosPlotArr1, color=cmapPink(0.1), lw=1.2,
             label="$z = $" + "{:1.0f}".format(zArrSPP[indArr[1]] / lambda0) + r"$\lambda_0$")
-    axDos.plot(wArr[0:], dosTot[0:, indArr[2]], color=cmapPink(0.4), lw=1.2,
+    axDos.plot(wArrPlot, dosPlotArr2, color=cmapPink(0.4), lw=1.2,
             label="$z = $" + "{:1.0f}".format(zArrSPP[indArr[2]] / lambda0) + r"$\lambda_0$")
-    axDos.plot(wArr[0:], dosTot[0:, indArr[3]], color=cmapPink(0.6), lw=1.2,
+    axDos.plot(wArrPlot, dosPlotArr3, color=cmapPink(0.6), lw=1.2,
             label="$z = $" + "{:1.1f}".format(zArrSPP[indArr[3]] / lambda0) + r"$\lambda_0$")
     #
     axDos.axhline(2. / 3., lw = 0.5, color = 'gray', zorder = -666)
@@ -611,8 +622,8 @@ def main():
 
     #NewFig1()
     #createFig2Plot()
-    #createFig3Plot()
-    FabryPerotPlot()
+    createFig3Plot()
+    #FabryPerotPlot()
 
 
 main()

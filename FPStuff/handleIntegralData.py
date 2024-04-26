@@ -90,3 +90,15 @@ def writeDosPaper(d, wArr, dos):
     h5f.create_dataset('wArr', data=wArr)
     h5f.create_dataset('dos', data=dos)
     h5f.close()
+
+
+def writeDosDefence(d, wArr, dos):
+
+    dir = "../SphPStuff/savedData/DefenceData/"
+    fileName = "DosFP"
+    fileName = dir + fileName + ".h5"
+    h5f = h5py.File(fileName, 'w')
+    h5f.create_dataset('d', data=np.array([d]))
+    h5f.create_dataset('wArr', data=wArr)
+    h5f.create_dataset('dos', data=dos)
+    h5f.close()

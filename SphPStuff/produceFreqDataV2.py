@@ -10,11 +10,11 @@ import numpy as np
 def defineFreqArray(wArrSubdivisons):
     wBot = 0.
     #for Far-Field / Near-Field Crossover
-    #wTop = 500. * 1e12
-    #nW = 100001
-    #For exp data plot and plotting dos
     wTop = 500. * 1e12
-    nW = 20001
+    nW = 100001
+    #For exp data plot and plotting dos
+    #wTop = 500. * 1e12
+    #nW = 20001
     ### For scaling plots
     #wTop = 500. * 1e12
     #nW = 20001
